@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+**/client/dist
+**/client/.vite
+**/commitlint.config.cjs
+**/.eslintrc.cjs
+**/eslint.config.mjs

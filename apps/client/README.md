@@ -12,7 +12,6 @@ nx show project @org/client   # Inspect project configuration
 nx run @org/client:dev        # Start dev server (next dev)
 nx run @org/client:build      # Build for production
 nx run @org/client:start      # Start production server
-nx run @org/client:test       # Run tests (jest)
 nx run @org/client:lint       # Run linting (eslint)
 ```
 
@@ -22,5 +21,5 @@ nx run @org/client:lint       # Run linting (eslint)
 
 - Run all commands from the **repository root**
 - **Nx is the single source of truth** for task execution
-- Do not run `next`, `jest`, or `eslint` directly
+- Do not run `next`, or `eslint` directly
 - This client **must not depend on backend-only shared libraries**

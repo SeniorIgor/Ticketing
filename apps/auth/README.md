@@ -9,9 +9,8 @@ Authentication microservice built with **Node.js + TypeScript**, managed by **Nx
 ```bash
 nx show project @org/auth     # Inspect project configuration
 
-nx run @org/auth:serve        # Run service locally
+nx run @org/auth:start        # Run service locally
 nx run @org/auth:build        # Build service (esbuild)
-nx run @org/auth:test         # Run tests (jest)
 nx run @org/auth:lint         # Run linting
 nx run @org/auth:typecheck    # Run TypeScript type-checking
 ```
