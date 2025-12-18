@@ -10,5 +10,10 @@
     "emitDeclarationOnly": false
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "**/*.spec.ts"]
+  "exclude": ["dist", "**/*.spec.ts"],
+  "references": [
+    {
+      "path": "../../packages/core/tsconfig.lib.json"
+    }
+  ]
 }

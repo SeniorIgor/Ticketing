@@ -1,8 +1,8 @@
-# Add files here to ignore them from prettier formatting
-**/dist
-**/coverage
-**/.nx
-.husky/**
-**/node_modules
-**/package.json
-**/next-env.d.ts
+# Prettier ignore
+dist
+coverage
+.nx
+.husky
+node_modules
+package.json
+next-env.d.ts

@@ -13,6 +13,13 @@
         "tsConfig": "packages/core/tsconfig.lib.json",
         "format": ["esm"],
         "declarationRootDir": "packages/core/src"
+      },
+      "configurations": {
+        "watch": {
+          "watch": true,
+          "sourcemap": true,
+          "cache": false
+        }
       }
     },
     "lint": {

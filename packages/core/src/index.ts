@@ -1,1 +1,1 @@
-export * from './lib/core.js';
+export const variable = 5;

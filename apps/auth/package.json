@@ -4,6 +4,13 @@
   "type": "commonjs",
   "private": true,
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19"
+  },
+  "scripts": {
+    "docker:build": "docker build -t seniorigortyapkin/auth -f apps/auth/Dockerfile ."
   }
 }
