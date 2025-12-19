@@ -1,8 +1,8 @@
-**/node_modules
-**/dist
-**/.nx
-**/.vite
-**/commitlint.config.cjs
-**/.eslintrc.cjs
-**/eslint.config.mjs
-**/next-env.d.ts
+node_modules
+dist
+.nx
+.vite
+commitlint.config.cjs
+.eslintrc.cjs
+eslint.config.mjs
+next-env.d.ts

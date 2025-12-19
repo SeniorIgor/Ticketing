@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 
-import { variable } from '@org/core';
+import { errorHandler } from '@org/core';
+
+import { usersRouter } from './routes';
 
 const port = process.env.AUTH_PORT ? Number(process.env.AUTH_PORT) : 4001;
 
@@ -9,9 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get('/api/v1/users/current-user', (req, res) => {
-  res.send({ message: `Hello API ${variable}` });
-});
+app.use('/api/v1/users', usersRouter);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`[ ready ] Auth listening on ${port}`);
