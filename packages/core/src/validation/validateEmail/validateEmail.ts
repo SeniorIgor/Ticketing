@@ -1,6 +1,5 @@
-import type { EmailValidationResult } from '../../types';
-
 import { EMAIL_ERROR_MESSAGES } from './validateEmail.constants';
+import type { EmailValidationResult } from './validateEmail.types';
 
 export function validateEmail(email: unknown): EmailValidationResult {
   if (email === null || email === undefined) {
@@ -58,3 +57,5 @@ export function validateEmail(email: unknown): EmailValidationResult {
 
   return { valid: true };
 }
+
+export type { EmailValidationError, EmailValidationResult } from './validateEmail.types';

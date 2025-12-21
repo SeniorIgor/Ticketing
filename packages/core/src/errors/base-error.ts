@@ -1,5 +1,4 @@
-import type { ApiError } from './types/api-error';
-import type { ErrorCode } from './types/error-codes';
+import type { ApiError, ErrorCode, ErrorDetail } from './types';
 
 export class BaseError extends Error {
   readonly statusCode: number;
@@ -10,10 +9,13 @@ export class BaseError extends Error {
     code: ErrorCode,
     message: string,
     reason: string | null = null,
-    details: ApiError['details'] = [],
+    details: Array<ErrorDetail> = [],
   ) {
     super(message);
 
+    Object.setPrototypeOf(this, new.target.prototype);
+
+    this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.apiError = {
       code,

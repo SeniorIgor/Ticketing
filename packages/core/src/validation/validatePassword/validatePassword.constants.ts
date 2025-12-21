@@ -1,4 +1,4 @@
-import type { PasswordValidationError } from '../../types';
+import type { PasswordValidationError } from './validatePassword.types';
 
 export const PASSWORD_ERROR_MESSAGES: Record<PasswordValidationError, string> = {
   empty: 'Password is required.',

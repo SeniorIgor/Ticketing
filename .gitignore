@@ -48,3 +48,4 @@
 **/.next
 **/out
 **/test-output
+**/next-env.d.ts

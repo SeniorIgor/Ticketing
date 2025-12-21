@@ -1,9 +1,6 @@
-import type { SignupReqBody } from '@org/core';
+import { type SignupReqBody, toFieldError, validateEmail, validatePassword } from '@org/core';
 
 import type { SignupValidationErrors } from '../../types';
-import { toFieldError } from '../toFieldError';
-import { validateEmail } from '../validateEmail/validateEmail';
-import { validatePassword } from '../validatePassword/validatePassword';
 
 export function validateSignup(body: SignupReqBody): SignupValidationErrors {
   const errors: SignupValidationErrors = {};

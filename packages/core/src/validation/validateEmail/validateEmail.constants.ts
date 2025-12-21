@@ -1,4 +1,4 @@
-import type { EmailValidationError } from '../../types';
+import type { EmailValidationError } from './validateEmail.types';
 
 export const EMAIL_ERROR_MESSAGES: Record<EmailValidationError, string> = {
   empty: 'Email address is required.',

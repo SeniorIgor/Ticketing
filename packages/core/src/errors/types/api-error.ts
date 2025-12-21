@@ -5,5 +5,5 @@ export interface ApiError {
   code: ErrorCode;
   reason: string | null;
   message: string;
-  details?: ErrorDetail[];
+  details?: Array<ErrorDetail>;
 }

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { type SignupReqBody, ValidationError } from '@org/core';
+import { InternalError, type SignupReqBody, ValidationError } from '@org/core';
 
 import { validateSignup } from '../utils';
 
@@ -20,9 +20,19 @@ router.post('/signup', (req: Request<unknown, unknown, SignupReqBody>, res: Resp
     );
   }
 
-  // registration logic
+  throw new InternalError('DATABASE_UNAVAILABLE', 'Database is temporarily unavailable');
 
-  return res.status(201).json({ success: true });
+  // return res.status(201).json({ success: true });
 });
 
 export { router as signupRouter };
+
+// throw new InternalError(
+//   'DATABASE_UNAVAILABLE',
+//   'Database is temporarily unavailable',
+// );
+
+// throw new BusinessRuleError(
+//   'USER_ALREADY_EXISTS',
+//   'User with this email already exists',
+// );

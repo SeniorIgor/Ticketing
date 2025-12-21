@@ -9,7 +9,11 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   }
 
   // Unknown error (fail-safe)
-  console.error(err);
+  if (err instanceof Error) {
+    console.error(err.stack ?? err.message);
+  } else {
+    console.error('Non-error thrown:', err);
+  }
 
   return res.status(500).json({
     code: 'INTERNAL',

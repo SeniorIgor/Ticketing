@@ -1,4 +1,4 @@
-import type { ValidationResult } from '@org/core';
+import type { ValidationResult } from '../validation.types';
 
 export type EmailValidationError =
   | 'empty'

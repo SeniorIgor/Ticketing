@@ -1,6 +1,5 @@
-import type { PasswordValidationResult } from '../../types';
-
 import { PASSWORD_ERROR_MESSAGES } from './validatePassword.constants';
+import type { PasswordValidationResult } from './validatePassword.types';
 
 export function validatePassword(password: unknown): PasswordValidationResult {
   if (password === null || password === undefined) {
@@ -71,3 +70,5 @@ export function validatePassword(password: unknown): PasswordValidationResult {
 
   return { valid: true };
 }
+
+export type { PasswordValidationError, PasswordValidationResult } from './validatePassword.types';

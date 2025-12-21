@@ -1,4 +1,4 @@
-import type { FieldError, ValidationResult } from '@org/core';
+import type { FieldError, ValidationResult } from './validation.types';
 
 export function toFieldError<E extends string>(result: ValidationResult<E>): FieldError<E> {
   return {
