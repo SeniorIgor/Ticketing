@@ -1,6 +1,6 @@
 import type { ApiError, ErrorCode, ErrorDetail } from './types';
 
-export class BaseError extends Error {
+export abstract class BaseError extends Error {
   readonly statusCode: number;
   readonly apiError: ApiError;
 

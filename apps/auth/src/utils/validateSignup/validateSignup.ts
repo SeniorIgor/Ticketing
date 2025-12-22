@@ -1,18 +1,17 @@
+import type { ErrorDetail } from '@org/core';
 import { type SignupReqBody, toFieldError, validateEmail, validatePassword } from '@org/core';
 
-import type { SignupValidationErrors } from '../../types';
-
-export function validateSignup(body: SignupReqBody): SignupValidationErrors {
-  const errors: SignupValidationErrors = {};
+export function validateSignup(body: SignupReqBody): Array<ErrorDetail> {
+  const errors: Array<ErrorDetail> = [];
 
   const email = validateEmail(body.email);
   if (!email.valid) {
-    errors.email = toFieldError(email);
+    errors.push(toFieldError(email, 'email'));
   }
 
   const password = validatePassword(body.password);
   if (!password.valid) {
-    errors.password = toFieldError(password);
+    errors.push(toFieldError(password, 'password'));
   }
 
   return errors;

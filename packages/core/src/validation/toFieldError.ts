@@ -1,10 +1,10 @@
-import type { FieldError, ValidationResult } from './validation.types';
+import type { ErrorDetail } from '../errors';
 
-export function toFieldError<E extends string>(result: ValidationResult<E>): FieldError<E> {
+import type { ValidationFailure } from './validation.types';
+
+export function toFieldError<E extends string>(result: ValidationFailure<E>, fieldName: string): ErrorDetail {
   return {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    code: result.error!,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    message: result.message!,
+    fieldName,
+    message: result.message,
   };
 }

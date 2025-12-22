@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 
-import { errorHandler } from '@org/core';
+import { asyncHandler, errorHandler, NotFoundError } from '@org/core';
 
 import { usersRouter } from './routes';
 
@@ -12,6 +12,12 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/v1/users', usersRouter);
+
+app.use(
+  asyncHandler(async () => {
+    throw new NotFoundError();
+  }),
+);
 
 app.use(errorHandler);
 

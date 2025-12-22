@@ -47,6 +47,11 @@
       }
     }
   ],
+  "pluginsConfig": {
+    "@nx/enforce-module-boundaries": {
+      "enforceBuildableLibDependency": true
+    }
+  },
   "targetDefaults": {
     "test": {
       "dependsOn": ["^build"]

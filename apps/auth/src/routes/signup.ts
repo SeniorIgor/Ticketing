@@ -10,14 +10,8 @@ const router = express.Router();
 router.post('/signup', (req: Request<unknown, unknown, SignupReqBody>, res: Response) => {
   const errors = validateSignup(req.body);
 
-  if (Object.keys(errors).length > 0) {
-    throw new ValidationError(
-      'SIGNUP_INVALID_INPUT',
-      Object.entries(errors).map(([field, err]) => ({
-        fieldName: field,
-        message: err.message,
-      })),
-    );
+  if (errors.length > 0) {
+    throw new ValidationError('SIGNUP_INVALID_INPUT', errors);
   }
 
   throw new InternalError('DATABASE_UNAVAILABLE', 'Database is temporarily unavailable');
