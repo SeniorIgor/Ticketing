@@ -156,3 +156,21 @@ Skaffold will:
 ---
 
 Happy hacking! 🚀
+
+////////////////////////////////////////////////
+
+🚀 How you use it
+Development
+skaffold dev
+
+uses Dockerfile.dev
+
+file sync enabled
+
+hot reload
+
+no rebuilds
+
+CI / Prod build
+skaffold build -p prod
+skaffold render -p prod

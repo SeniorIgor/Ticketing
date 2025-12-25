@@ -1,0 +1,18 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install deps once
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json ./
+
+RUN npm ci
+
+COPY apps/auth ./apps/auth
+COPY packages/core ./packages/core
+
+ENV NODE_ENV=development
+
+EXPOSE 3000
+
+CMD ["npx", "nx", "run", "auth:dev"]

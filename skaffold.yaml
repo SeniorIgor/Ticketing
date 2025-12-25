@@ -1,9 +1,13 @@
 apiVersion: skaffold/v4beta3
 kind: Config
 
+# =========================
+# DEFAULT = DEV
+# =========================
 manifests:
   rawYaml:
-    - infra/k8s/*
+    - infra/k8s/env/app-config.dev.yaml
+    - infra/k8s/base/*.yaml
 
 build:
   local:
@@ -13,9 +17,43 @@ build:
     - image: seniorigortyapkin/client
       context: .
       docker:
-        dockerfile: apps/client/Dockerfile
+        dockerfile: apps/client/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/client/**/*
+            dest: .
 
     - image: seniorigortyapkin/auth
       context: .
       docker:
-        dockerfile: apps/auth/Dockerfile
+        dockerfile: apps/auth/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/auth/**/*
+            dest: .
+          - src: packages/core/**/*
+            dest: .
+
+# =========================
+# PROD PROFILE
+# =========================
+profiles:
+  - name: prod
+    manifests:
+      rawYaml:
+        - infra/k8s/env/app-config.prod.yaml
+        - infra/k8s/base/*.yaml
+
+    build:
+      local:
+        push: false
+      artifacts:
+        - image: seniorigortyapkin/client
+          context: .
+          docker:
+            dockerfile: apps/client/Dockerfile
+
+        - image: seniorigortyapkin/auth
+          context: .
+          docker:
+            dockerfile: apps/auth/Dockerfile

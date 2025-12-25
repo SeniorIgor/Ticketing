@@ -3,5 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
+  NODE_ENV: development
   AUTH_PORT: '80'
   AUTH_URL: 'http://auth-srv'
+  MONGO_URI: 'mongodb://auth-mongo-srv:27017/auth'

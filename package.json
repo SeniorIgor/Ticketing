@@ -27,6 +27,7 @@
     "@nx/js": "22.2.5",
     "@nx/next": "22.2.5",
     "@nx/node": "^22.2.5",
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/node": "20.19.9",
     "@types/react": "^19.0.0",
@@ -55,6 +56,7 @@
     "apps/*"
   ],
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "mongoose": "^9.0.2",

@@ -1,0 +1,20 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install deps once (cached)
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json ./
+COPY eslint.config.mjs ./
+
+RUN npm ci
+
+COPY apps/client ./apps/client
+
+# Code will be synced by Skaffold (NOT copied here)
+EXPOSE 3000
+
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+
+CMD ["npx", "nx", "run", "client:dev"]

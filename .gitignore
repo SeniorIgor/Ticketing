@@ -49,3 +49,6 @@
 **/out
 **/test-output
 **/next-env.d.ts
+
+# ENV
+**/.env.local

@@ -1,23 +1,36 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { InternalError, type SignupReqBody, ValidationError } from '@org/core';
+import { asyncHandler, BusinessRuleError, type SignupReqBody, ValidationError } from '@org/core';
 
+import { User } from '../models';
 import { validateSignup } from '../utils';
 
 const router = express.Router();
 
-router.post('/signup', (req: Request<unknown, unknown, SignupReqBody>, res: Response) => {
-  const errors = validateSignup(req.body);
+router.post(
+  '/signup',
+  asyncHandler(async (req: Request<unknown, unknown, SignupReqBody>, res: Response) => {
+    const errors = validateSignup(req.body);
 
-  if (errors.length > 0) {
-    throw new ValidationError('SIGNUP_INVALID_INPUT', errors);
-  }
+    if (errors.length > 0) {
+      throw new ValidationError('SIGNUP_INVALID_INPUT', errors);
+    }
 
-  throw new InternalError('DATABASE_UNAVAILABLE', 'Database is temporarily unavailable');
+    const { email, password } = req.body;
 
-  // return res.status(201).json({ success: true });
-});
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      throw new BusinessRuleError('USER_ALREADY_EXISTS', 'User with this email already exists');
+    }
+
+    const user = User.build({ email, password });
+    await user.save();
+
+    res.status(201).send(user);
+  }),
+);
 
 export { router as signupRouter };
 

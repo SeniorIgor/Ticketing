@@ -64,7 +64,7 @@ export default [
 
       /* ---------------- Unused ------------------ */
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 
       /* ---------------- Style ------------------- */
       'max-len': ['warn', { code: 120, ignoreUrls: true }],
