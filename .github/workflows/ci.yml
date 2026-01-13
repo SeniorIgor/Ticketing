@@ -24,5 +24,5 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx affected -t typecheck
-      - run: npx nx affected -t lint
+      - run: npx nx affected -t typecheck --base=origin/master
+      - run: npx nx affected -t lint --base=origin/master
