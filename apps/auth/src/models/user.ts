@@ -8,8 +8,11 @@ interface UserAttrs {
 }
 
 interface UserDoc extends mongoose.Document {
+  id: string;
   email: string;
   password: string;
+  updatedAt: string;
+  createdAt: string;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -33,8 +36,12 @@ userSchema.statics.build = (attrs: UserAttrs) => {
 
 userSchema.set('toJSON', {
   transform(_doc, json) {
-    const { password: _password, ...rest } = json;
-    return rest;
+    const { _id, id: _i, password: _p, updatedAt: _u, createdAt: _c, ...rest } = json;
+
+    return {
+      id: _id.toString(),
+      ...rest,
+    };
   },
 });
 
