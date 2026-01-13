@@ -20,6 +20,6 @@
     "baseUrl": ".",
     "paths": {
       "@org/core": ["packages/core/src/index.ts"]
-    }
+    },
   }
 }

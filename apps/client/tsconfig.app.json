@@ -28,8 +28,10 @@
 
     "plugins": [{ "name": "next" }]
   },
+  "typeRoots": ["./src/@types"],
   "include": [
-    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "../../dist/apps/client/.next/types/**/*.ts"

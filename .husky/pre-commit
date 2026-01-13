@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "🔍 Type-checking affected projects..."
-npx nx affected -t typecheck
+npx nx affected -t typecheck --base=origin/master
 
 echo "✏️ Linting (auto-fix) affected projects..."
-npx nx affected -t lint -- --fix
+npx nx affected -t lint --base=origin/master -- --fix

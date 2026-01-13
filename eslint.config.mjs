@@ -7,6 +7,17 @@ import tseslint from 'typescript-eslint';
 import nx from '@nx/eslint-plugin';
 
 export default [
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.nx/**',
+      '**/.vite/**',
+      '**/.next/**',
+      '**/coverage/**',
+      '**/tmp/**',
+    ],
+  },
   /* ------------------------------------------------------------------ */
   /* Nx base configs                                                     */
   /* ------------------------------------------------------------------ */
