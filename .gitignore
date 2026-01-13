@@ -51,4 +51,5 @@
 **/next-env.d.ts
 
 # ENV
-**/.env.local
+**/.env
+**/.env.*

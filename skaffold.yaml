@@ -6,7 +6,7 @@ kind: Config
 # =========================
 manifests:
   rawYaml:
-    - infra/k8s/env/app-config.dev.yaml
+    - infra/k8s/env/dev/*.yaml
     - infra/k8s/base/*.yaml
 
 build:
@@ -41,7 +41,7 @@ profiles:
   - name: prod
     manifests:
       rawYaml:
-        - infra/k8s/env/app-config.prod.yaml
+        - infra/k8s/env/prod/*.yaml
         - infra/k8s/base/*.yaml
 
     build:

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { asyncHandler, BusinessRuleError, type SignupReqBody, ValidationError } from '@org/core';
+import { asyncHandler, BusinessRuleError, signJwt, type SignupReqBody, ValidationError } from '@org/core';
 
 import { User } from '../models';
 import { validateSignup } from '../utils';
@@ -27,6 +27,16 @@ router.post(
 
     const user = User.build({ email, password });
     await user.save();
+
+    const token = signJwt({ userId: user.id, email: user.email });
+
+    res.cookie('auth', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 1000 * 60 * 15,
+    });
 
     res.status(201).send(user);
   }),

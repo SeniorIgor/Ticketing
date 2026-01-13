@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -10,8 +11,10 @@ import { usersRouter } from './routes';
 const port = process.env.AUTH_PORT ? Number(process.env.AUTH_PORT) : 4001;
 
 const app = express();
+app.set('trust proxy', true);
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 app.use('/api/v1/users', usersRouter);
 app.use(() => {
