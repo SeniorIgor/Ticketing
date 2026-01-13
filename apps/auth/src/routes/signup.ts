@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { asyncHandler, BusinessRuleError, signJwt, type SignupReqBody, ValidationError } from '@org/core';
+import { asyncHandler, BusinessRuleError, signJwt, ValidationError } from '@org/core';
 
 import { User } from '../models';
+import type { SignupReqBody } from '../types';
 import { validateSignup } from '../utils';
 
 const router = express.Router();
@@ -43,13 +44,3 @@ router.post(
 );
 
 export { router as signupRouter };
-
-// throw new InternalError(
-//   'DATABASE_UNAVAILABLE',
-//   'Database is temporarily unavailable',
-// );
-
-// throw new BusinessRuleError(
-//   'USER_ALREADY_EXISTS',
-//   'User with this email already exists',
-// );

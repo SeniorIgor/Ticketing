@@ -1,38 +1,21 @@
 import { PASSWORD_ERROR_MESSAGES } from './validatePassword.constants';
 import type { PasswordValidationResult } from './validatePassword.types';
+import { validatePasswordBase } from './validatePasswordBase';
 
 export function validatePassword(password: unknown): PasswordValidationResult {
-  if (password === null || password === undefined) {
-    return { valid: false, error: 'empty', message: PASSWORD_ERROR_MESSAGES.empty };
+  const base = validatePasswordBase(password);
+
+  if (!base.valid) {
+    return base;
   }
 
-  if (typeof password !== 'string') {
-    return {
-      valid: false,
-      error: 'not_string',
-      message: PASSWORD_ERROR_MESSAGES.not_string,
-    };
-  }
-
-  const value = password;
-
-  if (value.length === 0) {
-    return { valid: false, error: 'empty', message: PASSWORD_ERROR_MESSAGES.empty };
-  }
+  const value = password as string;
 
   if (value.length < 8) {
     return {
       valid: false,
       error: 'too_short',
       message: PASSWORD_ERROR_MESSAGES.too_short,
-    };
-  }
-
-  if (value.length > 128) {
-    return {
-      valid: false,
-      error: 'too_long',
-      message: PASSWORD_ERROR_MESSAGES.too_long,
     };
   }
 

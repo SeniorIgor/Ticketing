@@ -1,5 +1,7 @@
 import type { ErrorDetail } from '@org/core';
-import { type SignupReqBody, toFieldError, validateEmail, validatePassword } from '@org/core';
+import { toFieldError, validateEmail, validatePassword } from '@org/core';
+
+import type { SignupReqBody } from '../types/signup';
 
 export function validateSignup(body: SignupReqBody): Array<ErrorDetail> {
   const errors: Array<ErrorDetail> = [];
