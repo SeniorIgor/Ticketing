@@ -28,6 +28,7 @@
 
     "plugins": [{ "name": "next" }]
   },
+  "typeRoots": ["./src/@types"],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",

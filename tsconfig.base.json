@@ -21,6 +21,5 @@
     "paths": {
       "@org/core": ["packages/core/src/index.ts"]
     },
-  },
-  "typeRoots": ["./@types"]
+  }
 }
