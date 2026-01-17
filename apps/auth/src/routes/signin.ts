@@ -1,7 +1,15 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { asyncHandler, AuthenticationError, comparePassword, signJwt, ValidationError } from '@org/core';
+import {
+  asyncHandler,
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_OPTIONS,
+  AuthenticationError,
+  comparePassword,
+  signJwt,
+  ValidationError,
+} from '@org/core';
 
 import { User } from '../models';
 import type { SigninReqBody } from '../types';
@@ -34,11 +42,8 @@ router.post(
 
     const token = signJwt({ userId: user.id, email: user.email });
 
-    res.cookie('auth', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
+    res.cookie(AUTH_COOKIE_NAME, token, {
+      ...AUTH_COOKIE_OPTIONS,
       maxAge: 1000 * 60 * 15,
     });
 
