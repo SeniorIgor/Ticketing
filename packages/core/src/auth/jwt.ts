@@ -2,17 +2,14 @@ import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 
 import { AuthenticationError } from '../errors';
-
+import type { AuthUser } from '../types';
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined');
 }
 
-export interface AuthJwtPayload extends JwtPayload {
-  userId: string;
-  email: string;
-}
+export interface AuthJwtPayload extends JwtPayload, AuthUser {}
 
 export const signJwt = (payload: AuthJwtPayload, options?: jwt.SignOptions): string => {
   return jwt.sign(payload, JWT_SECRET, {
@@ -22,7 +19,7 @@ export const signJwt = (payload: AuthJwtPayload, options?: jwt.SignOptions): str
   });
 };
 
-export const verifyJwt = (token: string): AuthJwtPayload => {
+export const verifyJwt = (token: string): AuthUser => {
   const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
   if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
