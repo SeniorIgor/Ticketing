@@ -53,3 +53,5 @@
 # ENV
 **/.env
 **/.env.*
+
+test-output

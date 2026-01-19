@@ -6,12 +6,16 @@
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "packages/core/dist",
         "main": "packages/core/src/index.ts",
         "tsConfig": "packages/core/tsconfig.lib.json",
-        "format": ["esm"],
+        "format": [
+          "esm"
+        ],
         "declarationRootDir": "packages/core/src"
       },
       "configurations": {
@@ -37,5 +41,7 @@
       }
     }
   },
-  "tags": ["npm:private"]
+  "tags": [
+    "npm:private"
+  ]
 }
