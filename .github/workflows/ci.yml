@@ -26,3 +26,4 @@ jobs:
 
       - run: npx nx affected -t typecheck --base=origin/master
       - run: npx nx affected -t lint --base=origin/master
+      - run: npx nx affected -t test --base=origin/master
