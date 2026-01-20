@@ -1,6 +1,7 @@
 import request from 'supertest';
 
 import { AUTH_COOKIE_NAME } from '@org/core';
+import { signupAndGetAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../app';
 
@@ -15,18 +16,7 @@ describe('POST /api/v1/users/signout', () => {
   let authCookie: string;
 
   beforeEach(async () => {
-    const res = await request(app).post('/api/v1/users/signup').send(validUser).expect(201);
-
-    const cookiesHeader = res.headers['set-cookie'];
-    const cookies = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
-
-    const found = cookies.find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
-
-    if (!found) {
-      throw new Error('Auth cookie was not set during signup');
-    }
-
-    authCookie = found;
+    authCookie = await signupAndGetAuthCookie(app, validUser);
   });
 
   it('clears auth cookie and returns 204', async () => {

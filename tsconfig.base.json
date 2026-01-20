@@ -5,7 +5,9 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -16,10 +18,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@org/source"],
-    "baseUrl": ".",
-    "paths": {
-      "@org/core": ["packages/core/src/index.ts"]
-    },
+    "customConditions": [
+      "@org/source"
+    ],
+    "baseUrl": "."
   }
 }

@@ -1,8 +1,8 @@
 import request from 'supertest';
 
 import { AUTH_COOKIE_NAME } from '@org/core';
+import { signupAndGetAuthCookie } from '@org/test-utils';
 
-import { signupAndGetAuthCookie } from '../../test';
 import { createApp } from '../app';
 
 const app = createApp();
@@ -16,7 +16,7 @@ describe('GET /api/v1/users/current-user', () => {
   let authCookie: string;
 
   beforeEach(async () => {
-    authCookie = await signupAndGetAuthCookie(validUser);
+    authCookie = await signupAndGetAuthCookie(app, validUser);
   });
 
   it('returns current user when authenticated', async () => {

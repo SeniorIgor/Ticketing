@@ -22,9 +22,20 @@
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
   ],
+  "paths": {
+    "@org/core": [
+      "packages/core/src/index.ts"
+    ],
+    "@org/test-utils": [
+      "packages/test-utils/src/index.ts"
+    ]
+  },
   "references": [
     {
       "path": "../../packages/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
     }
   ]
 }
