@@ -55,8 +55,59 @@ describe('POST /api/v1/users/signup', () => {
     expect(authCookie).toContain('Max-Age=900');
   });
 
-  it('rejects invalid input', async () => {
-    await request(app).post('/api/v1/users/signup').send({ email: 'bad', password: '123' }).expect(400);
+  it('rejects invalid email only (ApiError + details)', async () => {
+    const res = await request(app)
+      .post('/api/v1/users/signup')
+      .send({ email: 'bad', password: 'Password123_' })
+      .expect(400);
+
+    expect(res.body).toMatchObject({
+      code: 'VALIDATION',
+      reason: 'SIGNUP_INVALID_INPUT',
+      message: expect.any(String),
+      details: expect.arrayContaining([
+        expect.objectContaining({
+          fieldName: 'email',
+          message: expect.any(String),
+        }),
+      ]),
+    });
+  });
+
+  it('rejects invalid password only (ApiError + details)', async () => {
+    const res = await request(app)
+      .post('/api/v1/users/signup')
+      .send({ email: 'test@test.com', password: 'password123' })
+      .expect(400);
+
+    expect(res.body).toMatchObject({
+      code: 'VALIDATION',
+      reason: 'SIGNUP_INVALID_INPUT',
+      message: expect.any(String),
+      details: expect.arrayContaining([
+        expect.objectContaining({
+          fieldName: 'password',
+          message: expect.any(String),
+        }),
+      ]),
+    });
+  });
+
+  it('rejects when both fields invalid (two details)', async () => {
+    const res = await request(app).post('/api/v1/users/signup').send({ email: 'bad', password: '123' }).expect(400);
+
+    expect(res.body).toMatchObject({
+      code: 'VALIDATION',
+      reason: 'SIGNUP_INVALID_INPUT',
+      message: expect.any(String),
+    });
+
+    expect(res.body.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ fieldName: 'email' }),
+        expect.objectContaining({ fieldName: 'password' }),
+      ]),
+    );
   });
 
   it('rejects duplicate email', async () => {
