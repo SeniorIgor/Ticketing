@@ -3,11 +3,16 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "application",
-  "implicitDependencies": ["@org/core"],
+  "implicitDependencies": [
+    "@org/core",
+    "@org/test-utils"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "platform": "node",
         "outputPath": "{projectRoot}/dist",
@@ -15,7 +20,9 @@
         "tsConfig": "{projectRoot}/tsconfig.app.json",
         "bundle": true,
         "externalDependencies": "none",
-        "format": ["cjs"]
+        "format": [
+          "cjs"
+        ]
       },
       "configurations": {
         "watch": {
@@ -45,7 +52,9 @@
     },
     "start": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "options": {
         "command": "node apps/auth/dist/index.cjs"
       }
@@ -59,12 +68,23 @@
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "options": {
         "command": "tsc --noEmit -p tsconfig.app.json",
         "cwd": "apps/auth"
       }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "apps/auth/jest.config.cts",
+        "passWithNoTests": true
+      }
     }
   },
-  "tags": ["npm:private"]
+  "tags": [
+    "npm:private"
+  ]
 }

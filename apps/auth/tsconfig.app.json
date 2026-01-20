@@ -1,7 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "rootDir": "src",
     "outDir": "dist",
     "composite": false,
@@ -9,11 +11,31 @@
     "declarationMap": false,
     "emitDeclarationOnly": false
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "**/*.spec.ts"],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "**/*.spec.ts",
+    "jest.config.ts",
+    "jest.config.cts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
+  "paths": {
+    "@org/core": [
+      "packages/core/src/index.ts"
+    ],
+    "@org/test-utils": [
+      "packages/test-utils/src/index.ts"
+    ]
+  },
   "references": [
     {
       "path": "../../packages/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
     }
   ]
 }

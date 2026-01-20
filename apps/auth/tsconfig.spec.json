@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/jest",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": [
+      "jest",
+      "node"
+    ],
+    "esModuleInterop": true,
+  },
+  "include": [
+    "jest.config.cts",
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
+}

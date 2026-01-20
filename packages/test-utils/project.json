@@ -1,8 +1,11 @@
 {
-  "name": "@org/core",
+  "name": "@org/test-utils",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/core/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
+  "implicitDependencies": [
+    "@org/core"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -10,13 +13,13 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "packages/core/dist",
-        "main": "packages/core/src/index.ts",
-        "tsConfig": "packages/core/tsconfig.lib.json",
+        "outputPath": "{projectRoot}/dist",
+        "main": "{projectRoot}/src/index.ts",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
         "format": [
           "esm"
         ],
-        "declarationRootDir": "packages/core/src"
+        "declarationRootDir": "{projectRoot}/src"
       },
       "configurations": {
         "watch": {
@@ -30,14 +33,17 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "eslint .",
-        "cwd": "packages/core"
+        "cwd": "{projectRoot}"
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
+      "dependsOn": [
+        "^build"
+      ],
       "options": {
         "command": "tsc --noEmit -p tsconfig.lib.json",
-        "cwd": "packages/core"
+        "cwd": "{projectRoot}"
       }
     }
   },
