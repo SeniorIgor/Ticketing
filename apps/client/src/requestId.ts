@@ -1,5 +1,6 @@
-import { randomUUID } from 'crypto';
 import type { NextRequest } from 'next/server';
+
+import { randomUUID } from 'crypto';
 
 export const REQUEST_ID_HEADER = 'x-request-id';
 
