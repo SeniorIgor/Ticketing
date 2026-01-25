@@ -174,3 +174,21 @@ no rebuilds
 CI / Prod build
 skaffold build -p prod
 skaffold render -p prod
+
+
+! 1. Some new information that is not formatted yet
+//////////////////////////
+To run application in kubernetes cluster run command:
+make dev
+or
+make prod
+
+If during development changes not reflected, try to kill pod manually through the terminal or restart scaffold
+~ $ kubectl get pods
+Kill the pod by its name
+~ $ kubectl delete pod client-depl-75fc89b998-rmj2b
+
+
+// 
+//  run kustomize build overlays/dev
+//  run kustomize build overlays/prod

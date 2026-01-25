@@ -9,7 +9,15 @@
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "emitDeclarationOnly": false
+    "emitDeclarationOnly": false,
+    "paths": {
+      "@org/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@org/test-utils": [
+        "packages/test-utils/src/index.ts"
+      ]
+    },
   },
   "include": [
     "src/**/*.ts"
@@ -22,14 +30,6 @@
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
   ],
-  "paths": {
-    "@org/core": [
-      "packages/core/src/index.ts"
-    ],
-    "@org/test-utils": [
-      "packages/test-utils/src/index.ts"
-    ]
-  },
   "references": [
     {
       "path": "../../packages/core/tsconfig.lib.json"
