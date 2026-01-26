@@ -1,0 +1,54 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: ticketing
+
+build:
+  local:
+    push: false
+  artifacts:
+    - image: seniorigortyapkin/client
+      context: .
+      docker:
+        dockerfile: apps/client/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/client/**/*
+            dest: .
+    - image: seniorigortyapkin/auth
+      context: .
+      docker:
+        dockerfile: apps/auth/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/auth/**/*
+            dest: .
+          - src: packages/core/**/*
+            dest: .
+
+manifests:
+  kustomize:
+    paths:
+      - infra/k8s/apps/ticketing/overlays/dev
+
+deploy:
+  kubectl: {}
+
+profiles:
+  - name: prod
+    build:
+      local:
+        push: false
+      artifacts:
+        - image: seniorigortyapkin/client
+          context: .
+          docker:
+            dockerfile: apps/client/Dockerfile
+        - image: seniorigortyapkin/auth
+          context: .
+          docker:
+            dockerfile: apps/auth/Dockerfile
+    manifests:
+      kustomize:
+        paths:
+          - infra/k8s/apps/ticketing/overlays/prod

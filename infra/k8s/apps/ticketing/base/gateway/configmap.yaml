@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-declarative
+data:
+  kong.yml: |
+    _format_version: "3.0"
+
+    services:
+      - name: auth
+        url: http://auth-srv:80
+        routes:
+          - name: auth-users
+            paths:
+              - /api/v1/users
+            strip_path: false

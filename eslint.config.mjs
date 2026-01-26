@@ -1,10 +1,10 @@
+import nx from '@nx/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
-import nx from '@nx/eslint-plugin';
 
 export default [
   {
@@ -96,13 +96,42 @@ export default [
         'error',
         {
           groups: [
-            ['^react', '^\\w', '^@[^/]'],
-            ['^@org\\/'],
-            ['@/styles/base\\.scss$'],
+            // 0) Side-effect imports first (special prefix)
+            ['^\\u0000server-only$'],
+            ['^\\u0000'],
+
+            // 1) React / Next
+            ['^react$', '^react/', '^next$', '^next/'],
+
+            // 2) Other external packages
+            ['^@?\\w'],
+
+            // 3) Internal packages by scope
+            ['^@org/'],
+
+            // 4) App absolute alias
+            ['^@/'],
+
+            // 5) Types
             ['^@types'],
+
+            // 6) Parent imports
             ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+
+            // 7) Same-folder imports
             ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-            ['[A-Za-z@\\.].+\\.s?css$'],
+
+            // 8) Styles last (note: styles are also side-effect imports => \u0000)
+            ['^\\u0000.+\\.s?css$'],
+            ['^.+\\.s?css$'],
+            // Previous Sort Order
+            // ['^react', '^\\w', '^@[^/]'],
+            // ['^@org\\/'],
+            // ['^@\\/'],
+            // ['^@types'],
+            // ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+            // ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            // ['[A-Za-z@\\.].+\\.s?css$'],
           ],
         },
       ],

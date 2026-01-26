@@ -11,6 +11,7 @@
 **/out
 **/coverage
 **/tmp
+**/.next
 
 # Local environment
 **/.env

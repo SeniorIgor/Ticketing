@@ -4,8 +4,7 @@
   "sourceRoot": "{projectRoot}/src",
   "projectType": "application",
   "implicitDependencies": [
-    "@org/core",
-    "@org/test-utils"
+    "@org/core"
   ],
   "targets": {
     "build": {
