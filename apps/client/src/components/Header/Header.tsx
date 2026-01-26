@@ -1,29 +1,12 @@
-'use client';
-
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
-import { signoutUser } from '@/services';
+import { getCurrentUserServer } from '@/services';
 
-import { useNotify } from '../NotificationContext/NotificationContext';
+import SignOutButton from './SignOutButton/SignOutButton';
 
-interface HeaderProps {
-  isAuthenticated: boolean;
-}
-
-export default function Header({ isAuthenticated }: HeaderProps) {
-  const router = useRouter();
-  const notify = useNotify();
-
-  async function handleSignOut() {
-    try {
-      await signoutUser();
-      router.replace('/');
-      router.refresh();
-    } catch {
-      notify('Failed to sign out. Please try again.', 'danger');
-    }
-  }
+export default async function Header() {
+  const result = await getCurrentUserServer();
+  const isAuthenticated = result.ok ? true : false;
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -37,16 +20,14 @@ export default function Header({ isAuthenticated }: HeaderProps) {
           {!isAuthenticated ? (
             <>
               <Link href="/signup" className="btn btn-outline-primary">
-                Sign Up
+                Sign up
               </Link>
               <Link href="/signin" className="btn btn-primary">
-                Sign In
+                Sign in
               </Link>
             </>
           ) : (
-            <button type="button" className="btn btn-outline-danger" onClick={handleSignOut}>
-              Sign Out
-            </button>
+            <SignOutButton />
           )}
         </div>
       </div>

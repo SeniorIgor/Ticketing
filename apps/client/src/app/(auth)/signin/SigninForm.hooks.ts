@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import type { ChangeEvent, FormEvent } from 'react';
 
@@ -10,8 +9,6 @@ import { signinUser } from '@/services/auth/signin';
 export function useSigninForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const router = useRouter();
 
   const { loading, run } = useRequest();
   const { fieldErrors, formError, clearFieldError, clearAllErrors, applyBackendError } = useFormErrors();
@@ -47,8 +44,7 @@ export function useSigninForm() {
       return;
     }
 
-    router.replace('/');
-    router.refresh();
+    window.location.replace('/');
   }
 
   return {

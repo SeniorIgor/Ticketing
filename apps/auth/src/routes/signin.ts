@@ -3,6 +3,7 @@ import express from 'express';
 
 import {
   asyncHandler,
+  AUTH_COOKIE_MAX_AGE,
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_OPTIONS,
   AuthenticationError,
@@ -44,7 +45,7 @@ router.post(
 
     res.cookie(AUTH_COOKIE_NAME, token, {
       ...AUTH_COOKIE_OPTIONS,
-      maxAge: 1000 * 60 * 15,
+      maxAge: AUTH_COOKIE_MAX_AGE,
     });
 
     res.status(200).send(user);
