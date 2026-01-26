@@ -25,6 +25,16 @@ build:
             dest: .
           - src: packages/core/**/*
             dest: .
+    - image: seniorigortyapkin/tickets
+      context: .
+      docker:
+        dockerfile: apps/tickets/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/tickets/**/*
+            dest: .
+          - src: packages/core/**/*
+            dest: .
 
 manifests:
   kustomize:
@@ -48,6 +58,10 @@ profiles:
           context: .
           docker:
             dockerfile: apps/auth/Dockerfile
+        - image: seniorigortyapkin/tickets
+          context: .
+          docker:
+            dockerfile: apps/tickets/Dockerfile
     manifests:
       kustomize:
         paths:

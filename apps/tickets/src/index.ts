@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { createApp } from './app';
 import { connectMongo } from './config';
 
-const port = process.env.AUTH_PORT ? Number(process.env.AUTH_PORT) : 4001;
+const port = process.env.TICKETS_PORT ? Number(process.env.TICKETS_PORT) : 4002;
 
 const app = createApp();
 
@@ -35,7 +35,7 @@ async function start() {
     await connectMongo();
 
     server = app.listen(port, () => {
-      console.log(`[ ready ] Auth listening on ${port}`);
+      console.log(`[ ready ] Tickets listening on ${port}`);
     });
   } catch (err) {
     console.error('❌ Startup failed', err);

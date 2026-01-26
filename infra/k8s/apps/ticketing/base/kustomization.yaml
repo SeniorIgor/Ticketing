@@ -8,6 +8,12 @@ resources:
   - auth-mongo/deployment.yaml
   - auth-mongo/service.yaml
 
+  - tickets/deployment.yaml
+  - tickets/service.yaml
+
+  - tickets-mongo/deployment.yaml
+  - tickets-mongo/service.yaml
+
   - client/deployment.yaml
   - client/service.yaml
 

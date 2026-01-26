@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 export async function connectMongo(): Promise<void> {
-  const mongoUri = process.env.AUTH_MONGO_URI;
+  const mongoUri = process.env.TICKETS_MONGO_URI;
 
   if (!mongoUri) {
-    throw new Error('AUTH_MONGO_URI is not defined');
+    throw new Error('TICKETS_MONGO_URI is not defined');
   }
 
   await mongoose.connect(mongoUri, {
