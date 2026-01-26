@@ -52,7 +52,7 @@ describe('POST /api/v1/users/signup', () => {
 
     expect(authCookie).toBeDefined();
     expect(authCookie).toContain('HttpOnly');
-    expect(authCookie).toContain('Max-Age=900');
+    expect(authCookie).toContain('Max-Age=1800');
   });
 
   it('rejects invalid email only (ApiError + details)', async () => {

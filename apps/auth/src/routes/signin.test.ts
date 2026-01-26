@@ -35,7 +35,7 @@ describe('POST /api/v1/users/signin', () => {
 
     expect(authCookie).toBeDefined();
     expect(authCookie).toContain('HttpOnly');
-    expect(authCookie).toContain('Max-Age=900');
+    expect(authCookie).toContain('Max-Age=1800');
   });
 
   it('rejects invalid input (validation error)', async () => {
