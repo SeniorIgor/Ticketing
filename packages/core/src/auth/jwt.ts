@@ -9,7 +9,7 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined');
 }
 
-export interface AuthJwtPayload extends JwtPayload, AuthUser {}
+export type AuthJwtPayload = JwtPayload & AuthUser;
 
 export const signJwt = (payload: AuthJwtPayload, options?: jwt.SignOptions): string => {
   return jwt.sign(payload, JWT_SECRET, {

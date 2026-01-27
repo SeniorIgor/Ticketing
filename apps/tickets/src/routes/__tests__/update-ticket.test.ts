@@ -45,7 +45,6 @@ describe('PUT /api/v1/tickets/:id', () => {
       id: ticket.id,
       title: 'New',
       price: 99,
-      userId: 'user-1',
     });
   });
 });

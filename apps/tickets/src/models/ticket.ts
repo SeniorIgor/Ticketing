@@ -37,7 +37,7 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
 
 ticketSchema.set('toJSON', {
   transform(_doc, json) {
-    const { _id, id: _i, createdAt: _c, updatedAt: _u, ...rest } = json;
+    const { _id, id: _i, createdAt: _c, updatedAt: _u, userId: _d, ...rest } = json;
     return { id: _id.toString(), ...rest };
   },
 });

@@ -47,7 +47,6 @@ describe('POST /api/v1/tickets', () => {
     expect(res.body).toMatchObject({
       title: 'My Ticket',
       price: 25,
-      userId: 'user-1',
       id: expect.any(String),
     });
 
@@ -55,6 +54,7 @@ describe('POST /api/v1/tickets', () => {
     if (!saved) {
       throw new Error('Expected ticket to be saved');
     }
+
     expect(saved.title).toBe('My Ticket');
     expect(saved.price).toBe(25);
     expect(saved.userId).toBe('user-1');

@@ -1,4 +1,3 @@
-export interface SigninReqBody {
-  email: string;
-  password: string;
-}
+import type { User } from './user';
+
+export type SigninReqBody = User;

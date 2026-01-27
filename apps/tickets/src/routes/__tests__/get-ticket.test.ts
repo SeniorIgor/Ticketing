@@ -34,7 +34,6 @@ describe('GET /api/v1/tickets/:id', () => {
       id: ticket.id,
       title: 'Concert',
       price: 50,
-      userId: 'u1',
     });
   });
 });
