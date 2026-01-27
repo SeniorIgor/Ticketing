@@ -6,4 +6,6 @@ data:
   NODE_ENV: production
   AUTH_PORT: "80"
   AUTH_URL: "http://auth-srv"
+  TICKETS_PORT: "80"
+  TICKETS_URL: "http://tickets-srv"
   INTERNAL_API_BASE_URL: "http://client-gateway-srv"

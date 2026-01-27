@@ -14,3 +14,10 @@ data:
             paths:
               - /api/v1/users
             strip_path: false
+      - name: tickets
+        url: http://tickets-srv:80
+        routes:
+          - name: tickets
+            paths:
+              - /api/v1/tickets
+            strip_path: false
