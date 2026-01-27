@@ -7,9 +7,9 @@ import { updateTicketRouter } from './update-ticket';
 
 const router = Router();
 
-router.use('/api/v1/tickets', listTicketsRouter);
-router.use('/api/v1/tickets', createTicketRouter);
-router.use('/api/v1/tickets', showTicketRouter);
-router.use('/api/v1/tickets', updateTicketRouter);
+router.use(listTicketsRouter);
+router.use(createTicketRouter);
+router.use(showTicketRouter);
+router.use(updateTicketRouter);
 
 export { router as ticketsRouter };

@@ -13,6 +13,6 @@
   "include": [
     "jest.config.cts",
     "src/**/*.ts",
-    "test/**/*.ts"
+    "src/test/**/*.ts"
   ]
 }

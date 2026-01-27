@@ -3,7 +3,7 @@ import request from 'supertest';
 import { AUTH_COOKIE_NAME } from '@org/core';
 import { signupAndGetAuthCookie } from '@org/test-utils';
 
-import { createApp } from '../app';
+import { createApp } from '../../app';
 
 const app = createApp();
 
