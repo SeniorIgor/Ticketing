@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import mongoose from 'mongoose';
 
-import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, ValidationError } from '@org/core';
+import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 
 import { Ticket } from '../models';
 import type { UpdateTicketReqBody } from '../types';
@@ -29,7 +29,7 @@ router.put(
     const userId = req.currentUser!.userId;
 
     if (ticket.userId !== userId) {
-      throw new BusinessRuleError('TICKET_NOT_OWNER', 'You are not allowed to edit this ticket');
+      throw new AuthorizationError('TICKET_NOT_OWNER', 'You are not allowed to edit this ticket');
     }
 
     const errors = validateUpdateTicket(req.body);

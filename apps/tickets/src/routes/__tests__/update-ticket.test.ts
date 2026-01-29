@@ -24,15 +24,14 @@ describe('PUT /api/v1/tickets/:id', () => {
 
     const cookie = getAuthCookie({ userId: 'user-2', email: 'test@test.com' });
 
-    // Attempt unauthorized update
     const res = await request(app)
       .put(`/api/v1/tickets/${ticket.id}`)
       .set('Cookie', cookie)
       .send({ title: 'Hacked', price: 999 })
-      .expect(409);
+      .expect(403);
 
     expect(res.body).toMatchObject({
-      code: expect.any(String),
+      code: 'AUTHORIZATION',
       reason: 'TICKET_NOT_OWNER',
       message: expect.any(String),
     });
