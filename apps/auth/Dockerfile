@@ -29,6 +29,6 @@ ENV NODE_ENV=production
 COPY --from=builder /app/apps/auth/dist ./
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["node", "index.cjs"]

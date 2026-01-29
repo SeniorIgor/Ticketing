@@ -1,4 +1,3 @@
-export interface SignupReqBody {
-  email: string;
-  password: string;
-}
+import type { User } from './user';
+
+export type SignupReqBody = User;

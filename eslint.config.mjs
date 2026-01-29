@@ -79,6 +79,7 @@ export default [
 
       /* ---------------- Style ------------------- */
       'max-len': ['warn', { code: 120, ignoreUrls: true }],
+      curly: ['error', 'all'],
 
       /* ---------------- Types ------------------- */
       '@typescript-eslint/consistent-type-imports': [

@@ -3,10 +3,7 @@ import request from 'supertest';
 
 import { AUTH_COOKIE_NAME } from '@org/core';
 
-interface User {
-  email: string;
-  password: string;
-}
+import type { User } from '../../types';
 
 export async function signupAndGetAuthCookie(app: Application, user: User): Promise<string> {
   const res = await request(app).post('/api/v1/users/signup').send(user).expect(201);

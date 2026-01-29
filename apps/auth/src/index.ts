@@ -11,7 +11,10 @@ let server: ReturnType<typeof app.listen>;
 let isShuttingDown = false;
 
 const shutdown = async (signal: string) => {
-  if (isShuttingDown) return;
+  if (isShuttingDown) {
+    return;
+  }
+
   isShuttingDown = true;
 
   console.log(`🛑 ${signal} received. Closing gracefully...`);

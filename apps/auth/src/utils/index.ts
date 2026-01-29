@@ -1,2 +1,2 @@
-export { validateSignin } from './validateSignin';
-export { validateSignup } from './validateSignup';
+export { validateSignin } from './validate-signin';
+export { validateSignup } from './validate-signup';

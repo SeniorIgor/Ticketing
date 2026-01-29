@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import { AUTH_COOKIE_NAME } from '@org/core';
 
-import { createApp } from '../app';
+import { createApp } from '../../app';
 
 const app = createApp();
 

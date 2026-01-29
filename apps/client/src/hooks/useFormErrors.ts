@@ -9,7 +9,10 @@ export function useFormErrors() {
 
   function clearFieldError(field: string) {
     setFieldErrors((prev) => {
-      if (!prev[field]) return prev;
+      if (!prev[field]) {
+        return prev;
+      }
+
       const { [field]: _, ...rest } = prev;
       return rest;
     });
