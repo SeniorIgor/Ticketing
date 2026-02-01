@@ -9,17 +9,19 @@ export const HDR = {
   traceparent: 'traceparent',
 } as const;
 
-export function getHeader(h: MsgHdrs | undefined, key: string): string | undefined {
-  if (!h) {
+export function getHeader(headers: MsgHdrs | undefined, key: string): string | undefined {
+  if (!headers) {
     return undefined;
   }
-  const v = h.get(key);
-  return v ?? undefined;
+
+  const value = headers.get(key);
+  return value ?? undefined;
 }
 
-export function setHeader(h: MsgHdrs, key: string, value: string | undefined) {
+export function setHeader(headers: MsgHdrs, key: string, value: string | undefined) {
   if (!value) {
     return;
   }
-  h.set(key, value);
+
+  headers.set(key, value);
 }

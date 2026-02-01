@@ -5,9 +5,9 @@ import type { NatsConnectConfig } from './config';
 import { normalizeConfig } from './config';
 
 export type NatsDeps = {
-  nc: NatsConnection;
-  js: JetStreamClient;
-  jsm: JetStreamManager;
+  connection: NatsConnection;
+  client: JetStreamClient;
+  manager: JetStreamManager;
   logger: ReturnType<typeof normalizeConfig>['logger'];
 };
 
@@ -18,26 +18,29 @@ export async function connectNats(cfg: NatsConnectConfig): Promise<NatsDeps> {
   if (deps) {
     return deps;
   }
+
   if (connecting) {
     return connecting;
   }
 
-  const c = normalizeConfig(cfg);
+  const config = normalizeConfig(cfg);
 
   connecting = (async () => {
-    const nc = await connect({
-      servers: c.servers,
-      name: c.name,
-      ...(c.connectionOptions ?? {}),
+    const connection = await connect({
+      servers: config.servers,
+      name: config.name,
+      ...(config.connectionOptions ?? {}),
     });
 
-    const js = nc.jetstream();
-    const jsm = await nc.jetstreamManager();
+    const client = connection.jetstream();
+    const manager = await connection.jetstreamManager();
 
-    deps = { nc, js, jsm, logger: c.logger };
+    deps = { connection, client, manager, logger: config.logger };
 
-    deps.logger.info(`[nats] connected: ${nc.getServer()}`);
-    nc.closed()
+    deps.logger.info(`[nats] connected: ${connection.getServer()}`);
+
+    connection
+      .closed()
       .then((err) => {
         if (err) {
           deps?.logger.error('[nats] connection closed with error', err);
@@ -61,6 +64,7 @@ export function getNats(): NatsDeps {
   if (!deps) {
     throw new Error('NATS is not connected. Call connectNats() first.');
   }
+
   return deps;
 }
 
@@ -68,8 +72,9 @@ export async function drainNats(): Promise<void> {
   if (!deps) {
     return;
   }
+
   deps.logger.info('[nats] draining...');
-  await deps.nc.drain();
+  await deps.connection.drain();
   deps.logger.info('[nats] drained');
 }
 
@@ -77,18 +82,24 @@ export async function closeNats(): Promise<void> {
   if (!deps) {
     return;
   }
+
   deps.logger.info('[nats] closing...');
-  await deps.nc.close();
+  await deps.connection.close();
   deps.logger.info('[nats] closed');
 }
 
-export function registerNatsSignalHandlers(opts?: { onSignal?: (sig: string) => void }) {
-  const handler = async (sig: string) => {
-    opts?.onSignal?.(sig);
+interface RegisterNatsSignalHandlersParams {
+  onSignal?: (signal: string) => void;
+}
+
+export function registerNatsSignalHandlers(opts?: RegisterNatsSignalHandlersParams) {
+  const handler = async (signal: string) => {
+    opts?.onSignal?.(signal);
+
     try {
       await drainNats();
-    } catch (e) {
-      deps?.logger.error('[nats] drain failed', e);
+    } catch (error) {
+      deps?.logger.error('[nats] drain failed', error);
       // don't exit; let the app decide
     }
   };

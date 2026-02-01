@@ -15,4 +15,4 @@ export type MessageContext = {
   headers?: MsgHdrs;
 };
 
-export type EventHandler<TData> = (data: TData, ctx: MessageContext) => Promise<void>;
+export type EventHandler<TData> = (data: TData, context: MessageContext) => Promise<void>;

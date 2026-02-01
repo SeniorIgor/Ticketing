@@ -60,14 +60,14 @@ function semaphore(limit: number) {
   return { acquire, release };
 }
 
-const sc = StringCodec();
+const codec = StringCodec();
 
 export async function createPullWorker<TSubject extends string, TData>(
   opts: PullWorkerOptions<TSubject, TData>,
   handler: EventHandler<TData>,
   signal?: AbortSignal,
 ): Promise<{ stop: () => void }> {
-  const { js, logger } = getNats();
+  const { client, logger } = getNats();
 
   const filterSubjects = opts.def?.subject ? [opts.def.subject] : (opts.filterSubjects ?? []);
 
@@ -88,7 +88,7 @@ export async function createPullWorker<TSubject extends string, TData>(
     });
   }
 
-  const consumer: Consumer = await js.consumers.get(opts.stream, opts.consumer);
+  const consumer: Consumer = await client.consumers.get(opts.stream, opts.consumer);
 
   const batchSize = opts.batchSize ?? 50;
   const expiresMs = opts.expiresMs ?? 2000;
@@ -107,17 +107,18 @@ export async function createPullWorker<TSubject extends string, TData>(
   const loop = async () => {
     while (!stopped && !signal?.aborted) {
       try {
-        const iter = await consumer.fetch({ max_messages: batchSize, expires: expiresMs });
+        const messages = await consumer.fetch({ max_messages: batchSize, expires: expiresMs });
 
         const tasks: Promise<void>[] = [];
 
-        for await (const msg of iter) {
+        for await (const msg of messages) {
           if (stopped || signal?.aborted) {
             break;
           }
 
           const task = (async () => {
             await sem.acquire();
+
             try {
               const subject = msg.subject;
 
@@ -136,16 +137,18 @@ export async function createPullWorker<TSubject extends string, TData>(
                 if (env.subject !== opts.def.subject) {
                   throw new PoisonMessageError(`Unexpected subject: ${env.subject}`);
                 }
+
                 if (env.type !== opts.def.type || env.version !== opts.def.version) {
                   // allow you to later build multi-version routing; for now term + DLQ
                   throw new PoisonMessageError(`Unexpected event type/version: ${env.type}@${env.version}`);
                 }
+
                 const parsedData = opts.def.schema.safeParse(env.data);
                 if (!parsedData.success) {
                   throw new PoisonMessageError(parsedData.error.message);
                 }
 
-                const ctx: MessageContext = {
+                const context: MessageContext = {
                   stream: opts.stream,
                   consumer: opts.consumer,
                   subject,
@@ -157,13 +160,13 @@ export async function createPullWorker<TSubject extends string, TData>(
                   headers: msg.headers,
                 };
 
-                await handler(parsedData.data, ctx);
+                await handler(parsedData.data, context);
                 msg.ack();
                 return;
               }
 
               // If no def provided (advanced): just pass raw decoded data
-              const ctx: MessageContext = {
+              const context: MessageContext = {
                 stream: opts.stream,
                 consumer: opts.consumer,
                 subject,
@@ -175,19 +178,20 @@ export async function createPullWorker<TSubject extends string, TData>(
                 headers: msg.headers,
               };
 
-              await handler(env.data as TData, ctx);
+              await handler(env.data as TData, context);
               msg.ack();
             } catch (err) {
               const mode = classifyError(err);
 
               if (opts.deadLetterSubject) {
-                const hdrs: Record<string, string> = {};
+                const headers: Record<string, string> = {};
 
                 if (msg.headers) {
-                  for (const k of msg.headers.keys()) {
-                    const v = msg.headers.get(k);
-                    if (v !== null) {
-                      hdrs[k] = v;
+                  for (const key of msg.headers.keys()) {
+                    const value = msg.headers.get(key);
+
+                    if (value !== null) {
+                      headers[key] = value;
                     }
                   }
                 }
@@ -200,7 +204,7 @@ export async function createPullWorker<TSubject extends string, TData>(
                   delivered: (msg.info as any)?.delivered,
                   error: err instanceof Error ? err.message : String(err),
                   raw: safeDecodeRaw(msg.data),
-                  headers: Object.keys(hdrs).length ? hdrs : undefined,
+                  headers: Object.keys(headers).length ? headers : undefined,
                   at: new Date().toISOString(),
                 };
 
@@ -245,7 +249,7 @@ export async function createPullWorker<TSubject extends string, TData>(
 
 function safeDecodeRaw(data: Uint8Array): string {
   try {
-    return sc.decode(data);
+    return codec.decode(data);
   } catch {
     return '[un-decodable-bytes]';
   }

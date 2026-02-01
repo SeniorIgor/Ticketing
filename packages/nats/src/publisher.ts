@@ -22,7 +22,7 @@ export async function publishEvent<TSubject extends string, TData>(
   data: TData,
   opts?: PublishOptions,
 ): Promise<{ eventId: string }> {
-  const { js, logger } = getNats();
+  const { client, logger } = getNats();
 
   // Validate payload (fail fast)
   const parsed = def.schema.parse(data);
@@ -40,7 +40,7 @@ export async function publishEvent<TSubject extends string, TData>(
   setHeader(h, HDR.causationId, env.causationId);
   setHeader(h, HDR.traceparent, opts?.traceparent);
 
-  await js.publish(def.subject, encodeJson(env), {
+  await client.publish(def.subject, encodeJson(env), {
     msgID: opts?.msgId ?? env.id,
     headers: h,
   });

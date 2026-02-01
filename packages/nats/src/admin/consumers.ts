@@ -16,7 +16,7 @@ export async function ensureDurableConsumer(params: {
   maxAckPending?: number;
   reconcile?: ReconcileMode;
 }) {
-  const { jsm, logger } = getNats();
+  const { manager, logger } = getNats();
 
   const desired = {
     durable_name: params.durable,
@@ -29,7 +29,7 @@ export async function ensureDurableConsumer(params: {
   };
 
   try {
-    const info = await jsm.consumers.info(params.stream, params.durable);
+    const info = await manager.consumers.info(params.stream, params.durable);
     const current = info.config as any;
 
     const drift =
@@ -56,26 +56,26 @@ export async function ensureDurableConsumer(params: {
     });
 
     if (mode === 'update') {
-      const updater = (jsm.consumers as any).update;
+      const updater = (manager.consumers as any).update;
       if (typeof updater === 'function') {
-        await updater.call(jsm.consumers, params.stream, params.durable, desired);
+        await updater.call(manager.consumers, params.stream, params.durable, desired);
         logger.info('[nats] consumer updated', { stream: params.stream, durable: params.durable });
       } else {
         logger.warn('[nats] consumer update not supported by this nats.js version; keeping existing config');
       }
     }
   } catch {
-    await jsm.consumers.add(params.stream, desired as any);
+    await manager.consumers.add(params.stream, desired as any);
     logger.info('[nats] consumer created', { stream: params.stream, durable: params.durable });
   }
 }
 
-function pickRelevant(cfg: any) {
+function pickRelevant(config: any) {
   return {
-    filter_subjects: cfg.filter_subjects,
-    deliver_policy: cfg.deliver_policy,
-    ack_wait: cfg.ack_wait,
-    max_deliver: cfg.max_deliver,
-    max_ack_pending: cfg.max_ack_pending,
+    filter_subjects: config.filter_subjects,
+    deliver_policy: config.deliver_policy,
+    ack_wait: config.ack_wait,
+    max_deliver: config.max_deliver,
+    max_ack_pending: config.max_ack_pending,
   };
 }

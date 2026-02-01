@@ -18,9 +18,9 @@ export type NatsRuntime = {
   logger: Logger;
 };
 
-export function normalizeConfig(cfg: NatsConnectConfig): Required<NatsRuntime> & NatsConnectConfig {
+export function normalizeConfig(config: NatsConnectConfig): Required<NatsRuntime> & NatsConnectConfig {
   return {
-    ...cfg,
-    logger: cfg.logger ?? consoleLogger,
+    ...config,
+    logger: config.logger ?? consoleLogger,
   };
 }

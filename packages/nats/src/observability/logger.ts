@@ -6,8 +6,8 @@ export type Logger = {
 };
 
 export const consoleLogger: Logger = {
-  debug: (...a) => console.debug(...a),
-  info: (...a) => console.info(...a),
-  warn: (...a) => console.warn(...a),
-  error: (...a) => console.error(...a),
+  debug: (...args) => console.debug(...args),
+  info: (...args) => console.info(...args),
+  warn: (...args) => console.warn(...args),
+  error: (...args) => console.error(...args),
 };

@@ -14,7 +14,7 @@ export async function ensureStream(params: {
   replicas?: number;
   reconcile?: ReconcileMode;
 }) {
-  const { jsm, logger } = getNats();
+  const { manager, logger } = getNats();
 
   const desired = {
     name: params.stream,
@@ -26,7 +26,7 @@ export async function ensureStream(params: {
   };
 
   try {
-    const info = await jsm.streams.info(params.stream);
+    const info = await manager.streams.info(params.stream);
     const current = info.config as any;
 
     const drift =
@@ -52,21 +52,21 @@ export async function ensureStream(params: {
     });
 
     if (mode === 'update') {
-      await jsm.streams.update(params.stream, desired as any);
+      await manager.streams.update(params.stream, desired as any);
       logger.info('[nats] stream updated', { stream: params.stream });
     }
   } catch {
-    await jsm.streams.add(desired as any);
+    await manager.streams.add(desired as any);
     logger.info('[nats] stream created', { stream: params.stream });
   }
 }
 
-function pickRelevant(cfg: any) {
+function pickRelevant(config: any) {
   return {
-    subjects: cfg.subjects,
-    storage: cfg.storage,
-    max_age: cfg.max_age,
-    max_msgs: cfg.max_msgs,
-    num_replicas: cfg.num_replicas,
+    subjects: config.subjects,
+    storage: config.storage,
+    max_age: config.max_age,
+    max_msgs: config.max_msgs,
+    num_replicas: config.num_replicas,
   };
 }

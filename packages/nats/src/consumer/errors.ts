@@ -24,5 +24,6 @@ export function classifyError(err: unknown): 'retry' | 'term' {
   if (err instanceof NonRetryableError) {
     return 'term';
   }
+
   return 'retry';
 }
