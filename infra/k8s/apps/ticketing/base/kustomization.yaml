@@ -2,21 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - auth/deployment.yaml
-  - auth/service.yaml
-
-  - auth-mongo/deployment.yaml
-  - auth-mongo/service.yaml
-
-  - tickets/deployment.yaml
-  - tickets/service.yaml
-
-  - tickets-mongo/deployment.yaml
-  - tickets-mongo/service.yaml
-
-  - client/deployment.yaml
-  - client/service.yaml
-
-  - gateway/configmap.yaml
-  - gateway/deployment.yaml
-  - gateway/service.yaml
+  - auth
+  - auth-mongo
+  - tickets
+  - tickets-mongo
+  - client
+  - gateway
+  - event-bus

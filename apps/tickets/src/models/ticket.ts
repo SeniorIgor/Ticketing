@@ -13,6 +13,7 @@ interface TicketDoc extends mongoose.Document {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  version: number;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -27,7 +28,7 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
   },
   {
     timestamps: true,
-    versionKey: false,
+    versionKey: 'version',
   },
 );
 
@@ -37,7 +38,7 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
 
 ticketSchema.set('toJSON', {
   transform(_doc, json) {
-    const { _id, id: _i, createdAt: _c, updatedAt: _u, userId: _d, ...rest } = json;
+    const { _id, id: _i, createdAt: _c, updatedAt: _u, userId: _d, version: _v, ...rest } = json;
     return { id: _id.toString(), ...rest };
   },
 });

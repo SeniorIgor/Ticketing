@@ -1,6 +1,8 @@
 import express from 'express';
 
+import { TicketCreatedEvent } from '@org/contracts';
 import { asyncHandler, requireAuth, ValidationError } from '@org/core';
+import { publishEvent } from '@org/nats';
 
 import { Ticket } from '../models';
 import type { CreateTicketReqBody } from '../types';
@@ -26,6 +28,21 @@ router.post(
     });
 
     await ticket.save();
+
+    await publishEvent(
+      TicketCreatedEvent,
+      {
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+        version: ticket.version,
+      },
+      {
+        correlationId: req.get('x-request-id') ?? undefined,
+      },
+    );
+
     res.status(201).send(ticket);
   }),
 );

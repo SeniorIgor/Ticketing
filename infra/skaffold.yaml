@@ -35,6 +35,10 @@ build:
             dest: .
           - src: packages/core/**/*
             dest: .
+          - src: packages/nats/**/*
+            dest: .
+          - src: packages/contracts/**/*
+            dest: .
 
 manifests:
   kustomize:

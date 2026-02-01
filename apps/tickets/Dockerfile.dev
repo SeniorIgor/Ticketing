@@ -10,6 +10,8 @@ RUN npm ci
 
 COPY apps/tickets ./apps/tickets
 COPY packages/core ./packages/core
+COPY packages/nats ./packages/nats
+COPY packages/contracts ./packages/contracts
 
 ENV NODE_ENV=development
 

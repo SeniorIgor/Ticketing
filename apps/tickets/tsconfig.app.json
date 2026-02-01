@@ -16,6 +16,12 @@
       ],
       "@org/test-utils": [
         "packages/test-utils/src/index.ts"
+      ],
+      "@org/nats": [
+        "packages/nats/src/index.ts"
+      ],
+      "@org/contracts": [
+        "packages/contracts/src/index.ts"
       ]
     }
   },
@@ -33,7 +39,16 @@
   ],
   "references": [
     {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../packages/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/nats/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/contracts/tsconfig.lib.json"
     }
   ]
 }

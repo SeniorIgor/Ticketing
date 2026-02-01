@@ -11,3 +11,4 @@ data:
   TICKETS_URL: "http://tickets-srv"
   TICKETS_MONGO_URI: mongodb://tickets-mongo-srv:27017/tickets
   INTERNAL_API_BASE_URL: "http://client-gateway-srv"
+  NATS_URL: "nats://nats:4222"

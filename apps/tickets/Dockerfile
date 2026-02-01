@@ -10,12 +10,16 @@ COPY nx.json tsconfig.base.json ./
 # Per-project manifests for dependency graph
 COPY apps/tickets/package.json apps/tickets/
 COPY packages/core/package.json packages/core/
+COPY packages/nats/package.json packages/nats/
+COPY packages/contracts/package.json packages/contracts/
 
 RUN npm ci
 
 # Copy source code needed for build
 COPY apps/tickets ./apps/tickets
 COPY packages/core ./packages/core
+COPY packages/nats ./packages/nats
+COPY packages/contracts ./packages/contracts
 
 # Build tickets (bundles core)
 RUN npx nx build tickets

@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
+import { drainNats } from '@org/nats';
+
 import { createApp } from './app';
-import { connectMongo } from './config';
+import { connectMongo, startNats } from './config';
 
 const port = process.env.TICKETS_PORT ? Number(process.env.TICKETS_PORT) : 4002;
 
@@ -19,6 +21,8 @@ const shutdown = async (signal: string) => {
 
   console.log(`🛑 ${signal} received. Closing gracefully...`);
 
+  await drainNats().catch((error) => console.error('NATS drain failed', error));
+
   await mongoose.connection.close(false);
 
   server?.close(() => {
@@ -33,6 +37,7 @@ process.on('SIGTERM', shutdown);
 async function start() {
   try {
     await connectMongo();
+    await startNats();
 
     server = app.listen(port, () => {
       console.log(`[ ready ] Tickets listening on ${port}`);
