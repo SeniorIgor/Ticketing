@@ -4,6 +4,7 @@ import { getNats } from '../client/connection';
 import { HDR } from '../constants';
 import { makeEnvelope } from '../envelope';
 import type { EventDef } from '../event-def';
+import type { Subject } from '../subjects';
 import { setHeader } from '../utils';
 import { encodeJson } from '../utils/codec';
 
@@ -14,7 +15,7 @@ export interface PublishOptions {
   traceparent?: string;
 }
 
-export async function publishEvent<TSubject extends string, TData>(
+export async function publishEvent<TSubject extends Subject, TData>(
   def: EventDef<TSubject, TData>,
   data: TData,
   opts?: PublishOptions,

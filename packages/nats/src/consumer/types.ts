@@ -1,7 +1,8 @@
 import type { EventDef } from '../event-def';
+import type { Subject } from '../subjects';
 import type { MessageContext, RelevantConsumerConfig } from '../types';
 
-export interface PullWorkerOptions<TSubject extends string, TData> extends RelevantConsumerConfig {
+export interface PullWorkerOptions<TSubject extends Subject, TData> extends RelevantConsumerConfig {
   stream: string;
   def?: EventDef<TSubject, TData>; // recommended
 

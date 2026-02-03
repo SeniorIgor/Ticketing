@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-import { defineEvent } from '@org/nats';
-
-import { TicketSubjects } from './subjects';
+import { defineEvent, Subjects } from '@org/nats';
 
 export const TicketUpdatedSchema = z.object({
   id: z.string().min(1),
@@ -15,7 +13,7 @@ export const TicketUpdatedSchema = z.object({
 export type TicketUpdatedData = z.infer<typeof TicketUpdatedSchema>;
 
 export const TicketUpdatedEvent = defineEvent({
-  subject: TicketSubjects.TicketUpdated,
+  subject: Subjects.TicketUpdated,
   type: 'TicketUpdated',
   version: 1,
   schema: TicketUpdatedSchema,

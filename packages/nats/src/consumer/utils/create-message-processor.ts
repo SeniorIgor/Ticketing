@@ -1,23 +1,24 @@
 import type { JsMsg } from 'nats';
 
 import { buildDeadLetterRecord, publishDeadLetter } from '../../dlq';
-import type { EventEnvelope } from '../../envelope';
-import { decodeJson } from '../../utils/codec';
-import type { Logger } from '../../utils/logger';
+import { EventEnvelopeSchema } from '../../envelope';
+import type { Subject } from '../../subjects';
+import type { Logger } from '../../utils';
+import { decodeJson } from '../../utils';
 import { classifyError, PoisonMessageError } from '../errors';
 import type { PullWorkerEventHandler, PullWorkerOptions } from '../types';
 
 import type { Semaphore } from '.';
 import { buildContext } from '.';
 
-interface CreateMessageProcessorParams<TSubject extends string, TData> {
+interface CreateMessageProcessorParams<TSubject extends Subject, TData> {
   opts: PullWorkerOptions<TSubject, TData>;
   handler: PullWorkerEventHandler<TData>;
   semaphore: Semaphore;
   logger: Logger;
 }
 
-export function createMessageProcessor<TSubject extends string, TData>({
+export function createMessageProcessor<TSubject extends Subject, TData>({
   opts,
   handler,
   semaphore,
@@ -35,7 +36,14 @@ export function createMessageProcessor<TSubject extends string, TData>({
         msg,
       });
 
-      const env = decodeJson<EventEnvelope<unknown>>(msg.data);
+      const raw = decodeJson<unknown>(msg.data);
+      const envParsed = EventEnvelopeSchema.safeParse(raw);
+
+      if (!envParsed.success) {
+        throw new PoisonMessageError(envParsed.error.message);
+      }
+
+      const env = envParsed.data;
 
       if (opts.def) {
         if (env.subject !== opts.def.subject) {

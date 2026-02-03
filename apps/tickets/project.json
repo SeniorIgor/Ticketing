@@ -4,7 +4,8 @@
   "sourceRoot": "{projectRoot}/src",
   "projectType": "application",
   "implicitDependencies": [
-    "@org/core"
+    "@org/core",
+    "@org/contracts"
   ],
   "targets": {
     "build": {
