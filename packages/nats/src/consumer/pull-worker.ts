@@ -1,14 +1,14 @@
 import type { Consumer } from 'nats';
 
 import { ensureDurableConsumer } from '../admin';
-import { getNats } from '../client';
+import { getNats } from '../client/connection';
 import { sleep } from '../utils';
 
 import type { CreatePullWorkerResult, PullWorkerEventHandler, PullWorkerOptions } from './types';
 import { createMessageProcessor, createSemaphore } from './utils';
 
 export async function createPullWorker<TSubject extends string, TData>(
-  opts: PullWorkerOptions<TSubject>,
+  opts: PullWorkerOptions<TSubject, TData>,
   handler: PullWorkerEventHandler<TData>,
   signal?: AbortSignal,
 ): Promise<CreatePullWorkerResult> {
