@@ -1,8 +1,9 @@
 import type { MsgHdrs } from 'nats';
 
-export type MessageContext = {
+import type { RelevantConsumerConfig } from './consumer-config';
+
+export interface MessageContext extends Pick<RelevantConsumerConfig, 'durable_name'> {
   stream: string;
-  consumer: string;
   subject: string;
 
   seq?: number;
@@ -13,6 +14,4 @@ export type MessageContext = {
   traceparent?: string;
 
   headers?: MsgHdrs;
-};
-
-export type EventHandler<TData> = (data: TData, context: MessageContext) => Promise<void>;
+}

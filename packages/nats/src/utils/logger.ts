@@ -1,9 +1,9 @@
-export type Logger = {
+export interface Logger {
   debug: (...args: unknown[]) => void;
   info: (...args: unknown[]) => void;
   warn: (...args: unknown[]) => void;
   error: (...args: unknown[]) => void;
-};
+}
 
 export const consoleLogger: Logger = {
   debug: (...args) => console.debug(...args),

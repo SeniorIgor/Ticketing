@@ -1,7 +1,6 @@
 import type { ConnectionOptions } from 'nats';
 
-import type { Logger } from './observability/logger';
-import { consoleLogger } from './observability/logger';
+import { consoleLogger, type Logger } from '../utils';
 
 export type NatsConnectConfig = {
   servers: string | string[];

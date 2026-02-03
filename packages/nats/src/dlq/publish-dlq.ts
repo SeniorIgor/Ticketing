@@ -1,5 +1,5 @@
-import { encodeJson } from '../codec';
-import { getNats } from '../connection';
+import { getNats } from '../client';
+import { encodeJson } from '../utils';
 
 import type { DeadLetterRecord } from './types';
 

@@ -6,7 +6,7 @@ export const EventEnvelopeSchema = z.object({
   type: z.string().min(1),
   subject: z.string().min(1),
   version: z.number().int().nonnegative(),
-  time: z.string().min(1), // ISO
+  time: z.string().min(1), // ISO string
   correlationId: z.string().optional(),
   causationId: z.string().optional(),
   data: z.unknown(),
@@ -16,23 +16,33 @@ export type EventEnvelope<TData> = Omit<z.infer<typeof EventEnvelopeSchema>, 'da
   data: TData;
 };
 
-export type EventDef<TSubject extends string, TData> = {
-  subject: TSubject;
-  type: string; // e.g. "TicketCreated"
-  version: number; // schema version
-  schema: z.ZodType<TData>;
-};
+interface MakeEnvelopeParamsMeta {
+  id?: string;
+  time?: string;
+  correlationId?: string;
+  causationId?: string;
+}
 
-export function makeEnvelope<TSubject extends string, TData>(
-  def: EventDef<TSubject, TData>,
-  data: TData,
-  meta?: { correlationId?: string; causationId?: string; id?: string; time?: string },
-): EventEnvelope<TData> {
+interface MakeEnvelopeParams<TData> {
+  subject: string;
+  type: string;
+  version: number;
+  data: TData;
+  meta?: MakeEnvelopeParamsMeta;
+}
+
+export function makeEnvelope<TData>({
+  data,
+  subject,
+  type,
+  version,
+  meta,
+}: MakeEnvelopeParams<TData>): EventEnvelope<TData> {
   return {
     id: meta?.id ?? crypto.randomUUID(),
-    type: def.type,
-    subject: def.subject,
-    version: def.version,
+    type,
+    subject,
+    version,
     time: meta?.time ?? new Date().toISOString(),
     correlationId: meta?.correlationId,
     causationId: meta?.causationId,

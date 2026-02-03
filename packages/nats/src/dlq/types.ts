@@ -1,7 +1,8 @@
-export type DeadLetterRecord = {
+import type { RelevantConsumerConfig } from '../types';
+
+export interface DeadLetterRecord extends Pick<RelevantConsumerConfig, 'durable_name'> {
   originalSubject: string;
   stream: string;
-  consumer: string;
 
   seq?: number;
   delivered?: number;
@@ -11,4 +12,4 @@ export type DeadLetterRecord = {
 
   headers?: Record<string, string>;
   at: string;
-};
+}

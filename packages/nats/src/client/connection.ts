@@ -1,15 +1,17 @@
 import type { JetStreamClient, JetStreamManager, NatsConnection } from 'nats';
 import { connect } from 'nats';
 
+import type { Logger } from '../utils';
+
 import type { NatsConnectConfig } from './config';
 import { normalizeConfig } from './config';
 
-export type NatsDeps = {
+export interface NatsDeps {
   connection: NatsConnection;
   client: JetStreamClient;
   manager: JetStreamManager;
-  logger: ReturnType<typeof normalizeConfig>['logger'];
-};
+  logger: Logger;
+}
 
 let deps: NatsDeps | null = null;
 let connecting: Promise<NatsDeps> | null = null;

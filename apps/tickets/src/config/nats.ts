@@ -16,7 +16,7 @@ export async function startNats() {
 
   if (shouldEnsure) {
     await ensureStream({
-      stream: 'TICKETS',
+      name: 'TICKETS',
       subjects: ['tickets.*'],
       reconcile: 'warn',
     });
