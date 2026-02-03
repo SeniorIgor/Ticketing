@@ -4,11 +4,18 @@ metadata:
   name: app-config
 data:
   NODE_ENV: development
+  
   AUTH_PORT: "80"
   AUTH_URL: "http://auth-srv"
   AUTH_MONGO_URI: mongodb://auth-mongo-srv:27017/auth
+  
   TICKETS_PORT: "80"
   TICKETS_URL: "http://tickets-srv"
   TICKETS_MONGO_URI: mongodb://tickets-mongo-srv:27017/tickets
+  
+  ORDERS_PORT: "80"
+  ORDERS_URL: "http://orders-srv"
+  ORDERS_MONGO_URI: mongodb://orders-mongo-srv:27017/orders
+
   INTERNAL_API_BASE_URL: "http://client-gateway-srv"
   NATS_URL: "nats://nats:4222"

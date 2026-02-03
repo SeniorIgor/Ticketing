@@ -6,6 +6,8 @@ resources:
   - auth-mongo
   - tickets
   - tickets-mongo
+  - orders
+  - orders-mongo
   - client
   - gateway
   - event-bus

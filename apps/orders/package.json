@@ -1,0 +1,9 @@
+{
+  "name": "@org/orders",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "private": true,
+  "scripts": {
+    "docker:build": "docker build -t seniorigortyapkin/orders -f apps/orders/Dockerfile ."
+  }
+}

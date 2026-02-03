@@ -8,7 +8,7 @@ export async function startNats() {
 
   await connectNats({
     servers,
-    name: 'tickets-service',
+    name: 'orders-service',
   });
 
   // Keep this dev-friendly. In prod you usually provision via infra.
@@ -16,8 +16,8 @@ export async function startNats() {
 
   if (shouldEnsure) {
     await ensureStream({
-      stream: Streams.Tickets,
-      subjects: ['tickets.*'],
+      stream: Streams.Orders,
+      subjects: ['orders.*'],
       reconcile: 'warn',
     });
   }

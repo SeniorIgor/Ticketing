@@ -1,4 +1,4 @@
-import { getNats } from '../client';
+import { getNats } from '../connection';
 import { encodeJson } from '../utils';
 
 import type { DeadLetterRecord } from './types';
