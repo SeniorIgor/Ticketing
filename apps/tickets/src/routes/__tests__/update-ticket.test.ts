@@ -1,18 +1,26 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 
+import { TicketUpdatedEvent } from '@org/contracts';
 import { getAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../../app';
 import { Ticket } from '../../models';
+import { publishEventMock } from '../../test/mocks';
 
 const app = createApp();
 
 describe('PUT /api/v1/tickets/:id', () => {
+  beforeEach(() => {
+    publishEventMock.mockClear();
+  });
+
   it('rejects when not authenticated', async () => {
     const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
 
     await request(app).put(`/api/v1/tickets/${ticket.id}`).send({ title: 'New' }).expect(401);
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('rejects when ticket not owned by user and does not modify ticket', async () => {
@@ -43,6 +51,8 @@ describe('PUT /api/v1/tickets/:id', () => {
 
     expect(saved.title).toBe('Owned');
     expect(saved.price).toBe(10);
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('rejects invalid id format', async () => {
@@ -59,6 +69,8 @@ describe('PUT /api/v1/tickets/:id', () => {
       reason: 'TICKET_INVALID_ID',
       details: expect.arrayContaining([expect.objectContaining({ fieldName: 'id' })]),
     });
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('returns 404 when ticket does not exist', async () => {
@@ -66,6 +78,8 @@ describe('PUT /api/v1/tickets/:id', () => {
     const nonExistingId = new mongoose.Types.ObjectId().toHexString();
 
     await request(app).put(`/api/v1/tickets/${nonExistingId}`).set('Cookie', cookie).send({ title: 'New' }).expect(404);
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('rejects update with invalid title', async () => {
@@ -83,6 +97,8 @@ describe('PUT /api/v1/tickets/:id', () => {
       reason: 'TICKET_INVALID_INPUT',
       details: expect.arrayContaining([expect.objectContaining({ fieldName: 'title' })]),
     });
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('rejects update with invalid price', async () => {
@@ -100,13 +116,20 @@ describe('PUT /api/v1/tickets/:id', () => {
       reason: 'TICKET_INVALID_INPUT',
       details: expect.arrayContaining([expect.objectContaining({ fieldName: 'price' })]),
     });
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
-  it('allows partial update', async () => {
+  it('allows partial update (price only) and publishes event', async () => {
     const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
     const cookie = getAuthCookie({ userId: 'user-1', email: 'test@test.com' });
 
-    await request(app).put(`/api/v1/tickets/${ticket.id}`).set('Cookie', cookie).send({ price: 20 }).expect(200);
+    await request(app)
+      .put(`/api/v1/tickets/${ticket.id}`)
+      .set('Cookie', cookie)
+      .set('x-request-id', 'test-request-id')
+      .send({ price: 20 })
+      .expect(200);
 
     const updated = await Ticket.findById(ticket.id);
     if (!updated) {
@@ -115,25 +138,55 @@ describe('PUT /api/v1/tickets/:id', () => {
 
     expect(updated.title).toBe('Old');
     expect(updated.price).toBe(20);
+
+    expect(publishEventMock).toHaveBeenCalledTimes(1);
+    expect(publishEventMock).toHaveBeenCalledWith(
+      TicketUpdatedEvent,
+      expect.objectContaining({
+        id: updated.id,
+        title: 'Old',
+        price: 20,
+        userId: 'user-1',
+        version: expect.any(Number),
+      }),
+      expect.objectContaining({
+        correlationId: 'test-request-id',
+      }),
+    );
   });
 
-  it('updates ticket when owned by user', async () => {
+  it('updates ticket when owned by user and publishes event', async () => {
     const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
     const cookie = getAuthCookie({ userId: 'user-1', email: 'test@test.com' });
 
     await request(app)
       .put(`/api/v1/tickets/${ticket.id}`)
       .set('Cookie', cookie)
+      .set('x-request-id', 'test-request-id')
       .send({ title: 'New', price: 99 })
       .expect(200);
 
     const updated = await Ticket.findById(ticket.id);
-
     if (!updated) {
       throw new Error('Expected ticket to exist');
     }
 
     expect(updated.title).toBe('New');
     expect(updated.price).toBe(99);
+
+    expect(publishEventMock).toHaveBeenCalledTimes(1);
+    expect(publishEventMock).toHaveBeenCalledWith(
+      TicketUpdatedEvent,
+      expect.objectContaining({
+        id: updated.id,
+        title: 'New',
+        price: 99,
+        userId: 'user-1',
+        version: expect.any(Number),
+      }),
+      expect.objectContaining({
+        correlationId: 'test-request-id',
+      }),
+    );
   });
 });

@@ -17,7 +17,7 @@ export async function buildOrder(attrs: {
     userId: attrs.userId,
     status: attrs.status ?? OrderStatus.Created,
     expiresAt: attrs.expiresAt ?? new Date(Date.now() + 15 * 60 * 1000),
-    ticket,
+    ticket: ticket._id,
   });
 
   await order.save();

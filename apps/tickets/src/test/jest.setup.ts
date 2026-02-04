@@ -1,3 +1,5 @@
+import './mocks/nats';
+
 import { clearTestDb, setupTestDb, teardownTestDb } from './setup';
 
 beforeAll(async () => {
