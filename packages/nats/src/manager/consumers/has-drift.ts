@@ -12,17 +12,30 @@ export function hasConsumerDrift(
   const current = pickConsumerRelevant(currentConfig);
   const desired = pickConsumerRelevant(desiredConfig);
 
+  // Always compare filter_subjects if you always set them (you do).
   const cFilters = [...(current.filter_subjects ?? [])].sort();
   const dFilters = [...(desired.filter_subjects ?? [])].sort();
-
   if (!sameStringArray(cFilters, dFilters)) {
     return true;
   }
 
-  return (
-    current.deliver_policy !== desired.deliver_policy ||
-    current.ack_wait !== desired.ack_wait ||
-    current.max_deliver !== desired.max_deliver ||
-    current.max_ack_pending !== desired.max_ack_pending
-  );
+  // deliver_policy you always pass, so compare
+  if (current.deliver_policy !== desired.deliver_policy) {
+    return true;
+  }
+
+  // Only compare if desired explicitly specifies a value
+  if (desired.ack_wait !== undefined && current.ack_wait !== desired.ack_wait) {
+    return true;
+  }
+
+  if (desired.max_deliver !== undefined && current.max_deliver !== desired.max_deliver) {
+    return true;
+  }
+
+  if (desired.max_ack_pending !== undefined && current.max_ack_pending !== desired.max_ack_pending) {
+    return true;
+  }
+
+  return false;
 }

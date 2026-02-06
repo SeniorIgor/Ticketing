@@ -1,5 +1,8 @@
 import { connectNats, ensureStream, Streams } from '@org/nats';
 
+const SERVICE_NAME = 'tickets-service';
+const INSTANCE_ID = process.env.HOSTNAME ?? 'local';
+
 export async function startNats() {
   const servers = process.env.NATS_URL;
   if (!servers) {
@@ -8,7 +11,7 @@ export async function startNats() {
 
   await connectNats({
     servers,
-    name: 'tickets-service',
+    name: `${SERVICE_NAME}:${INSTANCE_ID}`,
   });
 
   // Keep this dev-friendly. In prod you usually provision via infra.

@@ -3,6 +3,8 @@ import { DeliverPolicy } from 'nats';
 import { TicketCreatedEvent } from '@org/contracts';
 import { createPullWorker, getNats, type MessageContext, Streams } from '@org/nats';
 
+import { Ticket } from '../../models';
+
 const DURABLE_NAME = 'orders-ticket-created';
 const DELIVER_POLICY = process.env.NODE_ENV === 'production' ? DeliverPolicy.New : DeliverPolicy.All;
 
@@ -23,16 +25,35 @@ export async function startTicketCreatedListener(signal?: AbortSignal) {
       concurrency: 8,
     },
     async (data, ctx: MessageContext) => {
-      logger.info('[orders] TicketCreated received', {
-        subject: ctx.subject,
-        seq: ctx.seq,
-        delivered: ctx.delivered,
-        ticketId: data.id,
+      // Idempotent "create if missing"
+      const existing = await Ticket.findById(data.id);
+
+      if (existing) {
+        logger.info('[orders] TicketCreated ignored (already exists)', {
+          ticketId: data.id,
+          existingVersion: existing.version,
+          incomingVersion: data.version,
+          subject: ctx.subject,
+          seq: ctx.seq,
+        });
+        return;
+      }
+
+      const ticket = Ticket.build({
+        id: data.id,
+        title: data.title,
+        price: data.price,
         version: data.version,
       });
 
-      // TODO: later you’ll implement the actual Orders logic here
-      // e.g. update local read model, publish follow-up events, etc.
+      await ticket.save();
+
+      logger.info('[orders] Ticket projection created', {
+        ticketId: data.id,
+        version: data.version,
+        subject: ctx.subject,
+        seq: ctx.seq,
+      });
     },
     signal,
   );

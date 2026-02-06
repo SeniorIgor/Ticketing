@@ -6,7 +6,7 @@ import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, Validation
 import { Order, Ticket } from '../models';
 import { OrderStatus } from '../types/order-status';
 import type { CreateOrderReqBody } from '../types/requests';
-import { validateCreateOrder } from '../utils/validate-create-order';
+import { validateCreateOrder } from '../utils';
 
 const router = express.Router();
 
@@ -24,12 +24,12 @@ router.post(
 
     const ticket = await Ticket.findById(req.body.ticketId);
     if (!ticket) {
-      throw new NotFoundError(); // or a domain NotFound like TICKET_NOT_FOUND
+      throw new NotFoundError();
     }
 
     // Reservation check: a ticket can only have ONE active order at a time
     const existingOrder = await Order.findOne({
-      ticket: ticket._id,
+      ticketId: ticket._id,
       status: { $in: [OrderStatus.Created, OrderStatus.AwaitingPayment, OrderStatus.Complete] },
     });
 
@@ -46,15 +46,21 @@ router.post(
       userId,
       status: OrderStatus.Created,
       expiresAt,
-      ticket: ticket._id,
+      ticketId: ticket._id,
     });
 
     await order.save();
 
-    // If you want ticket populated in response:
-    await order.populate('ticket');
-
-    res.status(201).send(order);
+    res.status(201).send({
+      id: order.id,
+      status: order.status,
+      expiresAt: order.expiresAt,
+      ticket: {
+        id: ticket._id,
+        title: ticket.title,
+        price: ticket.price,
+      },
+    });
   }),
 );
 

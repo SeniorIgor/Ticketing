@@ -29,6 +29,7 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
   {
     timestamps: true,
     versionKey: 'version',
+    optimisticConcurrency: true,
   },
 );
 

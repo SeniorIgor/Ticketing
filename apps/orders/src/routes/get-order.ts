@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 
 import { Order } from '../models';
+import { hydrateOrder } from '../utils';
 
 const router = express.Router();
 
@@ -18,20 +19,19 @@ router.get(
       throw new ValidationError('ORDER_INVALID_ID', [{ fieldName: 'id', message: 'Invalid order id' }]);
     }
 
-    const order = await Order.findById(id).populate('ticket');
-
+    const order = await Order.findById(id);
     if (!order) {
       throw new NotFoundError();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const userId = req.currentUser!.userId;
-
     if (order.userId !== userId) {
       throw new AuthorizationError('ORDER_NOT_OWNER', 'You do not have access to this order');
     }
 
-    res.send(order);
+    const response = await hydrateOrder(order);
+    res.send(response);
   }),
 );
 

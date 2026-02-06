@@ -32,7 +32,7 @@ describe('GET /api/v1/orders/:id', () => {
     await request(app).get(`/api/v1/orders/${id}`).set('Cookie', cookie).expect(404);
   });
 
-  it('returns 403 when accessing order of another user', async () => {
+  it('returns 403 when accessing another user order', async () => {
     const cookie = getAuthCookie({ userId: 'user-2', email: 'test@test.com' });
 
     const ticket = await buildTicket();
@@ -51,11 +51,11 @@ describe('GET /api/v1/orders/:id', () => {
 
     expect(res.body).toMatchObject({
       id: order.id,
-      ticket: expect.objectContaining({
-        id: ticket.id,
+      ticket: {
+        id: ticket._id,
         title: 'Concert',
         price: 50,
-      }),
+      },
     });
   });
 });

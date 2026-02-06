@@ -23,12 +23,19 @@ const shutdown = async (signal: string) => {
 
   await drainNats().catch((error) => console.error('NATS drain failed', error));
 
-  await mongoose.connection.close(false);
+  await new Promise<void>((resolve) => {
+    if (!server) {
+      return resolve();
+    }
 
-  server?.close(() => {
-    console.log('🧹 HTTP server closed');
-    process.exit(0);
+    server.close(() => {
+      console.log('🧹 HTTP server closed');
+      resolve();
+    });
   });
+
+  await mongoose.connection.close(false);
+  process.exit(0);
 };
 
 process.on('SIGINT', shutdown);

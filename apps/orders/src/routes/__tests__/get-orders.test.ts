@@ -18,7 +18,7 @@ describe('GET /api/v1/orders', () => {
   });
 
   it('returns only orders for current user', async () => {
-    const user1 = getAuthCookie({ userId: 'user-1', email: 'u1@test.com' });
+    const cookie = getAuthCookie({ userId: 'user-1', email: 'u1@test.com' });
 
     const t1 = await buildTicket({ title: 'A' });
     const t2 = await buildTicket({ title: 'B' });
@@ -28,12 +28,13 @@ describe('GET /api/v1/orders', () => {
     await buildOrder({ userId: 'user-1', ticket: t2 });
     await buildOrder({ userId: 'user-2', ticket: t3 });
 
-    const res = await request(app).get('/api/v1/orders').set('Cookie', user1).expect(200);
+    const res = await request(app).get('/api/v1/orders').set('Cookie', cookie).expect(200);
 
     expect(res.body).toHaveLength(2);
-    const ids = (res.body as OrderResponse[]).map((order) => order.ticket.id);
 
-    expect(ids).toEqual(expect.arrayContaining([t1.id, t2.id]));
-    expect(ids).not.toEqual(expect.arrayContaining([t3.id]));
+    const ids = (res.body as OrderResponse[]).map((o) => o.ticket.id);
+
+    expect(ids).toEqual(expect.arrayContaining([t1._id, t2._id]));
+    expect(ids).not.toEqual(expect.arrayContaining([t3._id]));
   });
 });

@@ -1,17 +1,13 @@
 import type { ConnectionOptions } from 'nats';
 
-import { consoleLogger, type Logger } from '../utils';
+import { createLogger, type Logger } from '../utils';
 
-export type NatsConnectConfig = {
+export interface NatsConnectConfig {
   servers: string | string[];
-  name?: string;
+  name: string;
   logger?: Logger;
-  /**
-   * Extra nats.js ConnectionOptions.
-   * (auth, tls, reconnect, timeout, etc.)
-   */
   connectionOptions?: Omit<ConnectionOptions, 'servers' | 'name'>;
-};
+}
 
 export type NatsRuntime = {
   logger: Logger;
@@ -20,6 +16,6 @@ export type NatsRuntime = {
 export function normalizeConfig(config: NatsConnectConfig): Required<NatsRuntime> & NatsConnectConfig {
   return {
     ...config,
-    logger: config.logger ?? consoleLogger,
+    logger: config.logger ?? createLogger({ natsName: config.name }),
   };
 }

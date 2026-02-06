@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+import type { Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 import type { OrderStatus } from '../types/order-status';
 import { OrderStatus as OrderStatusEnum } from '../types/order-status';
@@ -7,25 +8,25 @@ interface OrderAttrs {
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticket: mongoose.Types.ObjectId;
+  ticketId: string;
 }
 
-export interface OrderDoc extends mongoose.Document {
+export interface OrderDoc extends Document {
   id: string;
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticket: mongoose.Types.ObjectId;
+  ticketId: string;
   createdAt: Date;
   updatedAt: Date;
   version: number;
 }
 
-interface OrderModel extends mongoose.Model<OrderDoc> {
+interface OrderModel extends Model<OrderDoc> {
   build(attrs: OrderAttrs): OrderDoc;
 }
 
-const orderSchema = new mongoose.Schema<OrderDoc, OrderModel>(
+const orderSchema = new Schema<OrderDoc, OrderModel>(
   {
     userId: { type: String, required: true },
     status: {
@@ -34,16 +35,13 @@ const orderSchema = new mongoose.Schema<OrderDoc, OrderModel>(
       enum: Object.values(OrderStatusEnum),
       default: OrderStatusEnum.Created,
     },
-    expiresAt: { type: mongoose.Schema.Types.Date, required: true },
-    ticket: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Ticket',
-      required: true,
-    },
+    expiresAt: { type: Schema.Types.Date, required: true },
+    ticketId: { type: String, required: true, index: true },
   },
   {
     versionKey: 'version',
     timestamps: true,
+    optimisticConcurrency: true,
   },
 );
 

@@ -1,38 +1,39 @@
-import mongoose from 'mongoose';
+import type { Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 interface TicketAttrs {
-  id: string; // important: we want to set _id from event id
-  title: string;
-  price: number;
-  version: number;
-}
-
-export interface TicketDoc extends mongoose.Document {
   id: string;
   title: string;
   price: number;
-  createdAt: Date;
-  updatedAt: Date;
   version: number;
 }
 
-interface TicketModel extends mongoose.Model<TicketDoc> {
+export interface TicketDoc extends Document<string> {
+  _id: string;
+  title: string;
+  price: number;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface TicketModel extends Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
 }
 
-const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
+const ticketSchema = new Schema<TicketDoc, TicketModel>(
   {
-    title: { type: String, required: true },
+    _id: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     version: { type: Number, required: true, min: 0 },
   },
   {
-    versionKey: false,
     timestamps: true,
+    versionKey: false,
   },
 );
 
-// Make Mongo _id equal to incoming ticket id (string ObjectId from tickets service)
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket({
     _id: attrs.id,
@@ -44,8 +45,8 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
 
 ticketSchema.set('toJSON', {
   transform(_doc, json) {
-    const { _id, id: _i, createdAt: _c, updatedAt: _u, version: _v, ...rest } = json;
-    return { id: _id.toString(), ...rest };
+    const { _id, createdAt: _c, updatedAt: _u, version: _v, ...rest } = json;
+    return { id: _id, ...rest };
   },
 });
 
