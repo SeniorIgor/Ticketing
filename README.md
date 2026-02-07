@@ -192,3 +192,13 @@ Kill the pod by its name
 // 
 //  run kustomize build overlays/dev
 //  run kustomize build overlays/prod
+
+# How to clear NATS Store (PVC)
+
+```bash
+  kubectl get pvc -n ticketing-dev | grep nats
+```
+
+```bash
+  kubectl delete pvc data-nats-0 -n ticketing-dev
+```

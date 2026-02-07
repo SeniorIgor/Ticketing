@@ -35,6 +35,24 @@ build:
             dest: .
           - src: packages/core/**/*
             dest: .
+          - src: packages/nats/**/*
+            dest: .
+          - src: packages/contracts/**/*
+            dest: .
+    - image: seniorigortyapkin/orders
+      context: .
+      docker:
+        dockerfile: apps/orders/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/orders/**/*
+            dest: .
+          - src: packages/core/**/*
+            dest: .
+          - src: packages/nats/**/*
+            dest: .
+          - src: packages/contracts/**/*
+            dest: .
 
 manifests:
   kustomize:

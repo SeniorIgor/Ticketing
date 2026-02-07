@@ -1,0 +1,47 @@
+{
+  "name": "@org/nats",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/nats/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "packages/nats/dist",
+        "main": "packages/nats/src/index.ts",
+        "tsConfig": "packages/nats/tsconfig.lib.json",
+        "format": [
+          "esm"
+        ],
+        "declarationRootDir": "packages/nats/src"
+      },
+      "configurations": {
+        "watch": {
+          "watch": true,
+          "sourcemap": true,
+          "cache": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint .",
+        "cwd": "packages/nats"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "packages/nats"
+      }
+    }
+  },
+  "tags": [
+    "npm:private"
+  ]
+}

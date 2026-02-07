@@ -2,7 +2,9 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import mongoose from 'mongoose';
 
+import { TicketUpdatedEvent } from '@org/contracts';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
+import { publishEvent } from '@org/nats';
 
 import { Ticket } from '../models';
 import type { UpdateTicketReqBody } from '../types';
@@ -48,6 +50,20 @@ router.put(
     }
 
     await ticket.save();
+
+    await publishEvent(
+      TicketUpdatedEvent,
+      {
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+        version: ticket.version,
+      },
+      {
+        correlationId: req.get('x-request-id') ?? undefined,
+      },
+    );
 
     res.send(ticket);
   }),

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-config
+data:
+  nats.conf: |
+    port: 4222
+    http: 8222
+
+    # JetStream (persistence)
+    jetstream {
+      store_dir: "/data/jetstream"
+
+      # Optional safety limits (tune later)
+      max_file_store: 10Gb
+      max_mem_store: 256Mb
+    }
+
+    max_payload: 1MB

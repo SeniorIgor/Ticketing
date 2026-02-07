@@ -8,3 +8,6 @@ resources:
   - ../../base
   - app-config.yaml
   - ingress.yaml
+
+patches:
+  - path: nats-patch.yaml

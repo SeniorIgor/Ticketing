@@ -17,6 +17,15 @@
     },
     {
       "path": "./apps/tickets"
+    },
+    {
+      "path": "./packages/nats"
+    },
+    {
+      "path": "./packages/contracts"
+    },
+    {
+      "path": "./apps/orders"
     }
   ]
 }
