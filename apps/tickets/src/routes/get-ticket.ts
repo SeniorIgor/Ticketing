@@ -8,9 +8,13 @@ import { Ticket } from '../models';
 
 const router = express.Router();
 
+type GetTicketRequestParams = {
+  id: string;
+};
+
 router.get(
   '/:id',
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: Request<GetTicketRequestParams>, res: Response) => {
     const { id } = req.params;
 
     if (!mongoose.isValidObjectId(id)) {

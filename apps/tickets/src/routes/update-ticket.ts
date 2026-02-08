@@ -12,10 +12,14 @@ import { validateUpdateTicket } from '../utils/validate-update-ticket';
 
 const router = express.Router();
 
+type UpdateTicketRequestParams = {
+  id: string;
+};
+
 router.put(
   '/:id',
   requireAuth,
-  asyncHandler(async (req: Request<{ id: string }, unknown, UpdateTicketReqBody>, res: Response) => {
+  asyncHandler(async (req: Request<UpdateTicketRequestParams, unknown, UpdateTicketReqBody>, res: Response) => {
     const { id } = req.params;
 
     if (!mongoose.isValidObjectId(id)) {

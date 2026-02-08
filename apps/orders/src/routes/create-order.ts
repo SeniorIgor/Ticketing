@@ -1,7 +1,9 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
+import { OrderCreatedEvent } from '@org/contracts';
 import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, ValidationError } from '@org/core';
+import { publishEvent } from '@org/nats';
 
 import { Order, Ticket } from '../models';
 import { OrderStatus } from '../types/order-status';
@@ -10,7 +12,7 @@ import { validateCreateOrder } from '../utils';
 
 const router = express.Router();
 
-// 15 min order expiration (example)
+// 15 min order expiration
 const EXPIRATION_SECONDS = 15 * 60;
 
 router.post(
@@ -28,12 +30,7 @@ router.post(
     }
 
     // Reservation check: a ticket can only have ONE active order at a time
-    const existingOrder = await Order.findOne({
-      ticketId: ticket._id,
-      status: { $in: [OrderStatus.Created, OrderStatus.AwaitingPayment, OrderStatus.Complete] },
-    });
-
-    if (existingOrder) {
+    if (await ticket.isReserved()) {
       throw new BusinessRuleError('TICKET_RESERVED', 'Ticket is already reserved');
     }
 
@@ -46,21 +43,25 @@ router.post(
       userId,
       status: OrderStatus.Created,
       expiresAt,
-      ticketId: ticket._id,
+      ticket,
     });
 
     await order.save();
 
-    res.status(201).send({
-      id: order.id,
-      status: order.status,
-      expiresAt: order.expiresAt,
-      ticket: {
-        id: ticket._id,
-        title: ticket.title,
-        price: ticket.price,
+    await publishEvent(
+      OrderCreatedEvent,
+      {
+        id: order.id,
+        userId: order.userId,
+        status: order.status,
+        expiresAt: order.expiresAt.toISOString(),
+        ticket: { id: ticket.id, price: ticket.price },
+        version: order.version,
       },
-    });
+      { correlationId: req.get('x-request-id') ?? undefined },
+    );
+
+    res.status(201).send(order);
   }),
 );
 

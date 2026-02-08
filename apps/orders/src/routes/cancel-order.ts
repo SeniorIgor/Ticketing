@@ -2,17 +2,23 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import mongoose from 'mongoose';
 
+import { OrderCancelledEvent } from '@org/contracts';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
+import { publishEvent } from '@org/nats';
 
 import { Order } from '../models';
 import { OrderStatus } from '../types/order-status';
 
 const router = express.Router();
 
+type CancelOrderRequestParams = {
+  id: string;
+};
+
 router.delete(
   '/:id',
   requireAuth,
-  asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+  asyncHandler(async (req: Request<CancelOrderRequestParams>, res: Response) => {
     const { id } = req.params;
 
     if (!mongoose.isValidObjectId(id)) {
@@ -34,6 +40,17 @@ router.delete(
 
     order.status = OrderStatus.Cancelled;
     await order.save();
+
+    await publishEvent(
+      OrderCancelledEvent,
+      {
+        id: order.id,
+        userId: order.userId,
+        ticket: { id: order.ticket.toString() },
+        version: order.version,
+      },
+      { correlationId: req.get('x-request-id') ?? undefined },
+    );
 
     res.status(204).send();
   }),

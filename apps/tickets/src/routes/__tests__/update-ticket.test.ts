@@ -11,10 +11,6 @@ import { publishEventMock } from '../../test/mocks';
 const app = createApp();
 
 describe('PUT /api/v1/tickets/:id', () => {
-  beforeEach(() => {
-    publishEventMock.mockClear();
-  });
-
   it('rejects when not authenticated', async () => {
     const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
 

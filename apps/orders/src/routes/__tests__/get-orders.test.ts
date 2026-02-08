@@ -32,9 +32,9 @@ describe('GET /api/v1/orders', () => {
 
     expect(res.body).toHaveLength(2);
 
-    const ids = (res.body as OrderResponse[]).map((o) => o.ticket.id);
+    const ids = (res.body as OrderResponse[]).map((order) => order.ticket.id);
 
-    expect(ids).toEqual(expect.arrayContaining([t1._id, t2._id]));
-    expect(ids).not.toEqual(expect.arrayContaining([t3._id]));
+    expect(ids).toEqual(expect.arrayContaining([t1.id, t2.id]));
+    expect(ids).not.toEqual(expect.arrayContaining([t3.id]));
   });
 });
