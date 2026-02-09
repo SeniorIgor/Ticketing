@@ -3,7 +3,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 
 import { TicketUpdatedEvent } from '@org/contracts';
-import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
+import {
+  asyncHandler,
+  AuthorizationError,
+  BusinessRuleError,
+  NotFoundError,
+  requireAuth,
+  ValidationError,
+} from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Ticket } from '../models';
@@ -36,6 +43,10 @@ router.put(
 
     if (ticket.userId !== userId) {
       throw new AuthorizationError('TICKET_NOT_OWNER', 'You are not allowed to edit this ticket');
+    }
+
+    if (ticket.isReserved()) {
+      throw new BusinessRuleError('TICKET_RESERVED', 'Ticket is currently reserved and cannot be edited');
     }
 
     const errors = validateUpdateTicket(req.body);

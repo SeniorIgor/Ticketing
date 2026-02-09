@@ -24,6 +24,7 @@ export interface TicketDoc extends Document {
 
 interface TicketModel extends Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
+  applyUpdateFromEvent(data: TicketAttrs): Promise<TicketDoc | null>;
 }
 
 const ticketSchema = new Schema<TicketDoc, TicketModel>(
@@ -47,6 +48,10 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
   });
 };
 
+ticketSchema.statics.applyUpdateFromEvent = function ({ id, price, title, version }: TicketAttrs) {
+  return this.findOneAndUpdate({ _id: id, version: version - 1 }, { $set: { price, title, version } }, { new: true });
+};
+
 ticketSchema.methods.isReserved = async function (this: TicketDoc) {
   const existing = await Order.exists({
     ticket: this._id,
@@ -59,7 +64,8 @@ ticketSchema.methods.isReserved = async function (this: TicketDoc) {
 ticketSchema.set('toJSON', {
   transform(_doc, json) {
     const { _id, id: _, createdAt: _c, updatedAt: _u, version: _v, ...rest } = json;
-    return { id: _id, ...rest };
+
+    return { id: _id.toString(), ...rest };
   },
 });
 

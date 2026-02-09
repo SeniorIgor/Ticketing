@@ -25,14 +25,7 @@ export async function startTicketUpdatedListener(signal?: AbortSignal) {
       concurrency: 8,
     },
     async (data, ctx: MessageContext) => {
-      // ✅ Atomic "only apply if version-1 exists"
-      const updated = await Ticket.findOneAndUpdate(
-        { _id: data.id, version: data.version - 1 },
-        {
-          $set: { title: data.title, price: data.price, version: data.version },
-        },
-        { new: true },
-      );
+      const updated = await Ticket.applyUpdateFromEvent(data);
 
       if (!updated) {
         const alreadyApplied = await Ticket.exists({ _id: data.id, version: data.version });
