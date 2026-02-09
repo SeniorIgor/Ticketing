@@ -1,6 +1,6 @@
 import './mocks/nats';
 
-import { publishEventMock } from './mocks/nats';
+import { createPullWorkerMock, getNatsMock, publishEventMock } from './mocks/nats';
 import { clearTestDb, setupTestDb, teardownTestDb } from './setup';
 
 beforeAll(async () => {
@@ -8,15 +8,14 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  // Always ensure real timers for DB + supertest + mongoose internals
   jest.useRealTimers();
-
   await clearTestDb();
+  createPullWorkerMock.mockClear();
   publishEventMock.mockClear();
+  getNatsMock.mockClear();
 });
 
 afterAll(async () => {
-  // Extra safety: restore timers before teardown
   jest.useRealTimers();
 
   await teardownTestDb();

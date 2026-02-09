@@ -5,7 +5,9 @@
   "projectType": "application",
   "implicitDependencies": [
     "@org/core",
-    "@org/contracts"
+    "@org/nats",
+    "@org/contracts",
+    "@org/test-utils"
   ],
   "targets": {
     "build": {

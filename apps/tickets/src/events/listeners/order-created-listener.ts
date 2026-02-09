@@ -20,6 +20,8 @@ export async function startOrderCreatedListener(signal?: AbortSignal) {
       ensure: true,
       deliver_policy: DELIVER_POLICY,
 
+      ack_wait: 30_000, // 30s
+
       batchSize: 50,
       expiresMs: 2000,
       concurrency: 8,
@@ -32,7 +34,7 @@ export async function startOrderCreatedListener(signal?: AbortSignal) {
       // If already reserved by SAME order -> idempotent ok.
       // If reserved by DIFFERENT order -> something is off; retry (could be out-of-order cancel etc.)
       const updated = await Ticket.findOneAndUpdate(
-        { _id: ticketId, $or: [{ orderId: { $exists: false } }, { orderId: null }, { orderId }] },
+        { _id: ticketId, $or: [{ orderId: { $exists: false } }, { orderId: null }] },
         { $set: { orderId }, $inc: { version: 1 } },
         { new: true },
       );
