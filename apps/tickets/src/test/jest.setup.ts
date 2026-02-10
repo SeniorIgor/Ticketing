@@ -1,5 +1,6 @@
 import './mocks/nats';
 
+import { createPullWorkerMock, getNatsMock, publishEventMock } from './mocks/nats';
 import { clearTestDb, setupTestDb, teardownTestDb } from './setup';
 
 beforeAll(async () => {
@@ -8,6 +9,9 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await clearTestDb();
+  createPullWorkerMock.mockClear();
+  publishEventMock.mockClear();
+  getNatsMock.mockClear();
 });
 
 afterAll(async () => {

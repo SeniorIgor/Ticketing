@@ -6,14 +6,20 @@ interface TicketAttrs {
   userId: string; // owner
 }
 
-interface TicketDoc extends mongoose.Document {
+export interface TicketDoc extends mongoose.Document {
   id: string;
   title: string;
   price: number;
   userId: string;
+
+  // reservation flag controlled by Orders events
+  orderId?: string;
+
   createdAt: string;
   updatedAt: string;
   version: number;
+
+  isReserved(): boolean;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -25,6 +31,8 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
     title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     userId: { type: String, required: true },
+    // when present -> ticket is reserved and should not be edited
+    orderId: { type: String, required: false, index: true },
   },
   {
     timestamps: true,
@@ -32,6 +40,10 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
     optimisticConcurrency: true,
   },
 );
+
+ticketSchema.methods.isReserved = function isReserved(): boolean {
+  return !!this.orderId;
+};
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket(attrs);

@@ -5,6 +5,7 @@
   "projectType": "application",
   "implicitDependencies": [
     "@org/core",
+    "@org/nats",
     "@org/contracts"
   ],
   "targets": {

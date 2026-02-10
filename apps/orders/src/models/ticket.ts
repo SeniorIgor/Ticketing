@@ -1,6 +1,10 @@
 import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
+import { OrderStatus } from '../types';
+
+import { Order } from './order';
+
 interface TicketAttrs {
   id: string;
   title: string;
@@ -8,22 +12,23 @@ interface TicketAttrs {
   version: number;
 }
 
-export interface TicketDoc extends Document<string> {
-  _id: string;
+export interface TicketDoc extends Document {
+  id: string;
   title: string;
   price: number;
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  isReserved(): Promise<boolean>;
 }
 
 interface TicketModel extends Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
+  applyUpdateFromEvent(data: TicketAttrs): Promise<TicketDoc | null>;
 }
 
 const ticketSchema = new Schema<TicketDoc, TicketModel>(
   {
-    _id: { type: String, required: true },
     title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     version: { type: Number, required: true, min: 0 },
@@ -43,10 +48,24 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
   });
 };
 
+ticketSchema.statics.applyUpdateFromEvent = function ({ id, price, title, version }: TicketAttrs) {
+  return this.findOneAndUpdate({ _id: id, version: version - 1 }, { $set: { price, title, version } }, { new: true });
+};
+
+ticketSchema.methods.isReserved = async function (this: TicketDoc) {
+  const existing = await Order.exists({
+    ticket: this._id,
+    status: { $in: [OrderStatus.Created, OrderStatus.AwaitingPayment, OrderStatus.Complete] },
+  });
+
+  return !!existing;
+};
+
 ticketSchema.set('toJSON', {
   transform(_doc, json) {
-    const { _id, createdAt: _c, updatedAt: _u, version: _v, ...rest } = json;
-    return { id: _id, ...rest };
+    const { _id, id: _, createdAt: _c, updatedAt: _u, version: _v, ...rest } = json;
+
+    return { id: _id.toString(), ...rest };
   },
 });
 

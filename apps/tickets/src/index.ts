@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
+import type { CreatePullWorkerResult } from '@org/nats';
 import { drainNats } from '@org/nats';
 
+import { startTicketsListeners, stopWorkers } from './events/listeners';
 import { createApp } from './app';
 import { connectMongo, startNats } from './config';
 
@@ -10,6 +12,7 @@ const port = process.env.TICKETS_PORT ? Number(process.env.TICKETS_PORT) : 4002;
 const app = createApp();
 
 let server: ReturnType<typeof app.listen>;
+let workers: CreatePullWorkerResult[] = [];
 let isShuttingDown = false;
 
 const shutdown = async (signal: string) => {
@@ -20,6 +23,8 @@ const shutdown = async (signal: string) => {
   isShuttingDown = true;
 
   console.log(`🛑 ${signal} received. Closing gracefully...`);
+
+  stopWorkers(workers);
 
   await drainNats().catch((error) => console.error('NATS drain failed', error));
 
@@ -45,6 +50,7 @@ async function start() {
   try {
     await connectMongo();
     await startNats();
+    workers = await startTicketsListeners();
 
     server = app.listen(port, () => {
       console.log(`[ ready ] Tickets listening on ${port}`);

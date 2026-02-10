@@ -20,6 +20,8 @@ export async function startTicketCreatedListener(signal?: AbortSignal) {
       ensure: true,
       deliver_policy: DELIVER_POLICY,
 
+      ack_wait: 30_000_000_000, // 30s
+
       batchSize: 50,
       expiresMs: 2000,
       concurrency: 8,

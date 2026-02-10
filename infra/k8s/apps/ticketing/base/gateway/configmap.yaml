@@ -21,3 +21,10 @@ data:
             paths:
               - /api/v1/tickets
             strip_path: false
+      - name: orders
+        url: http://orders-srv:80
+        routes:
+          - name: orders
+            paths:
+              - /api/v1/orders
+            strip_path: false

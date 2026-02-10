@@ -10,10 +10,6 @@ import { publishEventMock } from '../../test/mocks';
 const app = createApp();
 
 describe('POST /api/v1/tickets', () => {
-  beforeEach(() => {
-    publishEventMock.mockClear();
-  });
-
   it('rejects when not authenticated', async () => {
     const res = await request(app).post('/api/v1/tickets').send({ title: 'My Ticket', price: 25 }).expect(401);
 

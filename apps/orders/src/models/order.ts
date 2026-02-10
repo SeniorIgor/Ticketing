@@ -4,11 +4,13 @@ import mongoose, { Schema } from 'mongoose';
 import type { OrderStatus } from '../types/order-status';
 import { OrderStatus as OrderStatusEnum } from '../types/order-status';
 
+import type { TicketDoc } from './ticket';
+
 interface OrderAttrs {
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticketId: string;
+  ticket: TicketDoc;
 }
 
 export interface OrderDoc extends Document {
@@ -16,10 +18,10 @@ export interface OrderDoc extends Document {
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticketId: string;
   createdAt: Date;
   updatedAt: Date;
   version: number;
+  ticket: TicketDoc;
 }
 
 interface OrderModel extends Model<OrderDoc> {
@@ -35,8 +37,8 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
       enum: Object.values(OrderStatusEnum),
       default: OrderStatusEnum.Created,
     },
-    expiresAt: { type: Schema.Types.Date, required: true },
-    ticketId: { type: String, required: true, index: true },
+    expiresAt: { type: Schema.Types.Date },
+    ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
   },
   {
     versionKey: 'version',

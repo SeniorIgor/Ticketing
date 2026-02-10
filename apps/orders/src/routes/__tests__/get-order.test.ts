@@ -52,7 +52,7 @@ describe('GET /api/v1/orders/:id', () => {
     expect(res.body).toMatchObject({
       id: order.id,
       ticket: {
-        id: ticket._id,
+        id: ticket.id,
         title: 'Concert',
         price: 50,
       },

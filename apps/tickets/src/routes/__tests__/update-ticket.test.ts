@@ -11,10 +11,6 @@ import { publishEventMock } from '../../test/mocks';
 const app = createApp();
 
 describe('PUT /api/v1/tickets/:id', () => {
-  beforeEach(() => {
-    publishEventMock.mockClear();
-  });
-
   it('rejects when not authenticated', async () => {
     const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
 
@@ -153,6 +149,39 @@ describe('PUT /api/v1/tickets/:id', () => {
         correlationId: 'test-request-id',
       }),
     );
+  });
+
+  it('rejects update when ticket is reserved and does not publish event', async () => {
+    const cookie = getAuthCookie({ userId: 'user-1', email: 'test@test.com' });
+
+    // ticket owned by user, but reserved
+    const ticket = await Ticket.build({ title: 'Old', price: 10, userId: 'user-1' }).save();
+    ticket.orderId = new mongoose.Types.ObjectId().toHexString();
+    await ticket.save();
+
+    const res = await request(app)
+      .put(`/api/v1/tickets/${ticket.id}`)
+      .set('Cookie', cookie)
+      .send({ title: 'New', price: 99 })
+      .expect(409);
+
+    expect(res.body).toMatchObject({
+      code: 'BUSINESS_RULE',
+      reason: 'TICKET_RESERVED',
+      message: expect.any(String),
+    });
+
+    // ensure ticket didn't change
+    const saved = await Ticket.findById(ticket.id);
+    if (!saved) {
+      throw new Error('Expected ticket to exist');
+    }
+
+    expect(saved.title).toBe('Old');
+    expect(saved.price).toBe(10);
+    expect(saved.orderId).toBeTruthy();
+
+    expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('updates ticket when owned by user and publishes event', async () => {

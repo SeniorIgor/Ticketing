@@ -5,21 +5,24 @@ import mongoose from 'mongoose';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 
 import { Order } from '../models';
-import { hydrateOrder } from '../utils';
 
 const router = express.Router();
+
+type GetOrderRequestParams = {
+  id: string;
+};
 
 router.get(
   '/:id',
   requireAuth,
-  asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+  asyncHandler(async (req: Request<GetOrderRequestParams>, res: Response) => {
     const { id } = req.params;
 
     if (!mongoose.isValidObjectId(id)) {
       throw new ValidationError('ORDER_INVALID_ID', [{ fieldName: 'id', message: 'Invalid order id' }]);
     }
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate('ticket');
     if (!order) {
       throw new NotFoundError();
     }
@@ -30,8 +33,7 @@ router.get(
       throw new AuthorizationError('ORDER_NOT_OWNER', 'You do not have access to this order');
     }
 
-    const response = await hydrateOrder(order);
-    res.send(response);
+    res.send(order);
   }),
 );
 
