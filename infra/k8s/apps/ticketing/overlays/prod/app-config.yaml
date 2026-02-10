@@ -16,6 +16,12 @@ data:
   ORDERS_PORT: "80"
   ORDERS_URL: "http://orders-srv"
   ORDERS_MONGO_URI: mongodb://orders-mongo-srv:27017/orders
+
+  EXPIRATION_PORT: "80"
+  EXPIRATION_URL: "http://expiration-srv"
   
   INTERNAL_API_BASE_URL: "http://client-gateway-srv"
   NATS_URL: "nats://nats:4222"
+
+  REDIS_HOST: "redis-srv"
+  REDIS_PORT: "6379"

@@ -1,0 +1,91 @@
+{
+  "name": "@org/expiration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "application",
+  "implicitDependencies": [
+    "@org/core",
+    "@org/nats",
+    "@org/contracts"
+  ],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "platform": "node",
+        "outputPath": "{projectRoot}/dist",
+        "main": "{projectRoot}/src/index.ts",
+        "tsConfig": "{projectRoot}/tsconfig.app.json",
+        "bundle": true,
+        "externalDependencies": "none",
+        "format": [
+          "cjs"
+        ]
+      },
+      "configurations": {
+        "watch": {
+          "watch": true,
+          "sourcemap": true,
+          "cache": false
+        }
+      }
+    },
+    "dev": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "@org/expiration:build:watch",
+        "watch": true,
+        "inspect": false
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          "nx run @org/core:build:watch",
+          "nx run @org/expiration:dev"
+        ]
+      }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build"
+      ],
+      "options": {
+        "command": "node apps/expiration/dist/index.cjs"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint .",
+        "cwd": "apps/expiration"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "^build"
+      ],
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.app.json",
+        "cwd": "apps/expiration"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "apps/expiration/jest.config.cts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": [
+    "npm:private"
+  ]
+}

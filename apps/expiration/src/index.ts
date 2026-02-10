@@ -1,0 +1,60 @@
+import type { CreatePullWorkerResult } from '@org/nats';
+import { drainNats } from '@org/nats';
+
+import { startExpirationListeners, stopWorkers } from './events/listeners';
+import { createApp } from './app';
+import { startNats } from './config';
+
+const port = process.env.EXPIRATION_PORT ? Number(process.env.EXPIRATION_PORT) : 4004;
+
+const app = createApp();
+
+let server: ReturnType<typeof app.listen>;
+let workers: CreatePullWorkerResult[] = [];
+let isShuttingDown = false;
+
+const shutdown = async (signal: string) => {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
+
+  console.log(`🛑 ${signal} received. Closing gracefully...`);
+
+  stopWorkers(workers);
+
+  await drainNats().catch((error) => console.error('NATS drain failed', error));
+
+  await new Promise<void>((resolve) => {
+    if (!server) {
+      return resolve();
+    }
+
+    server.close(() => {
+      console.log('🧹 HTTP server closed');
+      resolve();
+    });
+  });
+
+  process.exit(0);
+};
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+async function start() {
+  try {
+    await startNats();
+    workers = await startExpirationListeners();
+
+    server = app.listen(port, () => {
+      console.log(`[ ready ] Expiration listening on ${port}`);
+    });
+  } catch (err) {
+    console.error('❌ Startup failed', err);
+    process.exit(1);
+  }
+}
+
+start();

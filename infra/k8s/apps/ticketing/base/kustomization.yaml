@@ -11,3 +11,5 @@ resources:
   - client
   - gateway
   - event-bus
+  - expiration
+  - redis

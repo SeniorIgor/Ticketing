@@ -26,6 +26,9 @@
     },
     {
       "path": "./apps/orders"
+    },
+    {
+      "path": "./apps/expiration"
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "name": "@org/expiration",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "private": true,
+  "scripts": {
+    "docker:build": "docker build -t seniorigortyapkin/expiration -f apps/expiration/Dockerfile ."
+  }
+}
