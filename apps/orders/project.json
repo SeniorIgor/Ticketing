@@ -6,8 +6,7 @@
   "implicitDependencies": [
     "@org/core",
     "@org/nats",
-    "@org/contracts",
-    "@org/test-utils"
+    "@org/contracts"
   ],
   "targets": {
     "build": {

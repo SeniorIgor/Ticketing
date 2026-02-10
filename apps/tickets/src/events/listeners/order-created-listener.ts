@@ -20,7 +20,7 @@ export async function startOrderCreatedListener(signal?: AbortSignal) {
       ensure: true,
       deliver_policy: DELIVER_POLICY,
 
-      ack_wait: 30_000, // 30s
+      ack_wait: 30_000_000_000, // 30s
 
       batchSize: 50,
       expiresMs: 2000,
@@ -66,6 +66,7 @@ export async function startOrderCreatedListener(signal?: AbortSignal) {
           price: updated.price,
           userId: updated.userId,
           version: updated.version,
+          orderId: updated.orderId,
         },
         { correlationId: ctx.correlationId },
       );

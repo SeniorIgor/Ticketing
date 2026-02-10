@@ -8,6 +8,8 @@ export const TicketUpdatedSchema = z.object({
   price: z.number().nonnegative(),
   userId: z.string().min(1),
   version: z.number().int().nonnegative(),
+  // reservation state (optional)
+  orderId: z.string().min(1).optional(),
 });
 
 export type TicketUpdatedData = z.infer<typeof TicketUpdatedSchema>;

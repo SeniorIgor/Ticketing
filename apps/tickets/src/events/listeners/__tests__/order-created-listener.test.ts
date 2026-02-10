@@ -56,6 +56,7 @@ describe('tickets: OrderCreated listener', () => {
       price: saved.price,
       userId: saved.userId,
       version: saved.version,
+      orderId: saved.orderId,
     });
   });
 

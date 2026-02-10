@@ -20,7 +20,7 @@ export async function startOrderCancelledListener(signal?: AbortSignal) {
       ensure: true,
       deliver_policy: DELIVER_POLICY,
 
-      ack_wait: 30_000, // 30s
+      ack_wait: 30_000_000_000, // 30s
 
       batchSize: 50,
       expiresMs: 2000,
