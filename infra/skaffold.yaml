@@ -67,6 +67,8 @@ build:
             dest: .
           - src: packages/contracts/**/*
             dest: .
+          - src: packages/queue/**/*
+            dest: .
 
 manifests:
   kustomize:
@@ -94,6 +96,14 @@ profiles:
           context: .
           docker:
             dockerfile: apps/tickets/Dockerfile
+        - image: seniorigortyapkin/orders
+          context: .
+          docker:
+            dockerfile: apps/orders/Dockerfile
+        - image: seniorigortyapkin/expiration
+          context: .
+          docker:
+            dockerfile: apps/expiration/Dockerfile
     manifests:
       kustomize:
         paths:

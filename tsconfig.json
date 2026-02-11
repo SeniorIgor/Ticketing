@@ -10,13 +10,19 @@
       "path": "./apps/auth"
     },
     {
+      "path": "./apps/tickets"
+    },
+    {
+      "path": "./apps/orders"
+    },
+    {
+      "path": "./apps/expiration"
+    },
+    {
       "path": "./packages/core"
     },
     {
       "path": "./packages/test-utils"
-    },
-    {
-      "path": "./apps/tickets"
     },
     {
       "path": "./packages/nats"
@@ -25,10 +31,7 @@
       "path": "./packages/contracts"
     },
     {
-      "path": "./apps/orders"
-    },
-    {
-      "path": "./apps/expiration"
+      "path": "./packages/queue"
     }
   ]
 }

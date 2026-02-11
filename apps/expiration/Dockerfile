@@ -12,6 +12,7 @@ COPY apps/expiration/package.json apps/expiration/
 COPY packages/core/package.json packages/core/
 COPY packages/nats/package.json packages/nats/
 COPY packages/contracts/package.json packages/contracts/
+COPY packages/queue/package.json packages/queue/
 
 RUN npm ci
 
@@ -20,6 +21,7 @@ COPY apps/expiration ./apps/expiration
 COPY packages/core ./packages/core
 COPY packages/nats ./packages/nats
 COPY packages/contracts ./packages/contracts
+COPY packages/queue ./packages/queue
 
 # Build expiration (bundles core)
 RUN npx nx build expiration

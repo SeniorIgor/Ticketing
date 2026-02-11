@@ -14,15 +14,18 @@
       "@org/core": [
         "packages/core/src/index.ts"
       ],
-      "@org/test-utils": [
-        "packages/test-utils/src/index.ts"
-      ],
       "@org/nats": [
         "packages/nats/src/index.ts"
       ],
       "@org/contracts": [
         "packages/contracts/src/index.ts"
-      ]
+      ],
+      "@org/queue": [
+        "packages/queue/src/index.ts"
+      ],
+      "@org/test-utils": [
+        "packages/test-utils/src/index.ts"
+      ],
     }
   },
   "include": [
@@ -39,16 +42,19 @@
   ],
   "references": [
     {
-      "path": "../../packages/test-utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../packages/core/tsconfig.lib.json"
+      "path": "../../packages/contracts/tsconfig.lib.json"
     },
     {
       "path": "../../packages/nats/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/contracts/tsconfig.lib.json"
-    }
+      "path": "../../packages/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/queue/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
+    },
   ]
 }
