@@ -6,15 +6,13 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "types": [
-      "node",
-      "jest"
-    ]
+    "types": ["node", "jest"]
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "references": [
+    {
+      "path": "../nats/tsconfig.lib.json"
+    },
     {
       "path": "../core/tsconfig.lib.json"
     }

@@ -1,9 +1,10 @@
 import type { JsMsg } from 'nats';
 
+import type { Logger } from '@org/core';
+
 import { buildDeadLetterRecord, publishDeadLetter } from '../../dlq';
 import { EventEnvelopeSchema } from '../../envelope';
 import type { Subject } from '../../subjects';
-import type { Logger } from '../../utils';
 import { decodeJson } from '../../utils';
 import { classifyError, PoisonMessageError } from '../errors';
 import type { PullWorkerEventHandler, PullWorkerOptions } from '../types';

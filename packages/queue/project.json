@@ -1,0 +1,50 @@
+{
+  "name": "@org/queue",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/queue/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "packages/queue/dist",
+        "main": "packages/queue/src/index.ts",
+        "tsConfig": "packages/queue/tsconfig.lib.json",
+        "format": [
+          "esm"
+        ],
+        "declarationRootDir": "packages/queue/src"
+      },
+      "configurations": {
+        "watch": {
+          "watch": true,
+          "sourcemap": true,
+          "cache": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint .",
+        "cwd": "packages/queue"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "^build"
+      ],
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "tags": [
+    "npm:private"
+  ]
+}

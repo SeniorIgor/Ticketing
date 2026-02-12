@@ -28,8 +28,8 @@ dev-tls: ensure-dev-ns
 	  | sed 's/namespace: default/namespace: ticketing-dev/' \
 	  | kubectl apply -f -
 
-dev: dev-secrets
+dev: ensure-dev-ns
 	skaffold dev -f $(SKAFFOLD_CONFIG)
 
-prod: prod-secrets
+prod: ensure-prod-ns
 	skaffold run -f $(SKAFFOLD_CONFIG) -p prod

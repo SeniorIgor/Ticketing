@@ -1,6 +1,7 @@
 import type { ConnectionOptions } from 'nats';
 
-import { createLogger, type Logger } from '../utils';
+import type { Logger } from '@org/core';
+import { createLogger } from '@org/core';
 
 export interface NatsConnectConfig {
   servers: string | string[];

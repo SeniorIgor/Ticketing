@@ -11,3 +11,11 @@ resources:
 
 patches:
   - path: nats-patch.yaml
+
+secretGenerator:
+  - name: app-secret
+    envs:
+      - secrets.env
+
+generatorOptions:
+  disableNameSuffixHash: true

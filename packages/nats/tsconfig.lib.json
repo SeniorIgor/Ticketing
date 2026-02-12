@@ -3,10 +3,16 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../core/tsconfig.lib.json"
+    }
+  ]
 }

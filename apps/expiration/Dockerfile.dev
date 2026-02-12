@@ -1,0 +1,21 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install deps once
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json ./
+
+RUN npm ci
+
+COPY apps/expiration ./apps/expiration
+COPY packages/core ./packages/core
+COPY packages/nats ./packages/nats
+COPY packages/contracts ./packages/contracts
+COPY packages/queue ./packages/queue
+
+ENV NODE_ENV=development
+
+EXPOSE 80
+
+CMD ["npx", "nx", "run", "expiration:dev"]
