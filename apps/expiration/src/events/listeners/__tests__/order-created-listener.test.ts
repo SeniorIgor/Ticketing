@@ -1,15 +1,14 @@
-import type { Queue } from 'bullmq';
-
 import type { OrderCreatedData } from '@org/contracts';
 import { OrderCreatedEvent } from '@org/contracts';
 import { makeMessageContextFactory } from '@org/test-utils';
 
+import type { ExpirationQueue } from '../../../queues';
 import { createPullWorkerMock, getLastHandler, getNatsMock } from '../../../test/mocks/nats';
 import { startOrderCreatedListener } from '../order-created-listener';
 
 const scheduleExpirationMock = jest.fn().mockResolvedValue(undefined);
 
-jest.mock('../../../queue', () => ({
+jest.mock('../../../queues', () => ({
   scheduleExpiration: (...args: unknown[]) => scheduleExpirationMock(...args),
 }));
 
@@ -21,7 +20,7 @@ describe('expiration: OrderCreated listener', () => {
   });
 
   it('wires createPullWorker with correct contract', async () => {
-    const queue = {} as Queue;
+    const queue = {} as ExpirationQueue;
 
     await startOrderCreatedListener({ queue });
 
@@ -34,7 +33,7 @@ describe('expiration: OrderCreated listener', () => {
   });
 
   it('calls scheduleExpiration with deps.queue and ctx.correlationId', async () => {
-    const queue = {} as Queue;
+    const queue = {} as ExpirationQueue;
 
     await startOrderCreatedListener({ queue });
 
@@ -65,7 +64,7 @@ describe('expiration: OrderCreated listener', () => {
   });
 
   it('passes correlationId undefined when ctx has none', async () => {
-    const queue = {} as Queue;
+    const queue = {} as ExpirationQueue;
 
     await startOrderCreatedListener({ queue });
 

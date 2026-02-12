@@ -1,16 +1,16 @@
-import type { Queue } from 'bullmq';
 import { DeliverPolicy } from 'nats';
 
 import { OrderCreatedEvent } from '@org/contracts';
 import { createPullWorker, getNats, type MessageContext, Streams } from '@org/nats';
 
-import { scheduleExpiration } from '../../queue';
+import type { ExpirationQueue } from '../../queues';
+import { scheduleExpiration } from '../../queues';
 
 const DURABLE_NAME = 'expiration-order-created';
 const DELIVER_POLICY = process.env.NODE_ENV === 'production' ? DeliverPolicy.New : DeliverPolicy.All;
 
 interface StartOrderCreatedListenerDeps {
-  queue: Queue;
+  queue: ExpirationQueue;
 }
 
 export async function startOrderCreatedListener(deps: StartOrderCreatedListenerDeps, signal?: AbortSignal) {

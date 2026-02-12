@@ -202,3 +202,13 @@ Kill the pod by its name
 ```bash
   kubectl delete pvc data-nats-0 -n ticketing-dev
 ```
+
+# How to clear Redis (PVC)
+
+```bash
+  kubectl get pvc -n ticketing-dev | grep redis
+```
+
+```bash
+  kubectl delete pvc redis-data-redis-0 -n ticketing-dev
+```

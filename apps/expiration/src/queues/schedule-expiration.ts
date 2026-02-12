@@ -1,9 +1,10 @@
-import type { JobsOptions, Queue } from 'bullmq';
+import type { JobsOptions } from 'bullmq';
 
 import { ExpirationJobName, type ExpireOrderJobData } from './expiration.schema';
+import type { ExpirationQueue } from './types';
 
 interface ScheduleExpirationParams {
-  queue: Queue;
+  queue: ExpirationQueue;
   orderId: string;
   expiresAt: string | Date;
   correlationId?: string;
@@ -19,13 +20,11 @@ export async function scheduleExpiration({ orderId, expiresAt, queue, correlatio
   }
 
   const opts: JobsOptions = { jobId: orderId, delay };
-
-  const data: ExpireOrderJobData = { orderId: orderId, correlationId };
+  const data: ExpireOrderJobData = { orderId, correlationId };
 
   try {
     await queue.add(ExpirationJobName.ExpireOrder, data, opts);
   } catch (err) {
-    // Handle race: job may have been added by another instance
     const after = await queue.getJob(orderId);
     if (after) {
       return;

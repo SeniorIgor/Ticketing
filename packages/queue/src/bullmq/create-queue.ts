@@ -9,8 +9,11 @@ interface CreateQueueDeps {
   defaultJobOptions?: JobsOptions;
 }
 
-export function createQueue(name: string, { redis, namespace, defaultJobOptions }: CreateQueueDeps) {
-  return new Queue(name, {
+export function createQueue<TData = unknown, TResult = unknown, TName extends string = string>(
+  name: string,
+  { redis, namespace, defaultJobOptions }: CreateQueueDeps,
+) {
+  return new Queue<TData, TResult, TName>(name, {
     connection: redis.client,
     prefix: namespace?.prefix,
     defaultJobOptions,

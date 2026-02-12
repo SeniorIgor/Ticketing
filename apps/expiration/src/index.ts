@@ -4,7 +4,7 @@ import { drainNats } from '@org/nats';
 import { createApp } from './app';
 import { startNats } from './config';
 import { startExpirationListeners, stopWorkers } from './events';
-import { startExpirationWorker } from './queue';
+import { startExpirationWorker } from './queues';
 
 const port = process.env.EXPIRATION_PORT ? Number(process.env.EXPIRATION_PORT) : 4004;
 

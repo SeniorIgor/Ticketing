@@ -1,11 +1,15 @@
-import type { Queue } from 'bullmq';
-
 import type { CreatePullWorkerResult } from '@org/nats';
+
+import type { ExpirationQueue } from '../../queues';
 
 import { startOrderCreatedListener } from './order-created-listener';
 
+interface StartExpirationListenersDeps {
+  queue: ExpirationQueue;
+}
+
 export async function startExpirationListeners(
-  deps: { queue: Queue },
+  deps: StartExpirationListenersDeps,
   signal?: AbortSignal,
 ): Promise<CreatePullWorkerResult[]> {
   const workers: CreatePullWorkerResult[] = [];

@@ -1,10 +1,9 @@
-import type { Queue } from 'bullmq';
-
 import { createExpirationQueue } from './expiration.queue';
 import { createExpirationRedis } from './redis';
+import type { ExpirationQueue } from './types';
 
 export type ExpirationWorkerResult = {
-  queue: Queue;
+  queue: ExpirationQueue;
   shutdown: () => Promise<void>;
 };
 
