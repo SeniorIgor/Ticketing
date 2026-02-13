@@ -2,7 +2,7 @@ import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 import type { OrderStatus } from '../types/order-status';
-import { OrderStatus as OrderStatusEnum } from '../types/order-status';
+import { OrderStatuses } from '../types/order-status';
 
 import type { TicketDoc } from './ticket';
 
@@ -34,8 +34,8 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
     status: {
       type: String,
       required: true,
-      enum: Object.values(OrderStatusEnum),
-      default: OrderStatusEnum.Created,
+      enum: Object.values(OrderStatuses),
+      default: OrderStatuses.Created,
     },
     expiresAt: { type: Schema.Types.Date },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
@@ -47,9 +47,7 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
   },
 );
 
-orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order(attrs);
-};
+orderSchema.statics.build = (attrs: OrderAttrs) => new Order(attrs);
 
 orderSchema.set('toJSON', {
   transform(_doc, json) {

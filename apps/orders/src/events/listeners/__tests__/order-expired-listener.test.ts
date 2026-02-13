@@ -8,7 +8,7 @@ import { makeMessageContextFactory } from '@org/test-utils';
 import { Order } from '../../../models';
 import { buildOrder, buildTicket } from '../../../test/helpers';
 import { createPullWorkerMock, getLastHandler, publishEventMock } from '../../../test/mocks';
-import { OrderStatus } from '../../../types';
+import { OrderStatuses } from '../../../types';
 import { startOrderExpiredListener } from '../order-expired-listener';
 
 const ctx = makeMessageContextFactory({ subject: 'expiration.order-expired' });
@@ -16,7 +16,7 @@ const ctx = makeMessageContextFactory({ subject: 'expiration.order-expired' });
 describe('orders: OrderExpired listener', () => {
   it('cancels active order (Created) and publishes OrderCancelled', async () => {
     const ticket = await buildTicket();
-    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.Created });
+    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Created });
 
     await startOrderExpiredListener();
 
@@ -30,7 +30,7 @@ describe('orders: OrderExpired listener', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Cancelled);
+    expect(saved.status).toBe(OrderStatuses.Cancelled);
 
     expect(publishEventMock).toHaveBeenCalledTimes(1);
 
@@ -49,7 +49,7 @@ describe('orders: OrderExpired listener', () => {
 
   it('cancels active order (AwaitingPayment) and publishes OrderCancelled', async () => {
     const ticket = await buildTicket();
-    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.AwaitingPayment });
+    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.AwaitingPayment });
 
     await startOrderExpiredListener();
 
@@ -62,13 +62,13 @@ describe('orders: OrderExpired listener', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Cancelled);
+    expect(saved.status).toBe(OrderStatuses.Cancelled);
     expect(publishEventMock).toHaveBeenCalledTimes(1);
   });
 
   it('is idempotent: if order already Cancelled, does nothing and does not publish', async () => {
     const ticket = await buildTicket();
-    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.Cancelled });
+    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Cancelled });
 
     await startOrderExpiredListener();
 
@@ -81,13 +81,13 @@ describe('orders: OrderExpired listener', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Cancelled);
+    expect(saved.status).toBe(OrderStatuses.Cancelled);
     expect(publishEventMock).not.toHaveBeenCalled();
   });
 
   it('is idempotent: if order already Complete, does nothing and does not publish', async () => {
     const ticket = await buildTicket();
-    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.Complete });
+    const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Complete });
 
     await startOrderExpiredListener();
 
@@ -100,7 +100,7 @@ describe('orders: OrderExpired listener', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Complete);
+    expect(saved.status).toBe(OrderStatuses.Complete);
     expect(publishEventMock).not.toHaveBeenCalled();
   });
 

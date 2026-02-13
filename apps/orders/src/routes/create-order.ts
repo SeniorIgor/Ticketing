@@ -6,8 +6,8 @@ import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, Validation
 import { publishEvent } from '@org/nats';
 
 import { Order, Ticket } from '../models';
-import { OrderStatus } from '../types/order-status';
-import type { CreateOrderReqBody } from '../types/requests';
+import type { CreateOrderReqBody } from '../types';
+import { OrderStatuses } from '../types';
 import { validateCreateOrder } from '../utils';
 
 const router = express.Router();
@@ -43,7 +43,7 @@ router.post(
 
     const order = Order.build({
       userId,
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt,
       ticket,
     });

@@ -17,6 +17,10 @@ data:
   ORDERS_URL: "http://orders-srv"
   ORDERS_MONGO_URI: mongodb://orders-mongo-srv:27017/orders
 
+  PAYMENTS_PORT: "80"
+  PAYMENTS_URL: "http://payments-srv"
+  PAYMENTS_MONGO_URI: mongodb://payments-mongo-srv:27017/payments
+
   EXPIRATION_PORT: "80"
 
   INTERNAL_API_BASE_URL: "http://client-gateway-srv"

@@ -1,5 +1,5 @@
 import { buildTicket } from '../../test/helpers';
-import { OrderStatus } from '../../types';
+import { OrderStatuses } from '../../types';
 import { Order } from '../order';
 
 describe('Orders service Order model', () => {
@@ -8,7 +8,7 @@ describe('Orders service Order model', () => {
 
     const order = Order.build({
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: new Date(Date.now() + 60_000),
       ticket,
     });
@@ -17,7 +17,7 @@ describe('Orders service Order model', () => {
 
     expect(order.id).toBeDefined();
     expect(order.userId).toBe('user-1');
-    expect(order.status).toBe(OrderStatus.Created);
+    expect(order.status).toBe(OrderStatuses.Created);
     expect(order.ticket.id).toBe(ticket.id);
   });
 
@@ -32,7 +32,7 @@ describe('Orders service Order model', () => {
 
     await raw.save();
 
-    expect(raw.status).toBe(OrderStatus.Created);
+    expect(raw.status).toBe(OrderStatuses.Created);
   });
 
   it('toJSON transforms _id -> id and hides internal fields', async () => {
@@ -40,7 +40,7 @@ describe('Orders service Order model', () => {
 
     const order = Order.build({
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: new Date(Date.now() + 60_000),
       ticket,
     });
@@ -62,7 +62,7 @@ describe('Orders service Order model', () => {
 
     const order = Order.build({
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: new Date(Date.now() + 60_000),
       ticket,
     });
@@ -70,7 +70,7 @@ describe('Orders service Order model', () => {
     await order.save();
     const v0 = order.version;
 
-    order.set({ status: OrderStatus.Cancelled });
+    order.set({ status: OrderStatuses.Cancelled });
     await order.save();
 
     expect(order.version).toBe(v0 + 1);
@@ -81,7 +81,7 @@ describe('Orders service Order model', () => {
 
     const order = Order.build({
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: new Date(Date.now() + 60_000),
       ticket,
     });
@@ -95,10 +95,10 @@ describe('Orders service Order model', () => {
       throw new Error('Expected order to exist');
     }
 
-    order1.set({ status: OrderStatus.AwaitingPayment });
+    order1.set({ status: OrderStatuses.AwaitingPayment });
     await order1.save();
 
-    order2.set({ status: OrderStatus.Cancelled });
+    order2.set({ status: OrderStatuses.Cancelled });
     await expect(order2.save()).rejects.toThrow();
   });
 });

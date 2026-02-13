@@ -1,7 +1,7 @@
 import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import { OrderStatus } from '../types';
+import { OrderStatuses } from '../types';
 
 import { Order } from './order';
 
@@ -55,7 +55,7 @@ ticketSchema.statics.applyUpdateFromEvent = function ({ id, price, title, versio
 ticketSchema.methods.isReserved = async function (this: TicketDoc) {
   const existing = await Order.exists({
     ticket: this._id,
-    status: { $in: [OrderStatus.Created, OrderStatus.AwaitingPayment, OrderStatus.Complete] },
+    status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment, OrderStatuses.Complete] },
   });
 
   return !!existing;

@@ -7,7 +7,7 @@ import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, Validatio
 import { publishEvent } from '@org/nats';
 
 import { Order } from '../models';
-import { OrderStatus } from '../types/order-status';
+import { OrderStatuses } from '../types/order-status';
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.delete(
       throw new AuthorizationError('ORDER_NOT_OWNER', 'You do not have access to this order');
     }
 
-    order.status = OrderStatus.Cancelled;
+    order.status = OrderStatuses.Cancelled;
     await order.save();
 
     await publishEvent(

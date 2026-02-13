@@ -8,7 +8,7 @@ import { createApp } from '../../app';
 import { Order } from '../../models';
 import { buildOrder, buildTicket } from '../../test/helpers';
 import { publishEventMock } from '../../test/mocks';
-import { OrderStatus } from '../../types';
+import { OrderStatuses } from '../../types';
 
 const app = createApp();
 
@@ -51,7 +51,7 @@ describe('DELETE /api/v1/orders/:id', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Created);
+    expect(saved.status).toBe(OrderStatuses.Created);
     expect(publishEventMock).not.toHaveBeenCalled();
   });
 
@@ -68,7 +68,7 @@ describe('DELETE /api/v1/orders/:id', () => {
       throw new Error('Expected order to exist');
     }
 
-    expect(saved.status).toBe(OrderStatus.Cancelled);
+    expect(saved.status).toBe(OrderStatuses.Cancelled);
 
     expect(publishEventMock).toHaveBeenCalledTimes(1);
 

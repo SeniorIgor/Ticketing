@@ -1,0 +1,39 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "paths": {
+      "@org/core": ["packages/core/src/index.ts"],
+      "@org/test-utils": ["packages/test-utils/src/index.ts"],
+      "@org/nats": ["packages/nats/src/index.ts"],
+      "@org/contracts": ["packages/contracts/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "dist",
+    "**/*.spec.ts",
+    "jest.config.ts",
+    "jest.config.cts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/contracts/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/nats/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/core/tsconfig.lib.json"
+    }
+  ]
+}

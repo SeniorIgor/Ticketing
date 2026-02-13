@@ -1,11 +1,12 @@
 import type { TicketDoc } from '../../models';
 import { Order } from '../../models';
-import { OrderStatus } from '../../types';
+import type { OrderStatus } from '../../types';
+import { OrderStatuses } from '../../types';
 
 export async function buildOrder(attrs: {
   userId: string;
   ticket?: TicketDoc;
-  status?: (typeof OrderStatus)[keyof typeof OrderStatus];
+  status?: OrderStatus;
   expiresAt?: Date;
 }) {
   const ticket = attrs.ticket;
@@ -15,7 +16,7 @@ export async function buildOrder(attrs: {
 
   const order = Order.build({
     userId: attrs.userId,
-    status: attrs.status ?? OrderStatus.Created,
+    status: attrs.status ?? OrderStatuses.Created,
     expiresAt: attrs.expiresAt ?? new Date(Date.now() + 15 * 60 * 1000),
     ticket,
   });

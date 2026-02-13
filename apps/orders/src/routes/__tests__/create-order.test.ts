@@ -7,7 +7,7 @@ import { createApp } from '../../app';
 import { Order } from '../../models';
 import { buildOrder, buildTicket } from '../../test/helpers';
 import { publishEventMock } from '../../test/mocks';
-import { OrderStatus } from '../../types';
+import { OrderStatuses } from '../../types';
 
 const app = createApp();
 
@@ -54,7 +54,7 @@ describe('POST /api/v1/orders', () => {
     const cookie = getAuthCookie({ userId: 'user-2', email: 'test@test.com' });
     const ticket = await buildTicket();
 
-    await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.Created });
+    await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Created });
 
     await request(app).post('/api/v1/orders').set('Cookie', cookie).send({ ticketId: ticket.id }).expect(409);
 
@@ -84,7 +84,7 @@ describe('POST /api/v1/orders', () => {
     // API response
     expect(res.body).toMatchObject({
       id: expect.any(String),
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: expect.any(String),
       ticket: {
         id: ticket.id,
@@ -111,7 +111,7 @@ describe('POST /api/v1/orders', () => {
     expect(data).toMatchObject({
       id: saved.id,
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       ticket: { id: ticket.id, price: 99 },
       version: saved.version,
     });
