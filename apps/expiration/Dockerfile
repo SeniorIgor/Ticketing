@@ -14,7 +14,7 @@ COPY packages/nats/package.json packages/nats/
 COPY packages/contracts/package.json packages/contracts/
 COPY packages/queue/package.json packages/queue/
 
-RUN npm ci
+RUN npm i
 
 # Copy source code needed for build
 COPY apps/expiration ./apps/expiration

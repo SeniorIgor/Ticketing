@@ -13,7 +13,7 @@ COPY packages/core/package.json packages/core/
 COPY packages/nats/package.json packages/nats/
 COPY packages/contracts/package.json packages/contracts/
 
-RUN npm ci
+RUN npm i
 
 # Copy source code needed for build
 COPY apps/payments ./apps/payments

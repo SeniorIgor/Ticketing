@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 
-RUN npm ci
+RUN npm i
 
 COPY apps/auth ./apps/auth
 COPY packages/core ./packages/core

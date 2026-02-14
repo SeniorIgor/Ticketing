@@ -7,6 +7,6 @@ export const stripe = {
   }): Promise<{ id: string }> {
     // real impl later; in tests you'll mock this module
     console.error('Payment not implemented');
-    return Promise.resolve({ id: '123' });
+    return Promise.resolve({ id: crypto.randomUUID() });
   },
 };

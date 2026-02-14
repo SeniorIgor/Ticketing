@@ -60,7 +60,7 @@ router.post(
     // provider call (mockable)
     const charge = await stripe.charge({
       token,
-      amount: Math.round(order.price * 100),
+      amount: Math.round(order.price),
       currency: 'usd',
       idempotencyKey: orderId,
     });
@@ -68,7 +68,7 @@ router.post(
     const payment = Payment.build({
       order,
       userId,
-      amount: Math.round(order.price * 100),
+      amount: Math.round(order.price),
       currency: 'usd',
       provider: 'stripe',
       providerId: charge.id,

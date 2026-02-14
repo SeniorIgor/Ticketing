@@ -9,7 +9,7 @@ COPY eslint.config.mjs ./
 
 COPY apps/client/package.json apps/client/
 
-RUN npm ci
+RUN npm i
 
 COPY apps/client ./apps/client
 
