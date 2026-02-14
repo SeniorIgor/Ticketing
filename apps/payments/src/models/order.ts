@@ -1,6 +1,7 @@
 import mongoose, { type Document, type Model, Schema } from 'mongoose';
 
-import { type OrderStatus, OrderStatuses } from '../types';
+import type { OrderStatus } from '@org/contracts';
+import { OrderStatuses, OrderStatusValues } from '@org/contracts';
 
 type ApplyUpdateFromEventData = Pick<OrderAttrs, 'id' | 'version'>;
 
@@ -28,7 +29,7 @@ interface OrderModel extends Model<OrderDoc> {
 const orderSchema = new Schema<OrderDoc, OrderModel>(
   {
     userId: { type: String, required: true },
-    status: { type: String, required: true, enum: Object.values(OrderStatuses) },
+    status: { type: String, required: true, enum: OrderStatusValues },
     price: { type: Number, required: true, min: 0 },
     version: { type: Number, required: true, default: 0 },
   },

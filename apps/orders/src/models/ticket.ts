@@ -1,7 +1,7 @@
 import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import { OrderStatuses } from '../types';
+import { OrderStatuses } from '@org/contracts';
 
 import { Order } from './order';
 

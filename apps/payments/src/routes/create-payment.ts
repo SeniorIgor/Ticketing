@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { PaymentCreatedEvent } from '@org/contracts';
+import { OrderStatuses, PaymentCreatedEvent } from '@org/contracts';
 import {
   asyncHandler,
   AuthorizationError,
@@ -14,7 +14,7 @@ import { publishEvent } from '@org/nats';
 
 import { Payment } from '../models';
 import { Order } from '../models/order';
-import { OrderStatuses, PaymentStatuses } from '../types';
+import { PaymentStatuses } from '../types';
 import type { CreatePaymentReqBody } from '../types/requests';
 import { validateCreatePayment } from '../utils/validate-create-payment';
 import { stripe } from '../vendor'; // wrapper

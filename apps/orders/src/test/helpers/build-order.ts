@@ -1,7 +1,7 @@
+import { type OrderStatus, OrderStatuses } from '@org/contracts';
+
 import type { TicketDoc } from '../../models';
 import { Order } from '../../models';
-import type { OrderStatus } from '../../types';
-import { OrderStatuses } from '../../types';
 
 export async function buildOrder(attrs: {
   userId: string;

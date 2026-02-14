@@ -1,8 +1,8 @@
 import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import type { OrderStatus } from '../types/order-status';
-import { OrderStatuses } from '../types/order-status';
+import type { OrderStatus } from '@org/contracts';
+import { OrderStatuses, OrderStatusValues } from '@org/contracts';
 
 import type { TicketDoc } from './ticket';
 
@@ -34,7 +34,7 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
     status: {
       type: String,
       required: true,
-      enum: Object.values(OrderStatuses),
+      enum: OrderStatusValues,
       default: OrderStatuses.Created,
     },
     expiresAt: { type: Schema.Types.Date },

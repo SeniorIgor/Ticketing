@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
+import { OrderStatuses } from '@org/contracts';
+
 import { expectDoc } from '../../test/helpers';
-import { OrderStatuses } from '../../types';
 import { Order } from '../order';
 
 describe('payments: Order model', () => {

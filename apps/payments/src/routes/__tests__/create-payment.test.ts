@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { PaymentCreatedEvent } from '@org/contracts';
+import { OrderStatuses, PaymentCreatedEvent } from '@org/contracts';
 import { getAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../../app';
@@ -8,7 +8,6 @@ import { Payment } from '../../models/payment';
 import { buildOrderProjection, buildPayment } from '../../test/helpers';
 import { publishEventMock } from '../../test/mocks/nats';
 import { stripeChargeMock } from '../../test/mocks/stripe';
-import { OrderStatuses } from '../../types';
 
 const app = createApp();
 

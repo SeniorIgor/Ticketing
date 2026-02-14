@@ -6,3 +6,5 @@ export const OrderStatuses = {
 } as const;
 
 export type OrderStatus = (typeof OrderStatuses)[keyof typeof OrderStatuses];
+
+export const OrderStatusValues = Object.values(OrderStatuses) as readonly OrderStatus[];

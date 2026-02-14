@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { OrderCreatedEvent } from '@org/contracts';
+import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Order, Ticket } from '../models';
 import type { CreateOrderReqBody } from '../types';
-import { OrderStatuses } from '../types';
 import { validateCreateOrder } from '../utils';
 
 const router = express.Router();

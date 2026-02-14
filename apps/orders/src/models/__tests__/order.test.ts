@@ -1,5 +1,6 @@
+import { OrderStatuses } from '@org/contracts';
+
 import { buildTicket } from '../../test/helpers';
-import { OrderStatuses } from '../../types';
 import { Order } from '../order';
 
 describe('Orders service Order model', () => {

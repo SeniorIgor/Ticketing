@@ -2,12 +2,11 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import mongoose from 'mongoose';
 
-import { OrderCancelledEvent } from '@org/contracts';
+import { OrderCancelledEvent, OrderStatuses } from '@org/contracts';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Order } from '../models';
-import { OrderStatuses } from '../types/order-status';
 
 const router = express.Router();
 

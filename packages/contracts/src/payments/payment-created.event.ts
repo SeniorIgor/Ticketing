@@ -1,4 +1,3 @@
-// packages/contracts/src/payments/payment-created.event.ts
 import { z } from 'zod';
 
 import { defineEvent, Subjects } from '@org/nats';

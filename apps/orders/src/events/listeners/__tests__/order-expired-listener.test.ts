@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
 import type { OrderExpiredData } from '@org/contracts';
-import { OrderCancelledEvent, OrderExpiredEvent } from '@org/contracts';
+import { OrderCancelledEvent, OrderExpiredEvent, OrderStatuses } from '@org/contracts';
 import { RetryableError, Streams } from '@org/nats';
 import { makeMessageContextFactory } from '@org/test-utils';
 
 import { Order } from '../../../models';
 import { buildOrder, buildTicket } from '../../../test/helpers';
 import { createPullWorkerMock, getLastHandler, publishEventMock } from '../../../test/mocks';
-import { OrderStatuses } from '../../../types';
 import { startOrderExpiredListener } from '../order-expired-listener';
 
 const ctx = makeMessageContextFactory({ subject: 'expiration.order-expired' });

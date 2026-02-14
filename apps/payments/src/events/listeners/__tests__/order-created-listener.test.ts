@@ -1,13 +1,12 @@
 import mongoose from 'mongoose';
 
 import type { OrderCreatedData } from '@org/contracts';
-import { OrderCreatedEvent } from '@org/contracts';
+import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { makeMessageContextFactory } from '@org/test-utils';
 
 import { Order } from '../../../models/order';
 import { expectDoc } from '../../../test/helpers';
 import { createPullWorkerMock, getLastHandler } from '../../../test/mocks/nats';
-import { OrderStatuses } from '../../../types';
 import { startOrderCreatedListener } from '../order-created-listener';
 
 const ctx = makeMessageContextFactory({ subject: 'orders.created' });

@@ -1,13 +1,12 @@
 import request from 'supertest';
 
-import { OrderCreatedEvent } from '@org/contracts';
+import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { getAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../../app';
 import { Order } from '../../models';
 import { buildOrder, buildTicket } from '../../test/helpers';
 import { publishEventMock } from '../../test/mocks';
-import { OrderStatuses } from '../../types';
 
 const app = createApp();
 

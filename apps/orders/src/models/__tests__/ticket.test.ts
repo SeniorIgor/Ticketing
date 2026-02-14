@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
+import { OrderStatuses } from '@org/contracts';
+
 import { buildOrder, buildTicket } from '../../test/helpers';
-import { OrderStatuses } from '../../types';
 import { Ticket } from '../ticket';
 
 describe('Orders service Ticket model', () => {

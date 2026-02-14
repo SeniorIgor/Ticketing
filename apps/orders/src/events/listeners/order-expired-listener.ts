@@ -1,10 +1,9 @@
 import { DeliverPolicy } from 'nats';
 
-import { OrderCancelledEvent, OrderExpiredEvent } from '@org/contracts';
+import { OrderCancelledEvent, OrderExpiredEvent, OrderStatuses } from '@org/contracts';
 import { createPullWorker, getNats, type MessageContext, publishEvent, RetryableError, Streams } from '@org/nats';
 
 import { Order } from '../../models';
-import { OrderStatuses } from '../../types';
 
 const DURABLE_NAME = 'orders-order-expired';
 const DELIVER_POLICY = process.env.NODE_ENV === 'production' ? DeliverPolicy.New : DeliverPolicy.All;

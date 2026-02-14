@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
 import type { OrderCancelledData } from '@org/contracts';
-import { OrderCancelledEvent } from '@org/contracts';
+import { OrderCancelledEvent, OrderStatuses } from '@org/contracts';
 import { RetryableError } from '@org/nats';
 import { makeMessageContextFactory } from '@org/test-utils';
 
 import { Order } from '../../../models/order';
 import { expectDoc } from '../../../test/helpers';
 import { createPullWorkerMock, getLastHandler } from '../../../test/mocks';
-import { OrderStatuses } from '../../../types';
 import { startOrderCancelledListener } from '../order-cancelled-listener';
 
 const ctx = makeMessageContextFactory({ subject: 'orders.cancelled' });

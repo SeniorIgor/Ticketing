@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
+import type { OrderStatus } from '@org/contracts';
+import { OrderStatuses } from '@org/contracts';
+
 import { Order } from '../../models/order';
-import { type OrderStatus, OrderStatuses } from '../../types';
 
 export async function buildOrderProjection(
   attrs?: Partial<{
