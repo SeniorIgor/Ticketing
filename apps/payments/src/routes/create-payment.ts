@@ -52,7 +52,7 @@ router.post(
     }
 
     // (Optional) prevent double-pay quickly
-    const existing = await Payment.findOne({ order: orderId });
+    const existing = await Payment.findOne({ order: order._id });
     if (existing) {
       throw new BusinessRuleError('PAYMENT_ALREADY_EXISTS', 'Payment already exists for this order');
     }
@@ -79,7 +79,7 @@ router.post(
 
     await publishEvent(
       PaymentCreatedEvent,
-      { id: payment.id, orderId: payment.order.toString(), stripeId: payment.providerId },
+      { id: payment.id, orderId: order.id, stripeId: payment.providerId },
       { correlationId: req.get('x-request-id') ?? undefined },
     );
 

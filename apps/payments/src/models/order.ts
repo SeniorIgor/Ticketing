@@ -22,7 +22,7 @@ export interface OrderDoc extends Document {
 
 interface OrderModel extends Model<OrderDoc> {
   build(attrs: OrderAttrs): OrderDoc;
-  applyCancelledFromEvent(data: ApplyUpdateFromEventData): Promise<OrderAttrs | null>;
+  applyCancelledFromEvent(data: ApplyUpdateFromEventData): Promise<OrderDoc | null>;
 }
 
 const orderSchema = new Schema<OrderDoc, OrderModel>(

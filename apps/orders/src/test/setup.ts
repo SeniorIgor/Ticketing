@@ -2,6 +2,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 
 let mongo: MongoMemoryServer | null = null;
+const worker = process.env.JEST_WORKER_ID ?? '0';
 
 export async function setupTestDb(): Promise<void> {
   if (process.env.NODE_ENV !== 'test') {
@@ -10,10 +11,7 @@ export async function setupTestDb(): Promise<void> {
 
   mongo = await MongoMemoryServer.create();
 
-  await mongoose.connect(mongo.getUri(), {
-    dbName: 'test',
-    autoIndex: false,
-  });
+  await mongoose.connect(mongo.getUri(), { dbName: `test_${worker}`, autoIndex: false });
 }
 
 export async function clearTestDb(): Promise<void> {
