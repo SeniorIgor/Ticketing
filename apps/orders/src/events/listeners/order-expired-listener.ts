@@ -31,7 +31,7 @@ export async function startOrderExpiredListener(signal?: AbortSignal) {
       // Atomic: cancel only if still active (not Complete, not Cancelled).
       const updated = await Order.findOneAndUpdate(
         { _id: orderId, status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment] } },
-        { $set: { status: OrderStatuses.Cancelled } },
+        { $set: { status: OrderStatuses.Cancelled }, $inc: { version: 1 } },
         { new: true },
       );
 

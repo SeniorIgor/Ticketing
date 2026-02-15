@@ -54,11 +54,13 @@ describe('DELETE /api/v1/orders/:id', () => {
     expect(publishEventMock).not.toHaveBeenCalled();
   });
 
-  it('cancels order for owner (sets status to Cancelled) and publishes OrderCancelledEvent', async () => {
+  it('cancels order for owner, increments version, and publishes OrderCancelled', async () => {
     const cookie = getAuthCookie({ userId: 'user-1', email: 'test@test.com' });
 
     const ticket = await buildTicket({ title: 'Concert', price: 50 });
     const order = await buildOrder({ userId: 'user-1', ticket });
+
+    const before = order.version;
 
     await request(app).delete(`/api/v1/orders/${order.id}`).set('Cookie', cookie).expect(204);
 
@@ -68,16 +70,16 @@ describe('DELETE /api/v1/orders/:id', () => {
     }
 
     expect(saved.status).toBe(OrderStatuses.Cancelled);
+    expect(saved.version).toBe(before + 1);
 
     expect(publishEventMock).toHaveBeenCalledTimes(1);
-
     const [def, data, opts] = publishEventMock.mock.calls[0];
 
     expect(def).toBe(OrderCancelledEvent);
 
     expect(data).toMatchObject({
       id: saved.id,
-      userId: 'user-1',
+      userId: saved.userId,
       ticket: { id: saved.ticket.toString() },
       version: saved.version,
     });

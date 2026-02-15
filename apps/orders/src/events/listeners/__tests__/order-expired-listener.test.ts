@@ -13,26 +13,26 @@ import { startOrderExpiredListener } from '../order-expired-listener';
 const ctx = makeMessageContextFactory({ subject: 'expiration.order-expired' });
 
 describe('orders: OrderExpired listener', () => {
-  it('cancels active order (Created) and publishes OrderCancelled', async () => {
+  it('cancels active order (Created), increments version, and publishes OrderCancelled', async () => {
     const ticket = await buildTicket();
     const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Created });
+
+    const beforeVersion = order.version;
 
     await startOrderExpiredListener();
 
     const handler = getLastHandler<OrderExpiredData>();
-
     await handler({ orderId: order.id }, ctx({ correlationId: 'req-999', seq: 10 }));
 
     const saved = await Order.findById(order.id);
-    expect(saved).not.toBeNull();
     if (!saved) {
       throw new Error('Expected order to exist');
     }
 
     expect(saved.status).toBe(OrderStatuses.Cancelled);
+    expect(saved.version).toBe(beforeVersion + 1);
 
     expect(publishEventMock).toHaveBeenCalledTimes(1);
-
     const [def, data, opts] = publishEventMock.mock.calls[0];
 
     expect(def).toBe(OrderCancelledEvent);
@@ -46,9 +46,11 @@ describe('orders: OrderExpired listener', () => {
     });
   });
 
-  it('cancels active order (AwaitingPayment) and publishes OrderCancelled', async () => {
+  it('cancels active order (AwaitingPayment), increments version, and publishes OrderCancelled', async () => {
     const ticket = await buildTicket();
     const order = await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.AwaitingPayment });
+
+    const beforeVersion = order.version;
 
     await startOrderExpiredListener();
 
@@ -56,13 +58,16 @@ describe('orders: OrderExpired listener', () => {
     await handler({ orderId: order.id }, ctx({ correlationId: 'req-123' }));
 
     const saved = await Order.findById(order.id);
-    expect(saved).not.toBeNull();
     if (!saved) {
       throw new Error('Expected order to exist');
     }
 
     expect(saved.status).toBe(OrderStatuses.Cancelled);
+    expect(saved.version).toBe(beforeVersion + 1);
+
     expect(publishEventMock).toHaveBeenCalledTimes(1);
+    const [, data] = publishEventMock.mock.calls[0];
+    expect(data.version).toBe(saved.version);
   });
 
   it('is idempotent: if order already Cancelled, does nothing and does not publish', async () => {
@@ -75,7 +80,6 @@ describe('orders: OrderExpired listener', () => {
     await handler({ orderId: order.id }, ctx());
 
     const saved = await Order.findById(order.id);
-    expect(saved).not.toBeNull();
     if (!saved) {
       throw new Error('Expected order to exist');
     }
@@ -94,7 +98,6 @@ describe('orders: OrderExpired listener', () => {
     await handler({ orderId: order.id }, ctx());
 
     const saved = await Order.findById(order.id);
-    expect(saved).not.toBeNull();
     if (!saved) {
       throw new Error('Expected order to exist');
     }
