@@ -24,6 +24,7 @@ export interface OrderDoc extends Document {
 interface OrderModel extends Model<OrderDoc> {
   build(attrs: OrderAttrs): OrderDoc;
   applyCancelledFromEvent(data: ApplyUpdateFromEventData): Promise<OrderDoc | null>;
+  applyCompletedFromEvent(data: ApplyUpdateFromEventData): Promise<OrderDoc | null>;
 }
 
 const orderSchema = new Schema<OrderDoc, OrderModel>(
@@ -50,6 +51,14 @@ orderSchema.statics.applyCancelledFromEvent = function ({ id, version }: ApplyUp
   return this.findOneAndUpdate(
     { _id: id, version: version - 1 },
     { $set: { status: OrderStatuses.Cancelled, version } },
+    { new: true },
+  );
+};
+
+orderSchema.statics.applyCompletedFromEvent = function ({ id, version }: ApplyUpdateFromEventData) {
+  return this.findOneAndUpdate(
+    { _id: id, version: version - 1 },
+    { $set: { status: OrderStatuses.Complete, version } },
     { new: true },
   );
 };

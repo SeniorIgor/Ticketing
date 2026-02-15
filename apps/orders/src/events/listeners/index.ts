@@ -1,6 +1,7 @@
 import type { CreatePullWorkerResult } from '@org/nats';
 
 import { startOrderExpiredListener } from './order-expired-listener';
+import { startPaymentCreatedListener } from './payment-created-listener';
 import { startTicketCreatedListener } from './ticket-created-listener';
 import { startTicketUpdatedListener } from './ticket-updated-listener';
 
@@ -8,6 +9,7 @@ export async function startOrdersListeners(signal?: AbortSignal): Promise<Create
   const workers: CreatePullWorkerResult[] = [];
 
   workers.push(await startTicketCreatedListener(signal));
+  workers.push(await startPaymentCreatedListener(signal));
   workers.push(await startTicketUpdatedListener(signal));
   workers.push(await startOrderExpiredListener(signal));
 

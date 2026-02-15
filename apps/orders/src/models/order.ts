@@ -6,6 +6,10 @@ import { OrderStatuses, OrderStatusValues } from '@org/contracts';
 
 import type { TicketDoc } from './ticket';
 
+interface ApplyCompleteFromEventData {
+  id: string;
+}
+
 interface OrderAttrs {
   userId: string;
   status: OrderStatus;
@@ -26,6 +30,7 @@ export interface OrderDoc extends Document {
 
 interface OrderModel extends Model<OrderDoc> {
   build(attrs: OrderAttrs): OrderDoc;
+  applyCompleteFromEvent(data: ApplyCompleteFromEventData): Promise<OrderDoc | null>;
 }
 
 const orderSchema = new Schema<OrderDoc, OrderModel>(
@@ -48,6 +53,14 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
 );
 
 orderSchema.statics.build = (attrs: OrderAttrs) => new Order(attrs);
+
+orderSchema.statics.applyCompleteFromEvent = function ({ id }: ApplyCompleteFromEventData) {
+  return this.findOneAndUpdate(
+    { _id: id, status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment] } },
+    { $set: { status: OrderStatuses.Complete }, $inc: { version: 1 } },
+    { new: true },
+  );
+};
 
 orderSchema.set('toJSON', {
   transform(_doc, json) {
