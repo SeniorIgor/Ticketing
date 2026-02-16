@@ -1,5 +1,7 @@
 import mongoose, { type Document, type Model, Schema } from 'mongoose';
 
+import { type PaymentProvider, PaymentProviderValues } from '@org/contracts';
+
 import { type PaymentStatus, PaymentStatuses } from '../types';
 
 import type { OrderDoc } from './order';
@@ -9,7 +11,7 @@ interface PaymentAttrs {
   userId: string;
   amount: number;
   currency: string;
-  provider: 'stripe'; // extend later
+  provider: PaymentProvider;
   providerId: string; // stripe charge/paymentIntent id
   status: PaymentStatus;
 }
@@ -39,7 +41,7 @@ const paymentSchema = new mongoose.Schema<PaymentDoc>(
     userId: { type: String, required: true, index: true },
     amount: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true },
-    provider: { type: String, required: true },
+    provider: { type: String, required: true, enum: PaymentProviderValues },
     providerId: { type: String, required: true, unique: true },
     status: { type: String, required: true, enum: Object.values(PaymentStatuses) },
   },

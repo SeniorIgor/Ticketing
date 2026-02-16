@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { OrderStatuses, PaymentCreatedEvent } from '@org/contracts';
+import { OrderStatuses, PaymentCreatedEvent, PaymentProviders } from '@org/contracts';
 import { getAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../../app';
@@ -145,7 +145,8 @@ describe('POST /api/v1/payments', () => {
       expect.objectContaining({
         id: expect.any(String),
         orderId: order.id,
-        stripeId: 'pi_123',
+        provider: PaymentProviders.Stripe,
+        providerId: 'pi_123',
       }),
       expect.objectContaining({ correlationId: 'req-1' }),
     );

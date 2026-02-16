@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { OrderStatuses, PaymentCreatedEvent } from '@org/contracts';
+import { OrderStatuses, PaymentCreatedEvent, PaymentProviders } from '@org/contracts';
 import { asyncHandler, AuthorizationError, BusinessRuleError, NotFoundError, requireAuth, validate } from '@org/core';
 import { publishEvent } from '@org/nats';
 
@@ -68,7 +68,7 @@ router.post(
       userId,
       amount: amountCents,
       currency,
-      provider: 'stripe',
+      provider: PaymentProviders.Stripe,
       providerId: charge.id, // PaymentIntent id (pi_...)
       status: PaymentStatuses.Succeeded,
     });
@@ -77,7 +77,12 @@ router.post(
 
     await publishEvent(
       PaymentCreatedEvent,
-      { id: payment.id, orderId: order.id, stripeId: payment.providerId },
+      {
+        id: payment.id,
+        orderId: order.id,
+        provider: payment.provider,
+        providerId: payment.providerId,
+      },
       { correlationId: req.get('x-request-id') ?? undefined },
     );
 
