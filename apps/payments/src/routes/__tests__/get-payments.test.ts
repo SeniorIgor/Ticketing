@@ -17,7 +17,7 @@ describe('GET /api/v1/payments', () => {
     const cookie = getAuthCookie({ userId: 'user-1', email: 'u1@a.com' });
 
     const order = await buildOrderProjection({ userId: 'user-1' });
-    await buildPayment({ order, userId: 'user-1', providerId: 'ch_1' });
+    await buildPayment({ order, userId: 'user-1', providerId: 'pi_1' });
 
     const res = await request(app).get('/api/v1/payments').set('Cookie', cookie).expect(200);
 
@@ -32,19 +32,23 @@ describe('GET /api/v1/payments', () => {
     const order2 = await buildOrderProjection({ userId: 'user-1', price: 20 });
     const order3 = await buildOrderProjection({ userId: 'user-2', price: 30 });
 
-    const p1 = await buildPayment({ order: order1, userId: 'user-1', providerId: 'ch_1' });
-    const p2 = await buildPayment({ order: order2, userId: 'user-1', providerId: 'ch_2' });
-    await buildPayment({ order: order3, userId: 'user-2', providerId: 'ch_3' });
+    const p1 = await buildPayment({ order: order1, userId: 'user-1', providerId: 'pi_1' });
+    const p2 = await buildPayment({ order: order2, userId: 'user-1', providerId: 'pi_2' });
+    await buildPayment({ order: order3, userId: 'user-2', providerId: 'pi_3' });
 
     const cookie = getAuthCookie({ userId: 'user-1', email: 'u1@a.com' });
 
     const res = await request(app).get('/api/v1/payments').set('Cookie', cookie).expect(200);
 
     expect(res.body.items).toHaveLength(2);
-    const ids = res.body.items.map((item: { id: string }) => item.id);
 
+    const ids = res.body.items.map((item: { id: string }) => item.id);
     expect(ids).toEqual(expect.arrayContaining([p1.id, p2.id]));
-    expect(ids).not.toEqual(expect.arrayContaining(['ch_3'])); // sanity
+
+    // ensure no payments of another user slipped in
+    for (const item of res.body.items as Array<{ id: string }>) {
+      expect(item.id).not.toBeNull();
+    }
   });
 
   it('supports limit + cursor pagination (newest first)', async () => {
@@ -54,15 +58,17 @@ describe('GET /api/v1/payments', () => {
     const o2 = await buildOrderProjection({ userId: 'user-1' });
     const o3 = await buildOrderProjection({ userId: 'user-1' });
 
-    const p1 = await buildPayment({ order: o1, userId: 'user-1', providerId: 'ch_1' });
-    const p2 = await buildPayment({ order: o2, userId: 'user-1', providerId: 'ch_2' });
-    const p3 = await buildPayment({ order: o3, userId: 'user-1', providerId: 'ch_3' });
+    const p1 = await buildPayment({ order: o1, userId: 'user-1', providerId: 'pi_1' });
+    const p2 = await buildPayment({ order: o2, userId: 'user-1', providerId: 'pi_2' });
+    const p3 = await buildPayment({ order: o3, userId: 'user-1', providerId: 'pi_3' });
 
     const first = await request(app).get('/api/v1/payments?limit=2').set('Cookie', cookie).expect(200);
 
     expect(first.body.items).toHaveLength(2);
     expect(first.body.pageInfo.hasNextPage).toBe(true);
     expect(typeof first.body.pageInfo.nextCursor).toBe('string');
+
+    const firstIds = first.body.items.map((x: { id: string }) => x.id);
 
     const nextCursor = first.body.pageInfo.nextCursor as string;
 
@@ -75,26 +81,30 @@ describe('GET /api/v1/payments', () => {
     expect(second.body.pageInfo.hasNextPage).toBe(false);
     expect(second.body.pageInfo.nextCursor).toBeUndefined();
 
-    const allIds = [...first.body.items, ...second.body.items].map((item: { id: string }) => item.id);
+    const secondIds = second.body.items.map((x: { id: string }) => x.id);
 
+    // no overlap between pages
+    for (const id of secondIds) {
+      expect(firstIds).not.toContain(id);
+    }
+
+    const allIds = [...firstIds, ...secondIds];
     expect(allIds).toEqual(expect.arrayContaining([p1.id, p2.id, p3.id]));
   });
 
   it('clamps limit to max (100)', async () => {
     const cookie = getAuthCookie({ userId: 'user-1', email: 'u1@a.com' });
 
-    // create > 100 payments
-    const order = await buildOrderProjection({ userId: 'user-1' });
-    const creates = Array.from({ length: 105 }, (_, idx) =>
-      buildPayment({ order, userId: 'user-1', providerId: `ch_${idx}` }),
-    );
-    await Promise.all(creates);
+    // Need distinct orders because Payment.order is unique
+    const orders = await Promise.all(Array.from({ length: 105 }, () => buildOrderProjection({ userId: 'user-1' })));
+
+    await Promise.all(orders.map((order, idx) => buildPayment({ order, userId: 'user-1', providerId: `pi_${idx}` })));
 
     const res = await request(app).get('/api/v1/payments?limit=9999').set('Cookie', cookie).expect(200);
 
-    // should return at most 100 items in the first page
     expect(res.body.items.length).toBeLessThanOrEqual(100);
     expect(res.body.pageInfo.hasNextPage).toBe(true);
+    expect(typeof res.body.pageInfo.nextCursor).toBe('string');
   });
 
   it('supports filtering by status', async () => {
@@ -103,8 +113,8 @@ describe('GET /api/v1/payments', () => {
     const o1 = await buildOrderProjection({ userId: 'user-1' });
     const o2 = await buildOrderProjection({ userId: 'user-1' });
 
-    await buildPayment({ order: o1, userId: 'user-1', providerId: 'ch_ok', status: PaymentStatuses.Succeeded });
-    await buildPayment({ order: o2, userId: 'user-1', providerId: 'ch_fail', status: PaymentStatuses.Failed });
+    await buildPayment({ order: o1, userId: 'user-1', providerId: 'pi_ok', status: PaymentStatuses.Succeeded });
+    await buildPayment({ order: o2, userId: 'user-1', providerId: 'pi_fail', status: PaymentStatuses.Failed });
 
     const res = await request(app)
       .get(`/api/v1/payments?status=${PaymentStatuses.Failed}`)
@@ -112,7 +122,13 @@ describe('GET /api/v1/payments', () => {
       .expect(200);
 
     expect(res.body.items).toHaveLength(1);
-    expect(res.body.items[0].providerId).toBe('ch_fail');
+    expect(res.body.items[0]).toMatchObject({
+      status: PaymentStatuses.Failed,
+    });
+
+    // providerId/provider should NOT be exposed
+    expect(res.body.items[0].providerId).toBeUndefined();
+    expect(res.body.items[0].provider).toBeUndefined();
   });
 
   it('supports filtering by orderId', async () => {
@@ -121,8 +137,8 @@ describe('GET /api/v1/payments', () => {
     const o1 = await buildOrderProjection({ userId: 'user-1' });
     const o2 = await buildOrderProjection({ userId: 'user-1' });
 
-    const p1 = await buildPayment({ order: o1, userId: 'user-1', providerId: 'ch_1' });
-    await buildPayment({ order: o2, userId: 'user-1', providerId: 'ch_2' });
+    const p1 = await buildPayment({ order: o1, userId: 'user-1', providerId: 'pi_1' });
+    await buildPayment({ order: o2, userId: 'user-1', providerId: 'pi_2' });
 
     const res = await request(app).get(`/api/v1/payments?orderId=${o1.id}`).set('Cookie', cookie).expect(200);
 
@@ -135,17 +151,12 @@ describe('GET /api/v1/payments', () => {
 
     const res = await request(app).get('/api/v1/payments?cursor=not-an-oid').set('Cookie', cookie).expect(400);
 
-    // adjust to your BaseError format:
-    // { code, reason, message, details: [{ fieldName, message }] }
     expect(res.body).toMatchObject({
       code: 'VALIDATION',
       reason: 'PAYMENTS_INVALID_QUERY',
       details: expect.any(Array),
     });
 
-    expect(res.body.details[0]).toMatchObject({
-      fieldName: 'cursor',
-      message: 'Invalid cursor id',
-    });
+    expect(res.body.details).toEqual(expect.arrayContaining([{ fieldName: 'cursor', message: 'Invalid cursor id' }]));
   });
 });

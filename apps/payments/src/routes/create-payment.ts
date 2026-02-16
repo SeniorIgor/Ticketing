@@ -2,22 +2,14 @@ import type { Request, Response } from 'express';
 import express from 'express';
 
 import { OrderStatuses, PaymentCreatedEvent } from '@org/contracts';
-import {
-  asyncHandler,
-  AuthorizationError,
-  BusinessRuleError,
-  NotFoundError,
-  requireAuth,
-  ValidationError,
-} from '@org/core';
+import { asyncHandler, AuthorizationError, BusinessRuleError, NotFoundError, requireAuth, validate } from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Payment } from '../models';
 import { Order } from '../models/order';
 import { PaymentStatuses } from '../types';
-import type { CreatePaymentReqBody } from '../types/requests';
-import { validateCreatePayment } from '../utils/validate-create-payment';
-import { stripe } from '../vendor'; // wrapper
+import { CreatePaymentBodySchema, type CreatePaymentReqBody } from '../utils';
+import { createCharge } from '../vendor/stripe';
 
 const router = express.Router();
 
@@ -25,12 +17,9 @@ router.post(
   '/',
   requireAuth,
   asyncHandler(async (req: Request<unknown, unknown, CreatePaymentReqBody>, res: Response) => {
-    const errors = validateCreatePayment(req.body);
-    if (errors.length > 0) {
-      throw new ValidationError('PAYMENT_INVALID_INPUT', errors);
-    }
+    const body = validate(CreatePaymentBodySchema, req.body, 'PAYMENT_INVALID_INPUT');
 
-    const { orderId, token } = req.body;
+    const { orderId, token } = body;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const userId = req.currentUser!.userId;
 
@@ -51,27 +40,36 @@ router.post(
       throw new BusinessRuleError('ORDER_ALREADY_COMPLETE', 'Order is already paid');
     }
 
-    // (Optional) prevent double-pay quickly
     const existing = await Payment.findOne({ order: order._id });
     if (existing) {
       throw new BusinessRuleError('PAYMENT_ALREADY_EXISTS', 'Payment already exists for this order');
     }
 
-    // provider call (mockable)
-    const charge = await stripe.charge({
-      token,
-      amount: Math.round(order.price),
-      currency: 'usd',
+    const currency = 'usd';
+    const amountCents = Math.round(order.price * 100);
+
+    const charge = await createCharge({
+      paymentMethodId: token, // token == pm_... (or "pm_card_visa" in test)
+      amount: amountCents,
+      currency,
       idempotencyKey: orderId,
+      description: `Order ${orderId}`,
+      metadata: { orderId, userId },
     });
+
+    if (charge.status !== 'succeeded') {
+      // For now: simplified flow => fail fast.
+      // Later: return 202 + clientSecret for SCA flows (`requires_action`).
+      throw new BusinessRuleError('PAYMENT_NOT_SUCCEEDED', `Payment did not succeed. Status=${charge.status}`);
+    }
 
     const payment = Payment.build({
       order,
       userId,
-      amount: Math.round(order.price),
-      currency: 'usd',
+      amount: amountCents,
+      currency,
       provider: 'stripe',
-      providerId: charge.id,
+      providerId: charge.id, // PaymentIntent id (pi_...)
       status: PaymentStatuses.Succeeded,
     });
 
