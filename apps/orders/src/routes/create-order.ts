@@ -12,9 +12,9 @@ import { validateCreateOrder } from '../utils';
 const router = express.Router();
 
 // 15 min order expiration
-const EXPIRATION_SECONDS = 15 * 60;
+// const EXPIRATION_SECONDS = 15 * 60;
 // TODO change after test
-// const EXPIRATION_SECONDS = 30;
+const EXPIRATION_SECONDS = 60;
 
 router.post(
   '/',
