@@ -1,2 +1,3 @@
-export * from './ticket-created';
-export * from './ticket-updated';
+export * from './ticket-created.event';
+export * from './ticket-status';
+export * from './ticket-updated.event';

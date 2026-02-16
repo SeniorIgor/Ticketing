@@ -16,18 +16,14 @@ export async function startPaymentCreatedListener(signal?: AbortSignal) {
       stream: Streams.Payments,
       durable_name: DURABLE_NAME,
       def: PaymentCreatedEvent,
-
       ensure: true,
       deliver_policy: DELIVER_POLICY,
-
-      ack_wait: 30_000_000_000, // 30s
+      ack_wait: 30_000_000_000,
       batchSize: 50,
       expiresMs: 2000,
       concurrency: 8,
     },
     async ({ orderId }, ctx: MessageContext) => {
-      // Mark order complete only if it is still payable.
-      // Atomic + version bump.
       const updated = await Order.applyCompleteFromEvent({ id: orderId });
 
       if (!updated) {
@@ -36,9 +32,6 @@ export async function startPaymentCreatedListener(signal?: AbortSignal) {
           throw new RetryableError(`Order not found for payment orderId=${orderId}`);
         }
 
-        // Idempotency / race handling:
-        // - if already Complete => duplicate payment event -> ignore
-        // - if Cancelled => payment arrived too late -> ignore (but log)
         logger.info('[orders] PaymentCreated ignored (not completable)', {
           orderId,
           currentStatus: existing.status,
@@ -46,13 +39,17 @@ export async function startPaymentCreatedListener(signal?: AbortSignal) {
           seq: ctx.seq,
           correlationId: ctx.correlationId,
         });
-
         return;
       }
 
       await publishEvent(
         OrderCompletedEvent,
-        { id: updated.id, userId: updated.userId, version: updated.version },
+        {
+          id: updated.id,
+          userId: updated.userId,
+          version: updated.version,
+          ticket: { id: updated.ticket.toString() },
+        },
         { correlationId: ctx.correlationId },
       );
 

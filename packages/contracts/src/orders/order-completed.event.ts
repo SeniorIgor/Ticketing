@@ -6,6 +6,7 @@ export const OrderCompletedSchema = z.object({
   id: z.string().min(1), // orderId
   userId: z.string().min(1),
   version: z.number().int().nonnegative(),
+  ticket: z.object({ id: z.string().min(1) }),
 });
 
 export type OrderCompletedData = z.infer<typeof OrderCompletedSchema>;

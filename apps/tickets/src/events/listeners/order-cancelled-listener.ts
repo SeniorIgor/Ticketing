@@ -1,6 +1,6 @@
 import { DeliverPolicy } from 'nats';
 
-import { OrderCancelledEvent, TicketUpdatedEvent } from '@org/contracts';
+import { OrderCancelledEvent, TicketStatuses, TicketUpdatedEvent } from '@org/contracts';
 import { createPullWorker, getNats, type MessageContext, publishEvent, RetryableError, Streams } from '@org/nats';
 
 import { Ticket } from '../../models/ticket';
@@ -16,12 +16,9 @@ export async function startOrderCancelledListener(signal?: AbortSignal) {
       stream: Streams.Orders,
       durable_name: DURABLE_NAME,
       def: OrderCancelledEvent,
-
       ensure: true,
       deliver_policy: DELIVER_POLICY,
-
-      ack_wait: 30_000_000_000, // 30s
-
+      ack_wait: 30_000_000_000,
       batchSize: 50,
       expiresMs: 2000,
       concurrency: 8,
@@ -30,26 +27,31 @@ export async function startOrderCancelledListener(signal?: AbortSignal) {
       const ticketId = data.ticket.id;
       const orderId = data.id;
 
-      // Atomic: clear only if it is reserved by THIS order.
       const updated = await Ticket.findOneAndUpdate(
-        { _id: ticketId, orderId },
-        { $unset: { orderId: '' }, $inc: { version: 1 } },
+        { _id: ticketId, status: TicketStatuses.Reserved, orderId },
+        { $set: { status: TicketStatuses.Available }, $unset: { orderId: '' }, $inc: { version: 1 } },
         { new: true },
       );
 
       if (!updated) {
-        // If already cleared -> idempotent ok.
         const exists = await Ticket.findById(ticketId);
         if (!exists) {
-          throw new RetryableError(`Ticket not found for unreserve ticketId=${ticketId} orderId=${orderId}`);
+          throw new RetryableError(`Ticket not found for cancel ticketId=${ticketId} orderId=${orderId}`);
         }
 
-        if (!exists.orderId) {
-          logger.info('[tickets] OrderCancelled ignored (already not reserved)', { ticketId, orderId });
+        // If sold, ignore cancel (payment won the race or refunds not supported).
+        if (exists.status === TicketStatuses.Sold) {
+          logger.info('[tickets] OrderCancelled ignored (ticket already sold)', { ticketId, orderId });
           return;
         }
 
-        // Reserved by another order -> weird ordering; retry.
+        // Idempotent: already available => ok
+        if (exists.status === TicketStatuses.Available) {
+          logger.info('[tickets] OrderCancelled ignored (already available)', { ticketId, orderId });
+          return;
+        }
+
+        // Reserved but by different order => retry
         throw new RetryableError(
           `Ticket reserved by different order on cancel ticketId=${ticketId} 
           existingOrderId=${exists.orderId} incomingOrderId=${orderId}`,
@@ -68,13 +70,7 @@ export async function startOrderCancelledListener(signal?: AbortSignal) {
         { correlationId: ctx.correlationId },
       );
 
-      logger.info('[tickets] Ticket unreserved by order cancel', {
-        ticketId,
-        orderId,
-        ticketVersion: updated.version,
-        subject: ctx.subject,
-        seq: ctx.seq,
-      });
+      logger.info('[tickets] Ticket unreserved by order cancel', { ticketId, orderId, ticketVersion: updated.version });
     },
     signal,
   );

@@ -15,6 +15,7 @@ const ctx = makeMessageContextFactory({ subject: 'orders.completed' });
 describe('payments: OrderCompleted listener', () => {
   it('applies complete when version is next', async () => {
     const orderId = new mongoose.Types.ObjectId().toHexString();
+    const ticketId = new mongoose.Types.ObjectId().toHexString();
 
     await Order.build({
       id: orderId,
@@ -32,6 +33,7 @@ describe('payments: OrderCompleted listener', () => {
         id: orderId,
         userId: 'user-1',
         version: 1,
+        ticket: { id: ticketId },
       },
       ctx({ seq: 7 }),
     );
@@ -45,6 +47,7 @@ describe('payments: OrderCompleted listener', () => {
 
   it('ignores duplicates (already applied same version)', async () => {
     const orderId = new mongoose.Types.ObjectId().toHexString();
+    const ticketId = new mongoose.Types.ObjectId().toHexString();
 
     await Order.build({
       id: orderId,
@@ -63,6 +66,7 @@ describe('payments: OrderCompleted listener', () => {
           id: orderId,
           userId: 'user-1',
           version: 1,
+          ticket: { id: ticketId },
         },
         ctx(),
       ),
@@ -71,6 +75,7 @@ describe('payments: OrderCompleted listener', () => {
 
   it('throws RetryableError on out-of-order version', async () => {
     const orderId = new mongoose.Types.ObjectId().toHexString();
+    const ticketId = new mongoose.Types.ObjectId().toHexString();
 
     await Order.build({
       id: orderId,
@@ -89,6 +94,7 @@ describe('payments: OrderCompleted listener', () => {
           id: orderId,
           userId: 'user-1',
           version: 2,
+          ticket: { id: ticketId },
         },
         ctx(),
       ),
