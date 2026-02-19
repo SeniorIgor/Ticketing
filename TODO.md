@@ -6,14 +6,5 @@
 4. Add different currency support
 5. Add pagination in tickets and orders service similarly to payment service
 
-
-// Best folder structure for api
-src/features/user/
-  server/
-    getCurrentUser.ts
-  api/
-    signOut.ts
-  hooks/
-    useCurrentUserQuery.ts
-    useSignOutMutation.ts
-  types.ts
+1. Fix auth state in Header
+2. Fir concurrency issue when order created twice

@@ -52,6 +52,23 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
   },
 );
 
+/**
+ * Prevent race condition (double-click / concurrent requests):
+ * Only ONE "active" order per ticket at a time.
+ *
+ * IMPORTANT: decide which statuses should block.
+ * Here we treat Created + AwaitingPayment as "active".
+ */
+orderSchema.index(
+  { ticket: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment] },
+    },
+  },
+);
+
 orderSchema.statics.build = (attrs: OrderAttrs) => new Order(attrs);
 
 orderSchema.statics.applyCompleteFromEvent = function ({ id }: ApplyCompleteFromEventData) {
