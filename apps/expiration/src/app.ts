@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 
-import { errorHandler, NotFoundError, requestId } from '@org/core';
+import { errorHandler, notFoundHandler, requestId } from '@org/core';
 
 export function createApp() {
   const app = express();
@@ -17,9 +17,7 @@ export function createApp() {
 
   // app.use('/api/v1/orders', ordersRouter);
 
-  app.use(() => {
-    throw new NotFoundError();
-  });
+  app.use(notFoundHandler);
 
   app.use(errorHandler);
 

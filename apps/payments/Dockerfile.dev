@@ -1,0 +1,20 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install deps once
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json ./
+
+RUN npm i
+
+COPY apps/payments ./apps/payments
+COPY packages/core ./packages/core
+COPY packages/nats ./packages/nats
+COPY packages/contracts ./packages/contracts
+
+ENV NODE_ENV=development
+
+EXPOSE 80
+
+CMD ["npx", "nx", "run", "payments:dev"]

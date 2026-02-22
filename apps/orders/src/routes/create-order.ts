@@ -1,21 +1,20 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { OrderCreatedEvent } from '@org/contracts';
+import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Order, Ticket } from '../models';
-import { OrderStatus } from '../types/order-status';
-import type { CreateOrderReqBody } from '../types/requests';
+import type { CreateOrderReqBody } from '../types';
 import { validateCreateOrder } from '../utils';
 
 const router = express.Router();
 
 // 15 min order expiration
-const EXPIRATION_SECONDS = 15 * 60;
+// const EXPIRATION_SECONDS = 15 * 60;
 // TODO change after test
-// const EXPIRATION_SECONDS = 30;
+const EXPIRATION_SECONDS = 60;
 
 router.post(
   '/',
@@ -43,7 +42,7 @@ router.post(
 
     const order = Order.build({
       userId,
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt,
       ticket,
     });

@@ -19,6 +19,9 @@
       "path": "./apps/expiration"
     },
     {
+      "path": "./apps/payments"
+    },
+    {
       "path": "./packages/core"
     },
     {

@@ -11,7 +11,7 @@ COPY nx.json tsconfig.base.json ./
 COPY apps/auth/package.json apps/auth/
 COPY packages/core/package.json packages/core/
 
-RUN npm ci
+RUN npm i
 
 # Copy source code needed for build
 COPY apps/auth ./apps/auth

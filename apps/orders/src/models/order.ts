@@ -1,10 +1,14 @@
 import type { Document, Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import type { OrderStatus } from '../types/order-status';
-import { OrderStatus as OrderStatusEnum } from '../types/order-status';
+import type { OrderStatus } from '@org/contracts';
+import { OrderStatuses, OrderStatusValues } from '@org/contracts';
 
 import type { TicketDoc } from './ticket';
+
+interface ApplyCompleteFromEventData {
+  id: string;
+}
 
 interface OrderAttrs {
   userId: string;
@@ -26,6 +30,7 @@ export interface OrderDoc extends Document {
 
 interface OrderModel extends Model<OrderDoc> {
   build(attrs: OrderAttrs): OrderDoc;
+  applyCompleteFromEvent(data: ApplyCompleteFromEventData): Promise<OrderDoc | null>;
 }
 
 const orderSchema = new Schema<OrderDoc, OrderModel>(
@@ -34,8 +39,8 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
     status: {
       type: String,
       required: true,
-      enum: Object.values(OrderStatusEnum),
-      default: OrderStatusEnum.Created,
+      enum: OrderStatusValues,
+      default: OrderStatuses.Created,
     },
     expiresAt: { type: Schema.Types.Date },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
@@ -47,8 +52,14 @@ const orderSchema = new Schema<OrderDoc, OrderModel>(
   },
 );
 
-orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order(attrs);
+orderSchema.statics.build = (attrs: OrderAttrs) => new Order(attrs);
+
+orderSchema.statics.applyCompleteFromEvent = function ({ id }: ApplyCompleteFromEventData) {
+  return this.findOneAndUpdate(
+    { _id: id, status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment] } },
+    { $set: { status: OrderStatuses.Complete }, $inc: { version: 1 } },
+    { new: true },
+  );
 };
 
 orderSchema.set('toJSON', {

@@ -1,6 +1,5 @@
 import { OrderExpiredEvent } from '@org/contracts';
-import { createLogger } from '@org/core';
-import { publishEvent } from '@org/nats';
+import { getNats, publishEvent } from '@org/nats';
 import type { QueueNamespaced, RedisConnections } from '@org/queue';
 import { createQueue, createQueueEvents, createWorker, defaultJobOptionsFromEnv } from '@org/queue';
 
@@ -16,7 +15,7 @@ interface CreateExpirationQueueDeps {
 }
 
 export function createExpirationQueue({ redis, prefix, workerConcurrency }: CreateExpirationQueueDeps) {
-  const logger = createLogger();
+  const { logger } = getNats();
   const namespace: QueueNamespaced = { prefix };
 
   const queue = createQueue<ExpireOrderJobData, void, ExpirationJobName>(EXPIRATION_QUEUE_NAME, {

@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { type TicketStatus, TicketStatuses, TicketStatusValues } from '@org/contracts';
+
 interface TicketAttrs {
   title: string;
   price: number;
@@ -12,7 +14,7 @@ export interface TicketDoc extends mongoose.Document {
   price: number;
   userId: string;
 
-  // reservation flag controlled by Orders events
+  status: TicketStatus;
   orderId?: string;
 
   createdAt: string;
@@ -31,7 +33,11 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
     title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     userId: { type: String, required: true },
-    // when present -> ticket is reserved and should not be edited
+
+    status: { type: String, required: true, enum: TicketStatusValues, default: TicketStatuses.Available, index: true },
+
+    // When status=Reserved => orderId is set.
+    // When status=Sold => orderId may remain for audit, but ticket stays locked.
     orderId: { type: String, required: false, index: true },
   },
   {
@@ -42,12 +48,11 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
 );
 
 ticketSchema.methods.isReserved = function isReserved(): boolean {
-  return !!this.orderId;
+  // Locked whenever it is not available
+  return this.status !== TicketStatuses.Available;
 };
 
-ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
-};
+ticketSchema.statics.build = (attrs: TicketAttrs) => new Ticket(attrs);
 
 ticketSchema.set('toJSON', {
   transform(_doc, json) {

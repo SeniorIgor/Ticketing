@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { TicketStatuses } from '@org/contracts';
+
 import { buildTicket } from '../../test/helpers/build-ticket';
 import { Ticket } from '../ticket';
 
@@ -16,16 +18,28 @@ describe('Tickets service Ticket model', () => {
     expect(ticket.title).toBe('Concert');
     expect(ticket.price).toBe(50);
     expect(ticket.userId).toBe('user-1');
+    expect(ticket.status).toBe(TicketStatuses.Available);
     expect(ticket.id).toBeDefined();
   });
 
-  it('isReserved() returns false when orderId is not set', async () => {
-    const ticket = await buildTicket({ orderId: undefined });
+  it('isReserved() returns false when status is Available', async () => {
+    const ticket = await buildTicket({ status: TicketStatuses.Available, orderId: undefined });
     expect(ticket.isReserved()).toBe(false);
   });
 
-  it('isReserved() returns true when orderId is set', async () => {
-    const ticket = await buildTicket({ orderId: new mongoose.Types.ObjectId().toHexString() });
+  it('isReserved() returns true when status is Reserved', async () => {
+    const ticket = await buildTicket({
+      status: TicketStatuses.Reserved,
+      orderId: new mongoose.Types.ObjectId().toHexString(),
+    });
+    expect(ticket.isReserved()).toBe(true);
+  });
+
+  it('isReserved() returns true when status is Sold', async () => {
+    const ticket = await buildTicket({
+      status: TicketStatuses.Sold,
+      orderId: new mongoose.Types.ObjectId().toHexString(),
+    });
     expect(ticket.isReserved()).toBe(true);
   });
 
@@ -38,9 +52,9 @@ describe('Tickets service Ticket model', () => {
       id: expect.any(String),
       title: 'A',
       price: 10,
+      status: TicketStatuses.Available,
     });
 
-    expect(json.orderId).toBeUndefined();
     expect(json._id).toBeUndefined();
     expect(json.userId).toBeUndefined();
     expect(json.createdAt).toBeUndefined();

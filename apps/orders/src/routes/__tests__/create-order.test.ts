@@ -1,13 +1,12 @@
 import request from 'supertest';
 
-import { OrderCreatedEvent } from '@org/contracts';
+import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { getAuthCookie } from '@org/test-utils';
 
 import { createApp } from '../../app';
 import { Order } from '../../models';
 import { buildOrder, buildTicket } from '../../test/helpers';
 import { publishEventMock } from '../../test/mocks';
-import { OrderStatus } from '../../types';
 
 const app = createApp();
 
@@ -54,7 +53,7 @@ describe('POST /api/v1/orders', () => {
     const cookie = getAuthCookie({ userId: 'user-2', email: 'test@test.com' });
     const ticket = await buildTicket();
 
-    await buildOrder({ userId: 'user-1', ticket, status: OrderStatus.Created });
+    await buildOrder({ userId: 'user-1', ticket, status: OrderStatuses.Created });
 
     await request(app).post('/api/v1/orders').set('Cookie', cookie).send({ ticketId: ticket.id }).expect(409);
 
@@ -84,7 +83,7 @@ describe('POST /api/v1/orders', () => {
     // API response
     expect(res.body).toMatchObject({
       id: expect.any(String),
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       expiresAt: expect.any(String),
       ticket: {
         id: ticket.id,
@@ -95,8 +94,11 @@ describe('POST /api/v1/orders', () => {
 
     // expiresAt is around now + 15 min (tolerance)
     const expiresAtMs = Date.parse(res.body.expiresAt);
-    const expectedMin = before + 15 * 60 * 1000;
-    const expectedMax = after + 15 * 60 * 1000;
+    // TODO change after test
+    // const expectedMin = before + 15 * 60 * 1000;
+    // const expectedMax = after + 15 * 60 * 1000;
+    const expectedMin = before + 60 * 1000;
+    const expectedMax = after + 60 * 1000;
 
     expect(expiresAtMs).toBeGreaterThanOrEqual(expectedMin);
     expect(expiresAtMs).toBeLessThanOrEqual(expectedMax);
@@ -111,7 +113,7 @@ describe('POST /api/v1/orders', () => {
     expect(data).toMatchObject({
       id: saved.id,
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       ticket: { id: ticket.id, price: 99 },
       version: saved.version,
     });

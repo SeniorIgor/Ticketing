@@ -69,6 +69,20 @@ build:
             dest: .
           - src: packages/queue/**/*
             dest: .
+    - image: seniorigortyapkin/payments
+      context: .
+      docker:
+        dockerfile: apps/payments/Dockerfile.dev
+      sync:
+        manual:
+          - src: apps/payments/**/*
+            dest: .
+          - src: packages/core/**/*
+            dest: .
+          - src: packages/nats/**/*
+            dest: .
+          - src: packages/contracts/**/*
+            dest: .
 
 manifests:
   kustomize:
@@ -104,6 +118,10 @@ profiles:
           context: .
           docker:
             dockerfile: apps/expiration/Dockerfile
+        - image: seniorigortyapkin/payments
+          context: .
+          docker:
+            dockerfile: apps/payments/Dockerfile
     manifests:
       kustomize:
         paths:

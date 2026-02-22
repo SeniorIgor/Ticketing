@@ -1,0 +1,9 @@
+{
+  "name": "@org/payments",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "private": true,
+  "scripts": {
+    "docker:build": "docker build -t seniorigortyapkin/payments -f apps/payments/Dockerfile ."
+  }
+}

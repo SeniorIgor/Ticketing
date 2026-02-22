@@ -2,12 +2,11 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import mongoose from 'mongoose';
 
-import { OrderCancelledEvent } from '@org/contracts';
+import { OrderCancelledEvent, OrderStatuses } from '@org/contracts';
 import { asyncHandler, AuthorizationError, NotFoundError, requireAuth, ValidationError } from '@org/core';
 import { publishEvent } from '@org/nats';
 
 import { Order } from '../models';
-import { OrderStatus } from '../types/order-status';
 
 const router = express.Router();
 
@@ -38,7 +37,7 @@ router.delete(
       throw new AuthorizationError('ORDER_NOT_OWNER', 'You do not have access to this order');
     }
 
-    order.status = OrderStatus.Cancelled;
+    order.status = OrderStatuses.Cancelled;
     await order.save();
 
     await publishEvent(

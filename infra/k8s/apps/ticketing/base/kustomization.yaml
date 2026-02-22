@@ -8,6 +8,8 @@ resources:
   - tickets-mongo
   - orders
   - orders-mongo
+  - payments
+  - payments-mongo
   - client
   - gateway
   - event-bus

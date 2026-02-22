@@ -9,10 +9,38 @@
       "node"
     ],
     "esModuleInterop": true,
+    "paths": {
+      "@org/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@org/test-utils": [
+        "packages/test-utils/src/index.ts"
+      ],
+      "@org/nats": [
+        "packages/nats/src/index.ts"
+      ],
+      "@org/contracts": [
+        "packages/contracts/src/index.ts"
+      ]
+    }
   },
   "include": [
     "jest.config.cts",
     "src/**/*.ts",
     "src/test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/nats/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/contracts/tsconfig.lib.json"
+    }
   ]
 }

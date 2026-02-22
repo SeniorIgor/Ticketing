@@ -28,3 +28,10 @@ data:
             paths:
               - /api/v1/orders
             strip_path: false
+      - name: payments
+        url: http://payments-srv:80
+        routes:
+          - name: payments
+            paths:
+              - /api/v1/payments
+            strip_path: false

@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 COPY eslint.config.mjs ./
 
-RUN npm ci
+RUN npm i
 
 COPY apps/client ./apps/client
 

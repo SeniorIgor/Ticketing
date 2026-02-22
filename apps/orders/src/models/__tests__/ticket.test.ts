@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
+import { OrderStatuses } from '@org/contracts';
+
 import { buildOrder, buildTicket } from '../../test/helpers';
-import { OrderStatus } from '../../types';
 import { Ticket } from '../ticket';
 
 describe('Orders service Ticket model', () => {
@@ -39,7 +40,7 @@ describe('Orders service Ticket model', () => {
 
     await buildOrder({
       userId: 'user-1',
-      status: OrderStatus.Created,
+      status: OrderStatuses.Created,
       ticket,
     });
 
@@ -51,7 +52,7 @@ describe('Orders service Ticket model', () => {
 
     await buildOrder({
       userId: 'user-1',
-      status: OrderStatus.Cancelled,
+      status: OrderStatuses.Cancelled,
       ticket,
     });
 
