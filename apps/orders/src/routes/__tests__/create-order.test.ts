@@ -141,4 +141,37 @@ describe('POST /api/v1/orders', () => {
     const [, , opts] = publishEventMock.mock.calls[0];
     expect(opts).toEqual({ correlationId: 'req-123' });
   });
+
+  it('CONCURRENCY: two parallel creates reserve the ticket once (201 + 409) and publish once', async () => {
+    // autoIndex=false in tests => ensure indexes exist
+    await Order.syncIndexes();
+
+    const cookie = getAuthCookie({ userId: 'user-1', email: 'test@test.com' });
+    const ticket = await buildTicket();
+
+    const [r1, r2] = await Promise.all([
+      request(app).post('/api/v1/orders').set('Cookie', cookie).send({ ticketId: ticket.id }),
+      request(app).post('/api/v1/orders').set('Cookie', cookie).send({ ticketId: ticket.id }),
+    ]);
+
+    const statuses = [r1.status, r2.status].sort();
+    expect(statuses).toEqual([201, 409]);
+
+    // Only one active order for that ticket
+    const orders = await Order.find({
+      ticket: ticket._id,
+      status: { $in: [OrderStatuses.Created, OrderStatuses.AwaitingPayment] },
+    });
+    expect(orders).toHaveLength(1);
+
+    // Only one event should be published (the winner request)
+    expect(publishEventMock).toHaveBeenCalledTimes(1);
+
+    // Optional: ensure the loser has your business error shape
+    const loser = r1.status === 409 ? r1 : r2;
+    expect(loser.body).toMatchObject({
+      code: 'BUSINESS_RULE',
+      reason: 'TICKET_RESERVED',
+    });
+  });
 });

@@ -102,4 +102,38 @@ describe('Orders service Order model', () => {
     order2.set({ status: OrderStatuses.Cancelled });
     await expect(order2.save()).rejects.toThrow();
   });
+
+  it('enforces unique ACTIVE order per ticket (partial unique index)', async () => {
+    // autoIndex=false => ensure index exists in test DB
+    await Order.syncIndexes();
+
+    const ticket = await buildTicket();
+
+    await Order.build({
+      userId: 'user-1',
+      status: OrderStatuses.Created,
+      expiresAt: new Date(Date.now() + 60_000),
+      ticket,
+    }).save();
+
+    // Another ACTIVE order should fail (Created/AwaitingPayment are "active")
+    const o2 = Order.build({
+      userId: 'user-2',
+      status: OrderStatuses.AwaitingPayment,
+      expiresAt: new Date(Date.now() + 60_000),
+      ticket,
+    });
+
+    await expect(o2.save()).rejects.toMatchObject({ code: 11000 });
+
+    // A NON-active status should be allowed by partial index
+    const cancelled = Order.build({
+      userId: 'user-3',
+      status: OrderStatuses.Cancelled,
+      expiresAt: new Date(Date.now() + 60_000),
+      ticket,
+    });
+
+    await expect(cancelled.save()).resolves.toBeDefined();
+  });
 });
