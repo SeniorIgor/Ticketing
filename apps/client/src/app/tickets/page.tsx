@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
-import { TicketsInfinite, TicketsToolbar } from '@/modules/tickets/components';
-import { getCurrentUserServer, listTicketsServer } from '@/services';
+import { TicketsCreateButton, TicketsInfinite, TicketsToolbar } from '@/modules/tickets';
+import { listTicketsServer } from '@/services';
 import type { SearchParams } from '@/utils';
 import { getSearchQuery } from '@/utils';
 
@@ -12,15 +12,9 @@ export default async function TicketsPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const query = getSearchQuery(resolvedSearchParams);
 
-  const [userRes, ticketsRes] = await Promise.all([
-    getCurrentUserServer(),
-    listTicketsServer({ limit: 20, q: query || undefined }),
-  ]);
-
-  const isAuthed = userRes.ok && !!userRes.data.currentUser;
+  const ticketsRes = await listTicketsServer({ limit: 20, q: query || undefined });
 
   if (!ticketsRes.ok) {
-    // keep your error UI
     return (
       <div className="container py-4">
         <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
@@ -28,11 +22,8 @@ export default async function TicketsPage({ searchParams }: Props) {
             <h1 className="mb-1">All tickets</h1>
             <p className="text-muted mb-0">Browse all available listings.</p>
           </div>
-          {isAuthed && (
-            <Link href={ROUTES.tickets.new} className="btn btn-success">
-              Sell a ticket
-            </Link>
-          )}
+
+          <TicketsCreateButton />
         </div>
 
         <hr className="my-4" />
@@ -43,8 +34,6 @@ export default async function TicketsPage({ searchParams }: Props) {
 
   const page = ticketsRes.data;
 
-  console.log({ items: page.items });
-
   return (
     <div className="container py-4">
       <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
@@ -53,11 +42,7 @@ export default async function TicketsPage({ searchParams }: Props) {
           <p className="text-muted mb-0">Browse all available listings.</p>
         </div>
 
-        {isAuthed && (
-          <Link href={ROUTES.tickets.new} className="btn btn-success">
-            Sell a ticket
-          </Link>
-        )}
+        <TicketsCreateButton />
       </div>
 
       <hr className="my-4" />
@@ -71,6 +56,12 @@ export default async function TicketsPage({ searchParams }: Props) {
           initialHasNextPage={page.pageInfo.hasNextPage}
           query={query}
         />
+      </div>
+
+      <div className="mt-4">
+        <Link href={ROUTES.home} className="btn btn-link px-0">
+          Back to home
+        </Link>
       </div>
     </div>
   );

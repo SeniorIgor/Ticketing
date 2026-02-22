@@ -1,7 +1,8 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
-import { OrderBadge } from '@/modules/orders/components/OrderBadge/OrderBadge';
+import { OrderBadge } from '@/modules/orders/components';
+import { PayNowButton } from '@/modules/payments';
 import type { OrderDto } from '@/services/orders';
 import { formatPrice, isOrderPayable } from '@/utils';
 
@@ -47,9 +48,7 @@ export function OrderCard({ order }: OrderCardProps) {
           </Link>
 
           {payable ? (
-            <Link href={ROUTES.orders.details(order.id)} className="btn btn-success">
-              Pay now
-            </Link>
+            <PayNowButton orderId={order.id} className="btn btn-success" redirectTo={ROUTES.orders.details(order.id)} />
           ) : (
             <span className="text-muted small align-self-center">No action needed</span>
           )}

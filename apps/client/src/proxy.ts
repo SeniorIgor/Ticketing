@@ -1,9 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { getRequestId, REQUEST_ID_HEADER } from '@/middleware/requestId';
+import { getRequestId, REQUEST_ID_HEADER } from '@/middleware';
 
-import { handleAuthRedirect } from './authRedirect';
+import { handleAuthRedirect } from './middleware/authRedirect';
 
 export async function proxy(request: NextRequest) {
   const requestId = getRequestId(request);

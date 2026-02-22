@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
 import { OrderCard } from '@/modules/orders/components';
@@ -9,11 +8,6 @@ export default async function OrdersPage() {
   const ordersRes = await listOrders();
 
   if (!ordersRes.ok) {
-    // If cookie expired between middleware and render, still handle it safely.
-    if (ordersRes.error.status === 401) {
-      redirect(ROUTES.signIn);
-    }
-
     return (
       <div className="container py-4">
         <div className="alert alert-danger mb-0">Failed to load orders. Please try again later.</div>

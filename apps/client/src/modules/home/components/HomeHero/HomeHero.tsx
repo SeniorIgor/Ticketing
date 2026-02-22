@@ -1,6 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 
-export function HomeHero({ isAuthed }: { isAuthed: boolean }) {
+import { selectIsAuthenticated, useAppSelector } from '@/store';
+
+export function HomeHero() {
+  const isAuthed = useAppSelector(selectIsAuthenticated);
+
   return (
     <div className="p-4 p-md-5 mb-4 rounded-3 bg-body-tertiary border">
       <div className="container-fluid py-2">

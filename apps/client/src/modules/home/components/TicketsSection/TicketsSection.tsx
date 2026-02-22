@@ -1,14 +1,18 @@
+'use client';
+
 import Link from 'next/link';
 
 import { TicketsList } from '@/modules/tickets/components';
 import type { TicketDto } from '@/services';
+import { selectIsAuthenticated, useAppSelector } from '@/store';
 
 type TicketsSectionProps = {
   ticketsResult: { ok: true; tickets: TicketDto[] } | { ok: false };
-  isAuthed: boolean;
 };
 
-export function TicketsSection({ ticketsResult, isAuthed }: TicketsSectionProps) {
+export function TicketsSection({ ticketsResult }: TicketsSectionProps) {
+  const isAuthed = useAppSelector(selectIsAuthenticated);
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">

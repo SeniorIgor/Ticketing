@@ -1,10 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 
-type QuickActionsProps = {
-  isAuthed: boolean;
-};
+import { selectIsAuthenticated, useAppSelector } from '@/store';
 
-export function QuickActions({ isAuthed }: QuickActionsProps) {
+export function QuickActions() {
+  const isAuthed = useAppSelector(selectIsAuthenticated);
+
   if (!isAuthed) {
     return null;
   }

@@ -13,6 +13,8 @@ type TicketDetailsCardProps = {
 };
 
 export function TicketDetailsCard({ ticket, isAuthed }: TicketDetailsCardProps) {
+  const isAvailable = ticket.status === 'available';
+
   return (
     <div className="card border-0 shadow-sm">
       <div className="card-body p-4">
@@ -34,8 +36,15 @@ export function TicketDetailsCard({ ticket, isAuthed }: TicketDetailsCardProps) 
           </div>
 
           <div className="col-12 col-md-6">
-            {/* Orders flow not implemented yet → keep CTA ready but safe */}
-            {!isAuthed ? (
+            {!isAvailable ? (
+              <button className="btn btn-secondary w-100" disabled>
+                {ticket.status === 'reserved'
+                  ? 'Already reserved'
+                  : ticket.status === 'sold'
+                    ? 'Already sold'
+                    : 'Unavailable'}
+              </button>
+            ) : !isAuthed ? (
               <Link href={ROUTES.signIn} className="btn btn-primary w-100">
                 Sign in to purchase
               </Link>

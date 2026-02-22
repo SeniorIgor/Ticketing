@@ -8,3 +8,6 @@
 
 1. Fix auth state in Header
 2. Fir concurrency issue when order created twice
+
+1. Create payment popup and integrate Stripe
+2. Fix concurrency issue when payment created twice

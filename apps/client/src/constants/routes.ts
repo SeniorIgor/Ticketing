@@ -17,8 +17,6 @@ export const ROUTES = {
 
   payments: {
     root: '/payments',
-    new: (orderId: string) => `/payments/new?orderId=${encodeURIComponent(orderId)}`,
     details: (paymentId: string) => `/payments/${paymentId}`,
-    success: (orderId: string) => `/payments/success?orderId=${encodeURIComponent(orderId)}`,
   },
 } as const;

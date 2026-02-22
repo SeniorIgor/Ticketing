@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
 import { OrderCountdownWithRefresh } from '@/modules/orders/components';
 import { OrderBadge } from '@/modules/orders/components/OrderBadge/OrderBadge';
-import { getCurrentUserServer } from '@/services';
+import { PayNowButton } from '@/modules/payments';
 import { getOrder } from '@/services/orders';
 import { formatPrice, isOrderPayable } from '@/utils';
 
@@ -13,12 +13,6 @@ type OrderDetailsPageProps = { params: Params | Promise<Params> };
 
 export default async function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const { id } = await params;
-
-  const userRes = await getCurrentUserServer();
-  const isAuthed = userRes.ok && !!userRes.data.currentUser;
-  if (!isAuthed) {
-    redirect(ROUTES.signIn);
-  }
 
   const res = await getOrder(id);
 
@@ -86,11 +80,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
               View ticket
             </Link>
 
-            {payable ? (
-              <button className="btn btn-success" disabled>
-                Pay now (coming soon)
-              </button>
-            ) : null}
+            {payable ? <PayNowButton orderId={order.id} className="btn btn-success" /> : null}
           </div>
 
           <div className="text-muted small mt-3">Expires at: {new Date(order.expiresAt).toLocaleString()}</div>

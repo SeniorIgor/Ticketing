@@ -6,6 +6,8 @@ import { useFormErrors, useRequest } from '@/hooks';
 import { isBackendError } from '@/http';
 import { signinUser } from '@/services/auth/signin';
 
+import { getNextFromLocation } from './SigninForm.utils';
+
 export function useSigninForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,7 +46,8 @@ export function useSigninForm() {
       return;
     }
 
-    window.location.replace('/');
+    const next = getNextFromLocation();
+    window.location.replace(next ?? '/');
   }
 
   return {

@@ -30,6 +30,9 @@ export class HttpError<T = unknown> extends Error {
     public requestId?: string,
   ) {
     super(typeof payload === 'object' && payload && 'message' in payload ? String(payload.message) : 'Request failed');
+
+    Object.setPrototypeOf(this, new.target.prototype);
+
     this.name = 'HttpError';
   }
 }
