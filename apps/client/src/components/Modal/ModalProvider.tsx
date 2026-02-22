@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import { ModalContext } from './modalContext';
 import { ModalFrame } from './ModalFrame/ModalFrame';
+import { ModalContext } from './modalContext';
 
 type ModalProviderProps = {
   children: ReactNode;

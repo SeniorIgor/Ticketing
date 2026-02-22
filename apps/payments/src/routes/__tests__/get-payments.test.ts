@@ -124,11 +124,11 @@ describe('GET /api/v1/payments', () => {
     expect(res.body.items).toHaveLength(1);
     expect(res.body.items[0]).toMatchObject({
       status: PaymentStatuses.Failed,
+      provider: 'stripe', // now exposed
     });
 
-    // providerId/provider should NOT be exposed
     expect(res.body.items[0].providerId).toBeUndefined();
-    expect(res.body.items[0].provider).toBeUndefined();
+    expect(res.body.items[0].createdAt).toBeDefined();
   });
 
   it('supports filtering by orderId', async () => {
