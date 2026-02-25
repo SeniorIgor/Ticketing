@@ -33,25 +33,20 @@ function toStringArray(value: unknown): string[] {
 const statusSchema: z.ZodType<TicketStatus[] | undefined> = z
   .any()
   .optional()
-  .transform((v): TicketStatus[] | undefined => {
+  // 1) normalize to string[] | undefined (no throwing)
+  .transform((v): string[] | undefined => {
     const raw = toStringArray(v)
       .map((x) => x.trim())
       .filter(Boolean);
-    if (raw.length === 0) {
-      return undefined;
-    }
 
-    // validate against allowed values
-    for (const s of raw) {
-      if (!TicketStatusValues.includes(s as TicketStatus)) {
-        // throw in transform to keep fieldName=status in ValidationError details
-        // (your validate() wrapper will format it)
-        throw new Error('Invalid status value');
-      }
-    }
-
-    return raw as TicketStatus[];
-  });
+    return raw.length === 0 ? undefined : raw;
+  })
+  // 2) validate with refine so we get a proper Zod issue at path ["status"]
+  .refine((raw) => raw === undefined || raw.every((s) => TicketStatusValues.includes(s as TicketStatus)), {
+    message: 'Invalid status value',
+  })
+  // 3) cast to TicketStatus[] | undefined for downstream typing
+  .transform((raw) => raw as TicketStatus[] | undefined);
 
 export const GetTicketsQuerySchema = z.object({
   limit: z
