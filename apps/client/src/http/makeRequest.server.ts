@@ -37,6 +37,7 @@ export async function makeRequestServer<TResponse, TBody = unknown>(
     cache: options.cache ?? 'no-store',
   });
 
+  // TODO: (temporary for dev purposes) replace with logging service
   console.log({ res, host: headerStore.get('host') });
 
   if (!res.ok) {

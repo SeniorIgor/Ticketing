@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
-import { OrderCard } from '@/modules/orders/components';
-import { listOrders } from '@/services/orders/listOrders';
+import { OrderCard } from '@/modules/orders';
+import { listOrders } from '@/services/orders';
 
 export default async function OrdersPage() {
   const ordersRes = await listOrders();

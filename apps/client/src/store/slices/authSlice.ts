@@ -28,4 +28,4 @@ const slice = createSlice({
 });
 
 export const { hydrateAuth, logout } = slice.actions;
-export default slice.reducer;
+export const authReducer = slice.reducer;

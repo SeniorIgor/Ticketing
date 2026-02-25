@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
-import { OrderBadge } from '@/modules/orders/components';
+import { OrderBadge } from '@/modules/orders';
 import { PayNowButton } from '@/modules/payments';
 import type { OrderDto } from '@/services/orders';
 import { formatPrice, isOrderPayable } from '@/utils';

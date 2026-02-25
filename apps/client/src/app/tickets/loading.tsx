@@ -1,4 +1,4 @@
-import { TicketsSkeleton } from '@/modules/tickets/components';
+import { SkeletonCardsGrid } from '@/components';
 
 export default function LoadingTicketsPage() {
   return (
@@ -12,7 +12,7 @@ export default function LoadingTicketsPage() {
 
       <hr className="my-4" />
 
-      <TicketsSkeleton />
+      <SkeletonCardsGrid count={6} />
     </div>
   );
 }

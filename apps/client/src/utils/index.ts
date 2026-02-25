@@ -1,5 +1,5 @@
+export * from './auth';
 export * from './errors';
-export * from './isAuthenticated';
 export * from './isServer';
 export * from './orders';
 export * from './price';

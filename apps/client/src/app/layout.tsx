@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 
-import Header from '@/components/Header/Header';
-import { ModalProvider } from '@/components/Modal';
-import { NotificationProvider } from '@/components/NotificationContext/NotificationContext';
-import { Providers } from '@/components/Providers/Providers';
+import { Header, ModalProvider, NotificationProvider, Providers } from '@/components';
 import { PublicEnvProvider } from '@/context';
 import { getHydrationPayload } from '@/store/hydration/getHydrationPayload';
 import { requireServerEnv } from '@/utils';

@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { TicketDto } from '@/services';
-import { listTickets } from '@/services';
+import type { TicketDto } from '@/services/tickets';
+import { listTickets } from '@/services/tickets';
 
 import { TicketsList } from '../TicketsList/TicketsList';
 

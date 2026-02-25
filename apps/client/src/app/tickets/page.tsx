@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
 import { TicketsCreateButton, TicketsInfinite, TicketsToolbar } from '@/modules/tickets';
-import { listTicketsServer } from '@/services';
+import { listTicketsServer } from '@/services/tickets';
 import type { SearchParams } from '@/utils';
 import { getSearchQuery } from '@/utils';
 

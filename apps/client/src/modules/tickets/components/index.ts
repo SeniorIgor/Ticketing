@@ -5,5 +5,4 @@ export * from './TicketDetailsCard/TicketDetailsCard';
 export * from './TicketsCreateButton/TicketsCreateButton';
 export * from './TicketsInfinite/TicketsInfinite';
 export * from './TicketsList/TicketsList';
-export * from './TicketsSkeleton/TicketsSkeleton';
 export * from './TicketsToolbar/TicketsToolbar';

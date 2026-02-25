@@ -3,7 +3,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 
 import { ROUTES } from '@/constants';
-import type { TicketDto } from '@/services';
+import type { TicketDto } from '@/services/tickets';
 import { formatPrice } from '@/utils';
 
 import { TicketCardStatus } from '../TicketCardStatus/TicketCardStatus';

@@ -1,4 +1,4 @@
-import { CreateTicketForm } from '@/modules/tickets/components';
+import { CreateTicketForm } from '@/modules/tickets';
 
 export default async function CreateTicketPage() {
   return (

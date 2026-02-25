@@ -6,8 +6,5 @@
 4. Add different currency support
 5. Add pagination in tickets and orders service similarly to payment service
 
-1. Fix auth state in Header
-2. Fir concurrency issue when order created twice
-
-1. Create payment popup and integrate Stripe
-2. Fix concurrency issue when payment created twice
+1. Fir concurrency issue when order created twice
+2. Create production build and test

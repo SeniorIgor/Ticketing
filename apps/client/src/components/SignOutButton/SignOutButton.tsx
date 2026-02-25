@@ -2,11 +2,17 @@
 
 import { useRouter } from 'next/navigation';
 
+import clsx from 'clsx';
+
 import { useNotify } from '@/components/NotificationContext/NotificationContext';
-import { signoutUser } from '@/services';
+import { signoutUser } from '@/services/auth';
 import { logout, useAppDispatch } from '@/store';
 
-export default function SignOutButton() {
+export type SignOutButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  className?: string;
+};
+
+export function SignOutButton({ className, ...props }: SignOutButtonProps) {
   const notify = useNotify();
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -26,9 +32,10 @@ export default function SignOutButton() {
   return (
     <button
       type="button"
-      className="btn btn-outline-danger"
+      className={clsx('btn btn-outline-danger', className)}
       onClick={handleSignOut}
       aria-label="Sign out of your account"
+      {...props}
     >
       Sign out
     </button>

@@ -4,7 +4,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 
 import { useFormErrors, useRequest } from '@/hooks';
 import { isBackendError } from '@/http';
-import { signinUser } from '@/services/auth/signin';
+import { signinUser } from '@/services/auth';
 
 import { getNextFromLocation } from './SigninForm.utils';
 

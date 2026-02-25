@@ -4,8 +4,8 @@ import { useRef } from 'react';
 
 import { Provider } from 'react-redux';
 
-import type { AppPreloadedState } from './store';
-import { type AppStore, makeStore } from './store';
+import type { AppPreloadedState, AppStore } from './store';
+import { makeStore } from './store';
 
 export function StoreProvider({
   children,

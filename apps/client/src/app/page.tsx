@@ -1,5 +1,5 @@
-import { HomeHero, QuickActions, TicketsSection } from '@/modules/home/components';
-import { listTicketsServer } from '@/services';
+import { HomeHero, QuickActions, TicketsSection } from '@/modules/home';
+import { listTicketsServer } from '@/services/tickets';
 
 export default async function HomePage() {
   const ticketsRes = await listTicketsServer({ limit: 3 });

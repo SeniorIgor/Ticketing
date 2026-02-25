@@ -1,6 +1,6 @@
-import './mocks/nats';
+import { createPullWorkerMock, getNatsMock, installNatsMock, publishEventMock } from './mocks/nats';
 
-import { createPullWorkerMock, getNatsMock, publishEventMock } from './mocks/nats';
+installNatsMock();
 
 beforeEach(() => {
   jest.useRealTimers();

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { TicketsList } from '@/modules/tickets/components';
-import type { TicketDto } from '@/services';
+import { TicketsList } from '@/modules/tickets';
+import type { TicketDto } from '@/services/tickets';
 import { selectIsAuthenticated, useAppSelector } from '@/store';
 
 type TicketsSectionProps = {

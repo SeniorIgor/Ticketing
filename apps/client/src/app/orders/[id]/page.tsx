@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
-import { OrderCountdownWithRefresh } from '@/modules/orders/components';
-import { OrderBadge } from '@/modules/orders/components/OrderBadge/OrderBadge';
+import { OrderBadge, OrderCountdownWithRefresh } from '@/modules/orders';
 import { PayNowButton } from '@/modules/payments';
 import { getOrder } from '@/services/orders';
 import { formatPrice, isOrderPayable } from '@/utils';

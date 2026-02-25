@@ -32,13 +32,15 @@ export const getNatsMock = jest.fn().mockReturnValue({
   },
 });
 
-jest.mock('@org/nats', () => {
-  const actual = jest.requireActual('@org/nats');
+export function installNatsMock() {
+  jest.mock('@org/nats', () => {
+    const actual = jest.requireActual('@org/nats');
 
-  return {
-    ...actual,
-    publishEvent: publishEventMock,
-    createPullWorker: createPullWorkerMock,
-    getNats: getNatsMock,
-  };
-});
+    return {
+      ...actual,
+      publishEvent: publishEventMock,
+      createPullWorker: createPullWorkerMock,
+      getNats: getNatsMock,
+    };
+  });
+}

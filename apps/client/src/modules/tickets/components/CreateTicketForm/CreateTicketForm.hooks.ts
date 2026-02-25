@@ -6,7 +6,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useNotify } from '@/components/NotificationContext/NotificationContext';
 import { useFormErrors, useRequest } from '@/hooks';
 import { isBackendError } from '@/http';
-import { createTicket } from '@/services';
+import { createTicket } from '@/services/tickets';
 import { parsePrice } from '@/utils';
 
 export function useCreateTicketForm() {

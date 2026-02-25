@@ -1,5 +1,5 @@
-import { getCurrentUserServer } from '@/services';
-import type { HydrationPayload } from '@/store/hydration/types';
+import { getCurrentUserServer } from '@/services/auth';
+import type { HydrationPayload } from '@/store';
 
 export async function getHydrationPayload(): Promise<{ ok: true; data: HydrationPayload }> {
   const userRes = await getCurrentUserServer();

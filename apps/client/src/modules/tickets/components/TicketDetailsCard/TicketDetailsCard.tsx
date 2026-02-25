@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
-import { BuyTicketButton } from '@/modules/orders/components';
-import type { TicketDto } from '@/services';
+import { BuyTicketButton } from '@/modules/orders';
+import type { TicketDto } from '@/services/tickets';
 import { formatPrice } from '@/utils';
 
 import { TicketCardStatus } from '../TicketCardStatus/TicketCardStatus';

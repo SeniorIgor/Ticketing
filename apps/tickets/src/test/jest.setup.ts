@@ -1,6 +1,7 @@
-import './mocks/nats';
-
+import { installNatsMock } from './mocks';
 import { clearTestDb, setupTestDb, teardownTestDb } from './setup';
+
+installNatsMock();
 
 beforeAll(async () => {
   await setupTestDb();

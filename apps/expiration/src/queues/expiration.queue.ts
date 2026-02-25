@@ -3,8 +3,8 @@ import { getNats, publishEvent } from '@org/nats';
 import type { QueueNamespaced, RedisConnections } from '@org/queue';
 import { createQueue, createQueueEvents, createWorker, defaultJobOptionsFromEnv } from '@org/queue';
 
-import type { ExpirationJobName } from './expiration.schema';
-import { ExpireOrderJob, type ExpireOrderJobData } from './expiration.schema';
+import type { ExpirationJobName, ExpireOrderJobData } from './expiration.schema';
+import { ExpireOrderJob } from './expiration.schema';
 
 export const EXPIRATION_QUEUE_NAME = 'expiration';
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useSigninForm } from './SigninForm.hooks';
 
-export default function SigninForm() {
+export function SigninForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const { email, password, loading, formError, fieldErrors, handleEmailChange, handlePasswordChange, handleSubmit } =

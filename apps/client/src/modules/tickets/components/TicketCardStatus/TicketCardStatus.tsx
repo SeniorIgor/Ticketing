@@ -1,4 +1,4 @@
-import type { TicketStatus } from '@/services';
+import type { TicketStatus } from '@/services/tickets';
 
 interface TicketStatusProps {
   status: TicketStatus;

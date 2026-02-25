@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 
-import { TicketDetailsCard } from '@/modules/tickets/components';
-import { getCurrentUserServer, getTicketServer } from '@/services';
+import { TicketDetailsCard } from '@/modules/tickets';
+import { getCurrentUserServer } from '@/services/auth';
+import { getTicketServer } from '@/services/tickets';
 
 type Params = { id: string };
 

@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
-import { TicketsInfinite, TicketsToolbar } from '@/modules/tickets/components';
-import { getCurrentUserServer, listTicketsServer } from '@/services';
+import { TicketsInfinite, TicketsToolbar } from '@/modules/tickets';
+import { getCurrentUserServer } from '@/services/auth';
+import { listTicketsServer } from '@/services/tickets';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type Props = { searchParams?: SearchParams | Promise<SearchParams> };

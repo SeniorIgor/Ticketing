@@ -1,4 +1,4 @@
-import type { TicketDto } from '@/services';
+import type { TicketDto } from '@/services/tickets';
 
 import { TicketCard } from '../TicketCard/TicketCard';
 
