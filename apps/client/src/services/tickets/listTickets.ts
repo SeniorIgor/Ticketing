@@ -1,7 +1,8 @@
 import { makeSafeRequest } from '@/http';
+import type { Paginated } from '@/types';
 import { buildQueryString } from '@/utils';
 
-import type { CursorPage, ListTicketsQuery, TicketDto } from './types';
+import type { ListTicketsQuery, TicketDto } from './types';
 
 export function listTickets(query?: ListTicketsQuery) {
   const queryString = buildQueryString({
@@ -9,10 +10,8 @@ export function listTickets(query?: ListTicketsQuery) {
     cursor: query?.cursor,
     userId: query?.userId,
     q: query?.q,
-    reserved: typeof query?.reserved === 'boolean' ? query.reserved : undefined,
+    status: query?.status,
   });
 
-  return makeSafeRequest<CursorPage<TicketDto>>(`/api/v1/tickets${queryString}`, {
-    method: 'GET',
-  });
+  return makeSafeRequest<Paginated<TicketDto>>(`/api/v1/tickets${queryString}`, { method: 'GET' });
 }

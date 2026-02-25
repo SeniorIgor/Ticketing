@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { TicketDto } from '@/services/tickets';
+import type { TicketDto, TicketStatus } from '@/services/tickets';
 import { listTickets } from '@/services/tickets';
 
 import { TicketsList } from '../TicketsList/TicketsList';
@@ -13,15 +13,15 @@ type Props = {
   initialHasNextPage: boolean;
   query?: string;
   userId?: string;
+  status?: TicketStatus[];
 };
 
-export function TicketsInfinite({ initialItems, initialNextCursor, initialHasNextPage, query, userId }: Props) {
+export function TicketsInfinite({ initialItems, initialNextCursor, initialHasNextPage, query, userId, status }: Props) {
   const [items, setItems] = useState(initialItems);
   const [nextCursor, setNextCursor] = useState<string | undefined>(initialNextCursor);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [loading, setLoading] = useState(false);
 
-  // Reset when query/userId changes (navigation updates props)
   useEffect(() => {
     setItems(initialItems);
     setNextCursor(initialNextCursor);
@@ -41,6 +41,7 @@ export function TicketsInfinite({ initialItems, initialNextCursor, initialHasNex
       cursor: nextCursor,
       q: query || undefined,
       userId: userId || undefined,
+      status: status && status.length ? status : undefined,
     });
 
     if (res.ok) {
@@ -50,7 +51,7 @@ export function TicketsInfinite({ initialItems, initialNextCursor, initialHasNex
     }
 
     setLoading(false);
-  }, [hasNextPage, loading, nextCursor, query, userId]);
+  }, [hasNextPage, loading, nextCursor, query, userId, status]);
 
   useEffect(() => {
     const el = sentinelRef.current;

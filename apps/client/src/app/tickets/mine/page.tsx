@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
-import { TicketsInfinite, TicketsToolbar } from '@/modules/tickets';
+import { MyTicketsToolbar, TicketsInfinite } from '@/modules/tickets/components';
 import { getCurrentUserServer } from '@/services/auth';
-import { listTicketsServer } from '@/services/tickets';
+import { listTicketsServer, TicketStatuses } from '@/services/tickets';
+import { getStatusFromSearchParams } from '@/utils';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type Props = { searchParams?: SearchParams | Promise<SearchParams> };
@@ -18,6 +19,7 @@ function getQuery(sp?: SearchParams) {
 export default async function MyTicketsPage({ searchParams }: Props) {
   const sp = await searchParams;
   const q = getQuery(sp);
+  const status = getStatusFromSearchParams(sp) ?? [TicketStatuses.Available];
 
   const userRes = await getCurrentUserServer();
   if (!userRes.ok || !userRes.data.currentUser) {
@@ -26,7 +28,7 @@ export default async function MyTicketsPage({ searchParams }: Props) {
 
   const userId = userRes.data.currentUser.id;
 
-  const ticketsRes = await listTicketsServer({ limit: 20, userId, q: q || undefined });
+  const ticketsRes = await listTicketsServer({ limit: 20, userId, q: q || undefined, status });
 
   if (!ticketsRes.ok) {
     return (
@@ -53,7 +55,7 @@ export default async function MyTicketsPage({ searchParams }: Props) {
 
       <hr className="my-4" />
 
-      <TicketsToolbar initialQuery={q} total={page.items.length} />
+      <MyTicketsToolbar initialQuery={q} total={page.items.length} initialStatus={status} />
 
       <div className="mt-3">
         <TicketsInfinite
@@ -62,6 +64,7 @@ export default async function MyTicketsPage({ searchParams }: Props) {
           initialHasNextPage={page.pageInfo.hasNextPage}
           query={q}
           userId={userId}
+          status={status}
         />
       </div>
     </div>

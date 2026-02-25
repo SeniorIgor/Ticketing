@@ -61,7 +61,6 @@ describe('GET /api/v1/tickets', () => {
     const nextCursor = firstPage.pageInfo.nextCursor as string;
 
     const secondResponse = await request(app).get(`/api/v1/tickets?limit=2&cursor=${nextCursor}`).expect(200);
-
     const secondPage = secondResponse.body as CursorPage<TicketListItem>;
 
     expect(secondPage.items).toHaveLength(1);
@@ -94,20 +93,26 @@ describe('GET /api/v1/tickets', () => {
     expect(body.items[0].title).toBe('Rock Concert');
   });
 
-  it('filters reserved=true', async () => {
-    const freeTicket = await Ticket.build({ title: 'Free', price: 10, userId: 'u1' }).save();
+  it('filters by status', async () => {
+    const t1 = await Ticket.build({ title: 'Available', price: 10, userId: 'u1' }).save(); // default available
 
-    const reservedTicket = await Ticket.build({ title: 'Reserved', price: 10, userId: 'u1' }).save();
-    reservedTicket.orderId = 'o1';
-    await reservedTicket.save();
+    const t2 = await Ticket.build({ title: 'Reserved', price: 10, userId: 'u1' }).save();
+    t2.status = 'reserved';
+    t2.orderId = 'o1';
+    await t2.save();
 
-    const response = await request(app).get('/api/v1/tickets?reserved=true').expect(200);
-    const body = response.body as CursorPage<TicketListItem>;
+    const t3 = await Ticket.build({ title: 'Sold', price: 10, userId: 'u1' }).save();
+    t3.status = 'sold';
+    t3.orderId = 'o2';
+    await t3.save();
 
-    const returnedIds = body.items.map((item) => item.id);
+    const res = await request(app).get('/api/v1/tickets?status=sold').expect(200);
 
-    expect(returnedIds).toEqual([reservedTicket.id]);
-    expect(returnedIds).not.toEqual(expect.arrayContaining([freeTicket.id]));
+    const ids = res.body.items.map((x: { id: string }) => x.id);
+    expect(ids).toEqual([t3.id]);
+
+    // sanity: ensure others are not included
+    expect(ids).not.toEqual(expect.arrayContaining([t1.id, t2.id]));
   });
 
   it('returns 400 for invalid cursor', async () => {
@@ -123,6 +128,22 @@ describe('GET /api/v1/tickets', () => {
       fieldName: 'cursor',
       message: 'Invalid cursor id',
     });
+  });
+
+  it('returns 400 for invalid status', async () => {
+    const response = await request(app).get('/api/v1/tickets?status=unknown').expect(400);
+
+    expect(response.body).toMatchObject({
+      code: 'VALIDATION',
+      reason: 'TICKETS_INVALID_QUERY',
+      details: expect.any(Array),
+    });
+
+    // Depending on your validate() details shape, this can be:
+    // { fieldName: 'status', message: 'Invalid status value' }
+    expect(response.body.details).toEqual(
+      expect.arrayContaining([{ fieldName: 'status', message: 'Invalid status value' }]),
+    );
   });
 
   it('clamps limit to max (100)', async () => {

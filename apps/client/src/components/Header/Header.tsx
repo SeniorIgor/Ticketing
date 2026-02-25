@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ROUTES } from '@/constants';
 import { selectIsAuthenticated, useAppSelector } from '@/store';
 
-import { SignOutButton } from '../SignOutButton/SignOutButton';
 import { UserMenu } from '../UserMenu/UserMenu';
 
 export function Header() {
@@ -23,7 +22,7 @@ export function Header() {
           </Link>
 
           <div className="d-flex gap-2 align-items-center">
-            {!isAuthed ? (
+            {!isAuthed && (
               <>
                 <Link href={ROUTES.signIn} className="btn btn-outline-primary">
                   Sign in
@@ -32,8 +31,6 @@ export function Header() {
                   Sign up
                 </Link>
               </>
-            ) : (
-              <SignOutButton />
             )}
 
             <button

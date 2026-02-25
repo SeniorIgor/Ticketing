@@ -84,14 +84,14 @@ export function useCheckoutPayment(orderId: string) {
       return;
     }
 
-    const pi = result.paymentIntent;
-    if (!pi || pi.status !== 'succeeded') {
+    const paymentIntent = result.paymentIntent;
+    if (!paymentIntent || paymentIntent.status !== 'succeeded') {
       setSubmitting(false);
-      setErrorMessage(`Payment did not succeed. Status=${pi?.status ?? 'unknown'}`);
+      setErrorMessage(`Payment did not succeed. Status=${paymentIntent?.status ?? 'unknown'}`);
       return;
     }
 
-    const confirmRes = await confirmPayment(orderId, pi.id);
+    const confirmRes = await confirmPayment(orderId, paymentIntent.id);
 
     if (!confirmRes.ok) {
       setSubmitting(false);

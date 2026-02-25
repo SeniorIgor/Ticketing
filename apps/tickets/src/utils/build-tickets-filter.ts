@@ -1,58 +1,32 @@
-import mongoose from 'mongoose';
-import { z } from 'zod';
+import type { QueryFilter } from 'mongoose';
 
-const MAX_LIMIT = 100;
-const DEFAULT_LIMIT = 20;
+import type { TicketDoc } from '../models/ticket';
 
-const emptyStringToUndefined = z.string().transform((value) => {
-  const trimmed = value.trim();
-  return trimmed.length === 0 ? undefined : trimmed;
-});
+import type { GetTicketsQuery } from './get-tickets-query.schema';
 
-const toBool = (value: unknown): boolean | undefined => {
-  if (value === undefined) {
-    return undefined;
+export function buildTicketsFilter(query: GetTicketsQuery): QueryFilter<TicketDoc> {
+  const filter: QueryFilter<TicketDoc> = {};
+
+  if (query.cursor) {
+    filter._id = { $lt: query.cursor };
   }
-  if (value === 'true' || value === true) {
-    return true;
+
+  if (query.userId) {
+    filter.userId = query.userId;
   }
-  if (value === 'false' || value === false) {
-    return false;
+
+  if (query.status?.length) {
+    // query.status is TicketStatus[] (typed by schema)
+    filter.status = { $in: query.status };
   }
-  return undefined;
-};
 
-export const GetTicketsQuerySchema = z.object({
-  limit: z
-    .string()
-    .optional()
-    .transform((value) => {
-      if (!value) {
-        return DEFAULT_LIMIT;
-      }
+  if (query.q) {
+    filter.title = { $regex: escapeRegex(query.q), $options: 'i' };
+  }
 
-      const parsed = Number(value);
-      if (!Number.isFinite(parsed)) {
-        return DEFAULT_LIMIT;
-      }
+  return filter;
+}
 
-      return Math.min(Math.max(Math.trunc(parsed), 1), MAX_LIMIT);
-    }),
-
-  cursor: emptyStringToUndefined
-    .optional()
-    .refine((value) => !value || mongoose.isValidObjectId(value), { message: 'Invalid cursor id' }),
-
-  // Ticket.userId in your model is a string (from JWT), not ObjectId.
-  userId: emptyStringToUndefined.optional(),
-
-  q: emptyStringToUndefined.optional().transform((v) => (v ? v.trim() : undefined)),
-
-  reserved: z
-    .any()
-    .optional()
-    .transform((v) => toBool(v))
-    .refine((v) => v === undefined || typeof v === 'boolean', { message: 'Invalid reserved value' }),
-});
-
-export type GetTicketsQuery = z.infer<typeof GetTicketsQuerySchema>;
+function escapeRegex(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

@@ -16,7 +16,7 @@ const router = express.Router();
  *  - cursor (optional) - ticket id for cursor pagination (newest first)
  *  - userId (optional) - filter by owner userId
  *  - q (optional) - search by title
- *  - reserved (optional boolean) - true => only reserved, false => only not reserved
+ *  - status (optional) - status=available|reserved|sold (can be repeated)
  *
  * Response: CursorPage<Ticket>
  *  { items: Ticket[], pageInfo: { hasNextPage, nextCursor? } }

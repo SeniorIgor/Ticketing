@@ -1,6 +1,9 @@
 export type QueryValue = string | number | boolean | null | undefined;
 
-export type QueryRecord = Record<string, QueryValue>;
+// Allow repeatable query params: status=a&status=b
+export type QueryValueOrArray = QueryValue | readonly (string | number | boolean)[];
+
+export type QueryRecord = Record<string, QueryValueOrArray>;
 
 /**
  * Builds a query string from a record.
@@ -18,6 +21,26 @@ export function buildQueryString(query: QueryRecord | undefined, options?: { ski
 
   for (const [key, value] of Object.entries(query)) {
     if (value === undefined || value === null) {
+      continue;
+    }
+
+    const appendOne = (v: string | number | boolean) => {
+      if (typeof v === 'string') {
+        const trimmed = v.trim();
+        if (skipEmptyString && trimmed.length === 0) {
+          return;
+        }
+        params.append(key, trimmed);
+        return;
+      }
+
+      params.append(key, String(v));
+    };
+
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        appendOne(v);
+      }
       continue;
     }
 

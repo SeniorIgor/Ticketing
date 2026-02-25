@@ -1,4 +1,5 @@
 export * from './CreateTicketForm/CreateTicketForm';
+export * from './MyTicketsToolbar/MyTicketsToolbar';
 export * from './TicketCard/TicketCard';
 export * from './TicketCardStatus/TicketCardStatus';
 export * from './TicketDetailsCard/TicketDetailsCard';

@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 import { ROUTES } from '@/constants';
 import { TicketsCreateButton, TicketsInfinite, TicketsToolbar } from '@/modules/tickets';
-import { listTicketsServer } from '@/services/tickets';
+import { listTicketsServer, TicketStatuses } from '@/services/tickets';
 import type { SearchParams } from '@/utils';
-import { getSearchQuery } from '@/utils';
+import { getSearchQuery, getStatusFromSearchParams } from '@/utils';
 
 type Props = { searchParams?: SearchParams | Promise<SearchParams> };
 
@@ -12,7 +12,9 @@ export default async function TicketsPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const query = getSearchQuery(resolvedSearchParams);
 
-  const ticketsRes = await listTicketsServer({ limit: 20, q: query || undefined });
+  const status = getStatusFromSearchParams(resolvedSearchParams) ?? [TicketStatuses.Available];
+
+  const ticketsRes = await listTicketsServer({ limit: 20, q: query || undefined, status });
 
   if (!ticketsRes.ok) {
     return (
@@ -47,7 +49,7 @@ export default async function TicketsPage({ searchParams }: Props) {
 
       <hr className="my-4" />
 
-      <TicketsToolbar initialQuery={query} total={page.items.length} />
+      <TicketsToolbar initialQuery={query} initialStatus={status} total={page.items.length} />
 
       <div className="mt-3">
         <TicketsInfinite
@@ -55,6 +57,7 @@ export default async function TicketsPage({ searchParams }: Props) {
           initialNextCursor={page.pageInfo.nextCursor}
           initialHasNextPage={page.pageInfo.hasNextPage}
           query={query}
+          status={status}
         />
       </div>
 

@@ -1,4 +1,11 @@
-export type TicketStatus = 'available' | 'reserved' | 'sold' | string;
+export const TicketStatuses = {
+  Available: 'available',
+  Reserved: 'reserved',
+  Sold: 'sold',
+} as const;
+
+export type TicketStatus = (typeof TicketStatuses)[keyof typeof TicketStatuses];
+export const TicketStatusValues = Object.values(TicketStatuses) as readonly TicketStatus[];
 
 export type TicketDto = {
   id: string;
@@ -8,18 +15,10 @@ export type TicketDto = {
   orderId?: string;
 };
 
-export type CursorPage<T> = {
-  items: T[];
-  pageInfo: {
-    hasNextPage: boolean;
-    nextCursor?: string;
-  };
-};
-
 export type ListTicketsQuery = {
   limit?: number;
   cursor?: string;
   userId?: string;
   q?: string;
-  reserved?: boolean;
+  status?: TicketStatus[];
 };
