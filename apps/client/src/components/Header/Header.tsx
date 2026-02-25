@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/constants';
 import { selectIsAuthenticated, useAppSelector } from '@/store';
 
-import SignOutButton from '../SignOutButton/SignOutButton';
+import { SignOutButton } from '../SignOutButton/SignOutButton';
 import { UserMenu } from '../UserMenu/UserMenu';
 
 export function Header() {

@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { ROUTES } from '@/constants';
 import { selectIsAuthenticated, useAppSelector } from '@/store';
 
-import SignOutButton from '../SignOutButton/SignOutButton';
+import { SignOutButton } from '../SignOutButton/SignOutButton';
 
 import { NavList } from './components/NavList/NavList';
 import { Section } from './components/Section/Section';
