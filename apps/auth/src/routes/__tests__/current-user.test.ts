@@ -30,26 +30,30 @@ describe('GET /api/v1/users/current-user', () => {
     });
   });
 
-  it('rejects request when not authenticated', async () => {
-    const res = await request(app).get('/api/v1/users/current-user').expect(401);
+  it('returns currentUser: null when not authenticated', async () => {
+    const res = await request(app).get('/api/v1/users/current-user').expect(200);
 
-    expect(res.body).toMatchObject({
-      code: 'AUTHENTICATION',
-      reason: 'NOT_AUTHENTICATED',
-      message: expect.any(String),
-    });
+    expect(res.body).toEqual({ currentUser: null });
   });
 
-  it('rejects request with invalid token', async () => {
+  it('returns currentUser: null and clears cookie when token is invalid/outdated', async () => {
     const res = await request(app)
       .get('/api/v1/users/current-user')
       .set('Cookie', `${AUTH_COOKIE_NAME}=invalid-token`)
-      .expect(401);
+      .expect(200);
 
-    expect(res.body).toMatchObject({
-      code: 'AUTHENTICATION',
-      reason: 'INVALID_TOKEN',
-      message: expect.any(String),
-    });
+    expect(res.body).toEqual({ currentUser: null });
+
+    // Ensure cookie was cleared
+    const setCookie = res.headers['set-cookie'];
+    expect(setCookie).toBeDefined();
+
+    const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+
+    const cleared = cookies.find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
+    expect(cleared).toBeDefined();
+
+    // Typical clearCookie results include Max-Age=0 or Expires in the past.
+    expect(cleared).toMatch(/Max-Age=0|Expires=/);
   });
 });

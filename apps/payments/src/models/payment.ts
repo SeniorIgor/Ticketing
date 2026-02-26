@@ -56,17 +56,7 @@ paymentSchema.statics.build = (attrs: PaymentAttrs) => new Payment(attrs);
 
 paymentSchema.set('toJSON', {
   transform(_doc, json) {
-    const {
-      _id,
-      id: _i,
-      createdAt: _c,
-      updatedAt: _u,
-      userId: _d,
-      version: _v,
-      providerId: _p,
-      provider: _pr,
-      ...rest
-    } = json;
+    const { _id, id: _i, updatedAt: _u, userId: _d, version: _v, providerId: _p, ...rest } = json;
     return { id: _id.toString(), ...rest };
   },
 });

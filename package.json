@@ -3,17 +3,17 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "nx run-many --target=build --all",
+    "build": "nx run-many --target=build --all --parallel",
     "build:affected": "nx affected --target=build",
-    "start": "nx run-many --target=start --all --parallel --maxParallel=10 --exclude=shared",
-    "dev": "nx run-many --target=dev --all --parallel --maxParallel=10 --exclude=shared",
-    "lint": "nx run-many --target=lint --all",
+    "start": "nx run-many --target=start --all --parallel --maxParallel=20 --exclude=shared",
+    "dev": "nx run-many --target=dev --all --parallel --maxParallel=20 --exclude=shared",
+    "lint": "nx run-many --target=lint --all --parallel --maxParallel=10",
     "lint:affected": "nx affected --target=lint",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
     "lint:fix:affected": "nx affected --target=lint -- --fix",
-    "typecheck": "nx run-many --target=typecheck --all",
+    "typecheck": "nx run-many --target=typecheck --all --parallel --maxParallel=10",
     "typecheck:affected": "nx affected --target=typecheck",
-    "test": "nx run-many --target=test --all",
+    "test": "nx run-many --target=test --all --parallel --maxParallel=10",
     "test:watch": "nx run-many --target=test --all -- --watch",
     "test:affected": "nx affected --target=test",
     "prepare": "husky"
@@ -75,10 +75,14 @@
     "apps/*"
   ],
   "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
+    "@stripe/react-stripe-js": "^5.6.0",
+    "@stripe/stripe-js": "^8.8.0",
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "bullmq": "^5.67.3",
+    "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.2.1",
@@ -89,6 +93,7 @@
     "next": "^16.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "stripe": "^20.3.1",
     "zod": "^4.3.6"
   }

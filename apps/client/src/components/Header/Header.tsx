@@ -1,36 +1,51 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 
-import { getCurrentUserServer } from '@/services';
+import { ROUTES } from '@/constants';
+import { selectIsAuthenticated, useAppSelector } from '@/store';
 
-import SignOutButton from './SignOutButton/SignOutButton';
+import { UserMenu } from '../UserMenu/UserMenu';
 
-export default async function Header() {
-  const result = await getCurrentUserServer();
-  const isAuthenticated = result.ok ? true : false;
+export function Header() {
+  const isAuthed = useAppSelector(selectIsAuthenticated);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-      <div className="container">
-        <Link href="/" className="navbar-brand d-flex align-items-center gap-2">
-          <img src="/logo.png" alt="Ticketing" width={32} height={32} />
-          <span className="fw-bold">Ticketing</span>
-        </Link>
+    <>
+      <header className="border-bottom bg-white">
+        <div className="container py-3 d-flex align-items-center justify-content-between gap-3">
+          <Link href={ROUTES.home} className="navbar-brand d-flex align-items-center gap-2">
+            <img src="/logo.png" alt="Ticketing" width={32} height={32} />
+            <span className="fw-bold">Ticketing</span>
+          </Link>
 
-        <div className="d-flex gap-2">
-          {!isAuthenticated ? (
-            <>
-              <Link href="/signup" className="btn btn-outline-primary">
-                Sign up
-              </Link>
-              <Link href="/signin" className="btn btn-primary">
-                Sign in
-              </Link>
-            </>
-          ) : (
-            <SignOutButton />
-          )}
+          <div className="d-flex gap-2 align-items-center">
+            {!isAuthed && (
+              <>
+                <Link href={ROUTES.signIn} className="btn btn-outline-primary">
+                  Sign in
+                </Link>
+                <Link href={ROUTES.signUp} className="btn btn-primary">
+                  Sign up
+                </Link>
+              </>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              aria-label="Open menu"
+              onClick={() => setMenuOpen(true)}
+            >
+              <i className="bi bi-list" />
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </header>
+
+      <UserMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
   );
 }

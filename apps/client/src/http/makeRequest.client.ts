@@ -1,3 +1,5 @@
+import { emitUnauthorized } from '@/auth';
+
 import { HttpError } from './errors';
 import { generateRequestId } from './requestId';
 import { safeParseJson } from './safeParseJson';
@@ -19,6 +21,17 @@ export async function makeRequestClient<TResponse, TBody = unknown>(
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+
+  if (res.status === 401) {
+    emitUnauthorized({
+      requestId,
+      url,
+      method: (options.method ?? 'GET').toString().toUpperCase(),
+    });
+
+    const errorBody = await safeParseJson(res);
+    throw new HttpError(res.status, errorBody, requestId);
+  }
 
   if (!res.ok) {
     const errorBody = await safeParseJson(res);

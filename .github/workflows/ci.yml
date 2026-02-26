@@ -14,6 +14,9 @@ jobs:
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
       NODE_ENV: test
+      NX_PARALLEL: 6
+      NX_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      NX_HEAD: ${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
@@ -22,11 +25,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 24.11.1
           cache: npm
 
       - run: npm ci
 
-      - run: npx nx affected -t typecheck --base=origin/master
-      - run: npx nx affected -t lint --base=origin/master
-      - run: npx nx affected -t test --base=origin/master
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
+            nx-${{ runner.os }}-
+
+      - run: npx nx affected -t typecheck --base=$NX_BASE --head=$NX_HEAD --parallel
+      - run: npx nx affected -t lint --base=$NX_BASE --head=$NX_HEAD --parallel
+      - run: npx nx affected -t test --base=$NX_BASE --head=$NX_HEAD --parallel --ci

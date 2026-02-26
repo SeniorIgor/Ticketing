@@ -34,9 +34,10 @@ export async function makeRequestServer<TResponse, TBody = unknown>(
       ...options.headers,
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
-    cache: 'no-store',
+    cache: options.cache ?? 'no-store',
   });
 
+  // TODO: (temporary for dev purposes) replace with logging service
   console.log({ res, host: headerStore.get('host') });
 
   if (!res.ok) {

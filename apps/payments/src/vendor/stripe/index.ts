@@ -1,2 +1,2 @@
-export * from './create-charge';
-export * from './types';
+export * from './create-payment-intent';
+export * from './get-payment-intent';

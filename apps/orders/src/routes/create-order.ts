@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import express from 'express';
+import mongoose from 'mongoose';
 
 import { OrderCreatedEvent, OrderStatuses } from '@org/contracts';
 import { asyncHandler, BusinessRuleError, NotFoundError, requireAuth, ValidationError } from '@org/core';
@@ -30,7 +31,8 @@ router.post(
       throw new NotFoundError();
     }
 
-    // Reservation check: a ticket can only have ONE active order at a time
+    // Fast pre-check (still useful for nice error message),
+    // but NOT sufficient for concurrency. DB unique index is the real guard.
     if (await ticket.isReserved()) {
       throw new BusinessRuleError('TICKET_RESERVED', 'Ticket is already reserved');
     }
@@ -47,7 +49,15 @@ router.post(
       ticket,
     });
 
-    await order.save();
+    try {
+      await order.save();
+    } catch (err: unknown) {
+      if (err instanceof mongoose.mongo.MongoServerError && err.code === 11000) {
+        throw new BusinessRuleError('TICKET_RESERVED', 'Ticket is already reserved');
+      }
+
+      throw err;
+    }
 
     await publishEvent(
       OrderCreatedEvent,

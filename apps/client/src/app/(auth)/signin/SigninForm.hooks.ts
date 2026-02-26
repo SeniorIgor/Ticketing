@@ -4,7 +4,9 @@ import type { ChangeEvent, FormEvent } from 'react';
 
 import { useFormErrors, useRequest } from '@/hooks';
 import { isBackendError } from '@/http';
-import { signinUser } from '@/services/auth/signin';
+import { signinUser } from '@/services/auth';
+
+import { getNextFromLocation } from './SigninForm.utils';
 
 export function useSigninForm() {
   const [email, setEmail] = useState('');
@@ -44,7 +46,8 @@ export function useSigninForm() {
       return;
     }
 
-    window.location.replace('/');
+    const next = getNextFromLocation();
+    window.location.replace(next ?? '/');
   }
 
   return {

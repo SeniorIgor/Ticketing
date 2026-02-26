@@ -4,7 +4,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 
 import { useFormErrors, useRequest } from '@/hooks';
 import { isBackendError } from '@/http';
-import { signupUser } from '@/services';
+import { signupUser } from '@/services/auth';
 
 export function useSignupForm() {
   const [email, setEmail] = useState('');

@@ -13,6 +13,7 @@ export async function makeSafeRequest<TResponse, TBody = unknown>(
     if (err instanceof HttpError) {
       return { ok: false, error: err };
     }
+
     throw err;
   }
 }

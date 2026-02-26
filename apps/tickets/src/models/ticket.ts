@@ -17,8 +17,8 @@ export interface TicketDoc extends mongoose.Document {
   status: TicketStatus;
   orderId?: string;
 
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   version: number;
 
   isReserved(): boolean;
@@ -34,10 +34,15 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
     price: { type: Number, required: true, min: 0 },
     userId: { type: String, required: true },
 
-    status: { type: String, required: true, enum: TicketStatusValues, default: TicketStatuses.Available, index: true },
+    status: {
+      type: String,
+      required: true,
+      enum: TicketStatusValues,
+      default: TicketStatuses.Available,
+      index: true,
+    },
 
-    // When status=Reserved => orderId is set.
-    // When status=Sold => orderId may remain for audit, but ticket stays locked.
+    // Optional: used when status=reserved (and may remain for audit when sold).
     orderId: { type: String, required: false, index: true },
   },
   {
@@ -48,7 +53,6 @@ const ticketSchema = new mongoose.Schema<TicketDoc, TicketModel>(
 );
 
 ticketSchema.methods.isReserved = function isReserved(): boolean {
-  // Locked whenever it is not available
   return this.status !== TicketStatuses.Available;
 };
 

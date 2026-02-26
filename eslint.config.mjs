@@ -72,6 +72,24 @@ export default [
 
       /* ---------------- Imports ----------------- */
       'import/no-named-as-default-member': 'off',
+      'import/no-duplicates': 'error',
+      // 'no-restricted-imports': [
+      //   'error',
+      //   {
+      //     patterns: [
+      //       // Server files must not import client-only files
+      //       {
+      //         group: ['**/*.client', '**/*.client.*', '**/client/**'],
+      //         message: 'Do not import client-only modules from server code.',
+      //       },
+      //       // Client files must not import server-only files
+      //       {
+      //         group: ['**/*.server', '**/*.server.*', '**/server/**'],
+      //         message: 'Do not import server-only modules from client code.',
+      //       },
+      //     ],
+      //   },
+      // ],
 
       /* ---------------- Unused ------------------ */
       'no-unused-vars': 'off',
@@ -183,6 +201,18 @@ export default [
         __dirname: 'readonly',
         module: 'readonly',
       },
+    },
+  },
+
+  {
+    files: [
+      '**/*.config.{js,jsx,ts,tsx,cjs,mjs}',
+      '**/next.config.{js,mjs,ts}',
+      '**/jest.config.{js,ts,cjs,mjs}',
+      '**/eslint.config.{js,mjs,ts}',
+    ],
+    rules: {
+      'import/no-default-export': 'off',
     },
   },
 ];

@@ -1,0 +1,22 @@
+export const ROUTES = {
+  home: '/',
+  signIn: '/signin',
+  signUp: '/signup',
+
+  tickets: {
+    root: '/tickets',
+    new: '/tickets/new',
+    details: (id: string) => `/tickets/${id}`,
+    mine: '/tickets/mine',
+  },
+
+  orders: {
+    root: '/orders',
+    details: (id: string) => `/orders/${id}`,
+  },
+
+  payments: {
+    root: '/payments',
+    details: (paymentId: string) => `/payments/${paymentId}`,
+  },
+} as const;

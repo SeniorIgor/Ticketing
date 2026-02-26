@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useSignupForm } from './SignupForm.hooks';
 
-export default function SignupForm() {
+export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const { email, password, loading, formError, fieldErrors, handleEmailChange, handlePasswordChange, handleSubmit } =
