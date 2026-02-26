@@ -1,17 +1,18 @@
-FROM node:24-alpine
+FROM node:24.11.1-slim
 
 WORKDIR /app
 
-# Install deps once (cached)
+RUN npm i -g npm@11.6.2
+
 COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 COPY eslint.config.mjs ./
 
-RUN npm i
+ENV HUSKY=0
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY apps/client ./apps/client
 
-# Code will be synced by Skaffold (NOT copied here)
 EXPOSE 3000
 
 ENV NODE_ENV=development
