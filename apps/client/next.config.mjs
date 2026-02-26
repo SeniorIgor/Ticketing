@@ -5,6 +5,7 @@ import { composePlugins, withNx } from '@nx/next';
  */
 const nextConfig = {
   nx: {},
+  output: 'standalone',
   allowedDevOrigins: ['ticketing.dev', 'localhost:3000'],
   typescript: {
     tsconfigPath: 'tsconfig.app.json',
