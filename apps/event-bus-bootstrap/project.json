@@ -67,13 +67,6 @@
         "command": "tsc --noEmit -p tsconfig.app.json",
         "cwd": "apps/event-bus-bootstrap"
       }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "apps/event-bus-bootstrap/jest.config.cts",
-        "passWithNoTests": true
-      }
     }
   },
   "tags": [
