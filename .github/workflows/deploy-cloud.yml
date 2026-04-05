@@ -1,0 +1,86 @@
+name: Deploy Cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      hostname:
+        description: Public hostname for ingress and TLS
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SKAFFOLD_VERSION: v2.17.0
+      KUBECONFIG: ${{ github.workspace }}/.kube/config
+      LETSENCRYPT_EMAIL: ${{ vars.LETSENCRYPT_EMAIL }}
+      TICKETING_HOSTNAME: ${{ inputs.hostname }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold "https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64"
+          install skaffold /usr/local/bin/skaffold
+          skaffold version
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p "$(dirname "$KUBECONFIG")"
+          echo "${{ secrets.KUBE_CONFIG_B64 }}" | base64 --decode > "$KUBECONFIG"
+
+      - name: Write production secret inputs
+        run: |
+          printf '%s\n' \
+            'JWT_SECRET=${{ secrets.JWT_SECRET_PROD }}' \
+            'REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD_PROD }}' \
+            'STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY_PROD }}' \
+            'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}' \
+            > infra/k8s/apps/ticketing/overlays/prod-common/secrets.generated.env
+
+      - name: Inject cloud hostname and ACME email
+        run: |
+          test -n "$LETSENCRYPT_EMAIL"
+          sed -i "s/your-email@example.com/${LETSENCRYPT_EMAIL}/" infra/k8s/addons/cert-manager/clusterissuer-letsencrypt.yaml
+          sed -i "s/ticketing.example.com/${TICKETING_HOSTNAME}/g" infra/k8s/apps/ticketing/overlays/prod-cloud-app/ingress-cloud.yaml
+
+      - name: Build, push, and render manifests
+        run: |
+          mkdir -p .skaffold
+          skaffold build -f infra/skaffold.yaml -p prod-images --push=true --file-output=.skaffold/prod-artifacts.json
+          skaffold render -f infra/skaffold.yaml -p prod-images,prod-infra -a .skaffold/prod-artifacts.json --output=.skaffold/prod-infra.rendered.yaml
+          skaffold render -f infra/skaffold.yaml -p prod-images,prod-cloud-app -a .skaffold/prod-artifacts.json --output=.skaffold/prod-cloud-app.rendered.yaml
+
+      - name: Apply cert-manager issuer
+        run: kubectl apply -f infra/k8s/addons/cert-manager/clusterissuer-letsencrypt.yaml
+
+      - name: Apply infrastructure
+        run: |
+          kubectl get ns ticketing-prod >/dev/null 2>&1 || kubectl create ns ticketing-prod
+          kubectl delete job/event-bus-bootstrap -n ticketing-prod --ignore-not-found
+          kubectl apply -f .skaffold/prod-infra.rendered.yaml
+          kubectl wait -n ticketing-prod --for=condition=available deployment/auth-mongo-depl deployment/orders-mongo-depl deployment/payments-mongo-depl deployment/tickets-mongo-depl --timeout=180s
+          kubectl rollout status statefulset/nats -n ticketing-prod --timeout=180s
+          kubectl rollout status statefulset/redis -n ticketing-prod --timeout=180s
+          kubectl wait job/event-bus-bootstrap -n ticketing-prod --for=condition=complete --timeout=120s
+
+      - name: Apply application
+        run: |
+          kubectl apply -f .skaffold/prod-cloud-app.rendered.yaml
+          kubectl rollout restart -n ticketing-prod deployment/auth-depl deployment/client-depl deployment/client-gateway deployment/expiration-depl deployment/orders-depl deployment/payments-depl deployment/tickets-depl
+          kubectl wait -n ticketing-prod --for=condition=available deployment/auth-depl deployment/client-depl deployment/client-gateway deployment/expiration-depl deployment/orders-depl deployment/payments-depl deployment/tickets-depl --timeout=180s

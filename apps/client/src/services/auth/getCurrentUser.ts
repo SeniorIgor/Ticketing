@@ -1,7 +1,7 @@
 import { makeSafeRequest } from '@/http';
 
 export interface CurrentUserResponse {
-  currentUser: { id: string; email: string };
+  currentUser: { id: string; email: string } | null;
 }
 
 export function getCurrentUser() {

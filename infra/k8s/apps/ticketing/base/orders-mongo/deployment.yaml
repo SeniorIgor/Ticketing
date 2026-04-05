@@ -20,3 +20,18 @@ spec:
                 name: app-config
           ports:
             - containerPort: 27017
+          startupProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 10
+            failureThreshold: 3

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-gateway
+spec:
+  template:
+    spec:
+      containers:
+        - name: kong
+          startupProbe:
+            $patch: replace
+            tcpSocket:
+              port: proxy
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            $patch: replace
+            tcpSocket:
+              port: proxy
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            $patch: replace
+            tcpSocket:
+              port: proxy
+            periodSeconds: 10
+            failureThreshold: 3

@@ -1,21 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: ticketing-prod
+namespace: ticketing-dev
 
 resources:
-  - namespace.yaml
-  - ../../base
   - app-config.yaml
-  - ingress.yaml
-
-patches:
-  - path: nats-patch.yaml
 
 secretGenerator:
   - name: app-secret
     envs:
-      - secrets.env
+      - secrets.generated.env
 
 generatorOptions:
   disableNameSuffixHash: true

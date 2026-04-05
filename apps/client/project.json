@@ -1,10 +1,25 @@
 {
   "name": "@org/client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/client",
+  "projectType": "application",
   "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/client",
+        "command": "next dev --webpack -p 3000",
+        "env": {
+          "NEXT_TELEMETRY_DISABLED": "1"
+        }
+      }
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["tsc -p tsconfig.app.json --noEmit"],
+        "commands": [
+          "tsc -p tsconfig.app.json --noEmit"
+        ],
         "cwd": "apps/client",
         "forwardAllArgs": false
       }

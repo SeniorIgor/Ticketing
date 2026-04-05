@@ -22,3 +22,21 @@ spec:
                 name: app-secret
           ports:
             - containerPort: 80
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3

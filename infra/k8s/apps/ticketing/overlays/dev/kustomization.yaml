@@ -4,17 +4,13 @@ kind: Kustomization
 namespace: ticketing-dev
 
 resources:
+  - ../dev-common
   - ../../base
-  - app-config.yaml
   - ingress.yaml
 
-patches:
-  - path: nats-patch.yaml
-
-secretGenerator:
-  - name: app-secret
-    envs:
-      - secrets.env
-
-generatorOptions:
-  disableNameSuffixHash: true
+patchesStrategicMerge:
+  - nats-patch.yaml
+  - node-runtime-patch.yaml
+  - node-runtime-bootstrap-patch.yaml
+  - edge-runtime-patch.yaml
+  - data-runtime-patch.yaml

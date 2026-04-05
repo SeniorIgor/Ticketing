@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-gateway
+spec:
+  template:
+    spec:
+      containers:
+        - name: kong
+          env:
+            - name: KONG_NGINX_WORKER_PROCESSES
+              value: "1"
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/null
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/null
+            - name: KONG_LOG_LEVEL
+              value: warn

@@ -1,10 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useModal } from '@/components/Modal';
-
-import { StripePaymentModal } from '../StripePaymentModal/StripePaymentModal';
 
 type PayNowButtonProps = {
   orderId: string;
@@ -15,31 +14,49 @@ type PayNowButtonProps = {
 export function PayNowButton({ orderId, className, redirectTo }: PayNowButtonProps) {
   const router = useRouter();
   const modal = useModal();
+  const [loadingPaymentUi, setLoadingPaymentUi] = useState(false);
 
   return (
     <button
       className={className ?? 'btn btn-success'}
       type="button"
-      onClick={() => {
-        modal.open(
-          <StripePaymentModal
-            orderId={orderId}
-            onClose={modal.close}
-            onSuccess={() => {
-              modal.close();
+      disabled={loadingPaymentUi}
+      onClick={async () => {
+        if (loadingPaymentUi) {
+          return;
+        }
 
-              if (redirectTo) {
-                router.push(redirectTo);
-                return;
-              }
+        setLoadingPaymentUi(true);
 
-              router.refresh();
-            }}
-          />,
-        );
+        try {
+          const { StripePaymentModal } = await import('../StripePaymentModal/StripePaymentModal');
+
+          modal.open(
+            <StripePaymentModal
+              orderId={orderId}
+              onClose={modal.close}
+              onSuccess={() => {
+                modal.close();
+
+                if (redirectTo) {
+                  router.push(redirectTo);
+                  return;
+                }
+
+                router.refresh();
+              }}
+            />,
+            {
+              title: 'Payment',
+              size: 'md',
+            },
+          );
+        } finally {
+          setLoadingPaymentUi(false);
+        }
       }}
     >
-      Pay now
+      {loadingPaymentUi ? 'Loading payment…' : 'Pay now'}
     </button>
   );
 }

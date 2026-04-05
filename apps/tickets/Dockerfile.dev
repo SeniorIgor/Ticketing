@@ -8,6 +8,12 @@ RUN npm i -g npm@11.6.2
 COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 
+# Per-project manifests for dependency graph
+COPY apps/tickets/package.json apps/tickets/
+COPY packages/core/package.json packages/core/
+COPY packages/nats/package.json packages/nats/
+COPY packages/contracts/package.json packages/contracts/
+
 ENV HUSKY=0
 RUN --mount=type=cache,target=/root/.npm npm ci
 
@@ -17,5 +23,8 @@ COPY packages/nats ./packages/nats
 COPY packages/contracts ./packages/contracts
 
 ENV NODE_ENV=development
+ENV NX_DAEMON=false
 
-CMD ["npx", "nx", "run", "tickets:dev"]
+RUN npx nx build tickets
+
+CMD ["node", "apps/tickets/dist/index.cjs"]

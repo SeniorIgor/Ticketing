@@ -1,5 +1,7 @@
 import { connect } from 'nats';
 
+import { parsePositiveInt, retry } from '@org/core';
+
 import type { NatsConnectConfig } from './config';
 import { normalizeConfig } from './config';
 import type { NatsDeps } from './types';
@@ -38,6 +40,34 @@ async function createNatsDeps(config: ReturnType<typeof normalizeConfig>): Promi
   return newDeps;
 }
 
+function getConnectRetryConfig() {
+  const defaultAttempts = process.env.NODE_ENV === 'production' ? 0 : 60;
+  const attempts = parsePositiveInt('NATS_CONNECT_MAX_ATTEMPTS', defaultAttempts);
+
+  return {
+    delayMs: parsePositiveInt('NATS_CONNECT_RETRY_DELAY_MS', 1000),
+    maxAttempts: attempts === 0 ? undefined : attempts,
+  };
+}
+
+function isRetryableConnectError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const code = 'code' in error ? error.code : undefined;
+  const message = 'message' in error ? error.message : undefined;
+
+  return (
+    code === 'CONNECTION_REFUSED' ||
+    code === 'ECONNREFUSED' ||
+    code === 'TIMEOUT' ||
+    code === '503' ||
+    (typeof message === 'string' &&
+      (message.includes('ECONNREFUSED') || message.includes('connection refused') || message.includes('timeout')))
+  );
+}
+
 export async function connectNats(cfg: NatsConnectConfig): Promise<NatsDeps> {
   if (deps) {
     return deps;
@@ -50,7 +80,15 @@ export async function connectNats(cfg: NatsConnectConfig): Promise<NatsDeps> {
   const config = normalizeConfig(cfg);
 
   connecting = (async () => {
-    const created = await createNatsDeps(config);
+    const retryConfig = getConnectRetryConfig();
+    const created = await retry(() => createNatsDeps(config), {
+      label: '[nats] initial connection',
+      delayMs: retryConfig.delayMs,
+      maxAttempts: retryConfig.maxAttempts,
+      logger: config.logger,
+      shouldRetry: isRetryableConnectError,
+    });
+
     deps = created;
     return created;
   })();
@@ -71,21 +109,27 @@ export function getNats(): NatsDeps {
 }
 
 export async function drainNats(): Promise<void> {
-  if (!deps) {
+  const currentDeps = deps;
+  if (!currentDeps) {
     return;
   }
 
-  deps.logger.info('[nats] draining...');
-  await deps.connection.drain();
-  deps.logger.info('[nats] drained');
+  currentDeps.logger.info('[nats] draining...');
+  await currentDeps.connection.drain();
+  currentDeps.logger.info('[nats] drained');
 }
 
 export async function closeNats(): Promise<void> {
-  if (!deps) {
+  const currentDeps = deps;
+  if (!currentDeps) {
     return;
   }
 
-  deps.logger.info('[nats] closing...');
-  await deps.connection.close();
-  deps.logger.info('[nats] closed');
+  currentDeps.logger.info('[nats] closing...');
+  await currentDeps.connection.close();
+  currentDeps.logger.info('[nats] closed');
+}
+
+export function isNatsConnected(): boolean {
+  return deps !== null;
 }

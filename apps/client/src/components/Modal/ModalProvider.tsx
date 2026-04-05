@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ModalFrame } from './ModalFrame/ModalFrame';
+import type { ModalOpenOptions } from './modalContext';
 import { ModalContext } from './modalContext';
 
 type ModalProviderProps = {
@@ -14,32 +15,16 @@ type ModalProviderProps = {
 
 export function ModalProvider({ children }: ModalProviderProps) {
   const [content, setContent] = useState<ReactNode | null>(null);
+  const [frameOptions, setFrameOptions] = useState<ModalOpenOptions | null>(null);
 
-  const close = useCallback(() => setContent(null), []);
-  const open = useCallback((node: ReactNode) => setContent(node), []);
-
-  // Close on ESC
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        close();
-      }
-    }
-
-    if (content) {
-      document.addEventListener('keydown', onKeyDown);
-      // optional: lock scroll
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-
-      return () => {
-        document.removeEventListener('keydown', onKeyDown);
-        document.body.style.overflow = prevOverflow;
-      };
-    }
-
-    return undefined;
-  }, [content, close]);
+  const close = useCallback(() => {
+    setContent(null);
+    setFrameOptions(null);
+  }, []);
+  const open = useCallback((node: ReactNode, options?: ModalOpenOptions) => {
+    setContent(node);
+    setFrameOptions(options ?? null);
+  }, []);
 
   const api = useMemo(
     () => ({
@@ -55,7 +40,21 @@ export function ModalProvider({ children }: ModalProviderProps) {
       {children}
 
       {/* Global modal host */}
-      {content ? createPortal(<ModalFrame onClose={close}>{content}</ModalFrame>, document.body) : null}
+      {content
+        ? createPortal(
+            <ModalFrame
+              onClose={close}
+              title={frameOptions?.title}
+              size={frameOptions?.size}
+              closeOnBackdrop={frameOptions?.closeOnBackdrop}
+              closeOnEsc={frameOptions?.closeOnEsc}
+              isBusy={frameOptions?.isBusy}
+            >
+              {content}
+            </ModalFrame>,
+            document.body,
+          )
+        : null}
     </ModalContext.Provider>
   );
 }

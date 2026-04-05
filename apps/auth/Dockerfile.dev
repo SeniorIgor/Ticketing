@@ -15,5 +15,8 @@ COPY apps/auth ./apps/auth
 COPY packages/core ./packages/core
 
 ENV NODE_ENV=development
+ENV NX_DAEMON=false
 
-CMD ["npx", "nx", "run", "auth:dev"]
+RUN npx nx build auth
+
+CMD ["node", "apps/auth/dist/index.cjs"]

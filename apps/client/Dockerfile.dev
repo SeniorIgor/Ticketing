@@ -15,7 +15,23 @@ COPY apps/client ./apps/client
 
 EXPOSE 3000
 
-ENV NODE_ENV=development
+ENV NODE_ENV=production
+ENV NX_DAEMON=false
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=1024 --enable-source-maps"
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
-CMD ["npx", "nx", "run", "client:dev"]
+# build Next
+RUN npx nx build client
+
+# keep assets before moving standalone runtime files
+RUN cp -a apps/client/.next/static /tmp/next-static
+RUN cp -a apps/client/public /tmp/public
+
+# copy standalone runtime
+RUN cp -a apps/client/.next/standalone/. ./
+RUN rm -rf ./apps/client/.next/static && cp -a /tmp/next-static ./apps/client/.next/static
+RUN rm -rf ./apps/client/public && cp -a /tmp/public ./apps/client/public
+
+CMD ["node", "apps/client/server.js"]

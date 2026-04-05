@@ -8,7 +8,14 @@ RUN npm i -g npm@11.6.2
 COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 
+# Per-project manifests for dependency graph
+COPY apps/payments/package.json apps/payments/
+COPY packages/core/package.json packages/core/
+COPY packages/nats/package.json packages/nats/
+COPY packages/contracts/package.json packages/contracts/
+
 ENV HUSKY=0
+ENV NX_VERBOSE_LOGGING=true
 RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY apps/payments ./apps/payments
@@ -17,7 +24,8 @@ COPY packages/nats ./packages/nats
 COPY packages/contracts ./packages/contracts
 
 ENV NODE_ENV=development
+ENV NX_DAEMON=false
 
+RUN npx nx build payments
 
-
-CMD ["npx", "nx", "run", "payments:dev"]
+CMD ["node", "apps/payments/dist/index.cjs"]
