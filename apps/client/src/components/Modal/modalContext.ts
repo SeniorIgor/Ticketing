@@ -2,8 +2,12 @@
 
 import { createContext, useContext } from 'react';
 
+import type { ModalFrameProps } from './ModalFrame/ModalFrame.types';
+
+export type ModalOpenOptions = Pick<ModalFrameProps, 'title' | 'size' | 'closeOnBackdrop' | 'closeOnEsc' | 'isBusy'>;
+
 export type ModalApi = {
-  open: (content: React.ReactNode) => void;
+  open: (content: React.ReactNode, options?: ModalOpenOptions) => void;
   close: () => void;
   isOpen: boolean;
 };

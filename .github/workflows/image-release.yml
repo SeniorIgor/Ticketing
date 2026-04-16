@@ -1,0 +1,45 @@
+name: Release Images
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - infra/gitops/production/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      SKAFFOLD_VERSION: v2.17.0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold "https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64"
+          install skaffold /usr/local/bin/skaffold
+          skaffold version
+
+      - name: Build and push immutable images
+        run: |
+          mkdir -p .skaffold
+          skaffold build -f infra/skaffold.yaml -p prod-images --push=true --file-output=.skaffold/prod-artifacts.json
+
+      - name: Upload image metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-artifacts
+          path: .skaffold/prod-artifacts.json

@@ -5,6 +5,7 @@
 **/tmp
 **/out-tsc
 **/*.tsbuildinfo
+**/.skaffold
 
 # dependencies
 **/node_modules
@@ -53,6 +54,9 @@
 # ENV
 **/.env
 **/*.env
-**/.env.*
+**/.env.local
+**/.env.prod
+**/.tls
+**/secrets.generated.env
 
 test-output

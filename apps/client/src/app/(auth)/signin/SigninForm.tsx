@@ -21,6 +21,7 @@ export function SigninForm() {
           className={`form-control ${fieldErrors.email ? 'is-invalid' : ''}`}
           value={email}
           placeholder="you@example.com"
+          autoComplete="email"
           onChange={handleEmailChange}
           required
         />
@@ -35,6 +36,7 @@ export function SigninForm() {
             className={`form-control ${fieldErrors.password ? 'is-invalid' : ''}`}
             value={password}
             onChange={handlePasswordChange}
+            autoComplete="current-password"
             required
             aria-describedby="password-toggle"
           />

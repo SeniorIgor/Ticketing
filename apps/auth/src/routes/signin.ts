@@ -1,20 +1,11 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import {
-  asyncHandler,
-  AUTH_COOKIE_MAX_AGE,
-  AUTH_COOKIE_NAME,
-  AUTH_COOKIE_OPTIONS,
-  AuthenticationError,
-  comparePassword,
-  signJwt,
-  ValidationError,
-} from '@org/core';
+import { asyncHandler, AuthenticationError, comparePassword, ValidationError } from '@org/core';
 
 import { User } from '../models';
 import type { SigninReqBody } from '../types';
-import { validateSignin } from '../utils';
+import { issueSessionForUser, setAuthCookies, validateSignin } from '../utils';
 
 const router = express.Router();
 
@@ -41,12 +32,8 @@ router.post(
       throw new AuthenticationError('INVALID_CREDENTIALS', 'Invalid email or password');
     }
 
-    const token = signJwt({ userId: user.id, email: user.email });
-
-    res.cookie(AUTH_COOKIE_NAME, token, {
-      ...AUTH_COOKIE_OPTIONS,
-      maxAge: AUTH_COOKIE_MAX_AGE,
-    });
+    const session = await issueSessionForUser(user);
+    setAuthCookies(res, session);
 
     res.status(200).send(user);
   }),

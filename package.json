@@ -16,7 +16,8 @@
     "test": "nx run-many --target=test --all --parallel --maxParallel=10",
     "test:watch": "nx run-many --target=test --all -- --watch",
     "test:affected": "nx affected --target=test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "print:affected": "npx nx show projects --affected --base=origin/master --head=HEAD"
   },
   "private": true,
   "devDependencies": {

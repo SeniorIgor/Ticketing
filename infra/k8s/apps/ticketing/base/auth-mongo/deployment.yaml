@@ -20,3 +20,25 @@ spec:
                 name: app-config
           ports:
             - containerPort: 27017
+          volumeMounts:
+            - name: auth-mongo-data
+              mountPath: /data/db
+          startupProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 10
+            failureThreshold: 3
+      volumes:
+        - name: auth-mongo-data
+          persistentVolumeClaim:
+            claimName: auth-mongo-data

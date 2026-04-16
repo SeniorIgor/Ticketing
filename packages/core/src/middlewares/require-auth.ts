@@ -4,7 +4,7 @@ import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, verifyJwt } from '../auth';
 import { AuthenticationError } from '../errors';
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.auth;
+  const token = req.cookies?.[AUTH_COOKIE_NAME];
 
   if (!token) {
     throw new AuthenticationError('NOT_AUTHENTICATED', 'Authentication required');

@@ -1,12 +1,21 @@
-FROM node:24-alpine
+FROM node:24.11.1-slim
 
 WORKDIR /app
+
+RUN npm i -g npm@11.6.2
 
 # Install deps once
 COPY package.json package-lock.json ./
 COPY nx.json tsconfig.base.json ./
 
-RUN npm i
+# Per-project manifests for dependency graph
+COPY apps/orders/package.json apps/orders/
+COPY packages/core/package.json packages/core/
+COPY packages/nats/package.json packages/nats/
+COPY packages/contracts/package.json packages/contracts/
+
+ENV HUSKY=0
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY apps/orders ./apps/orders
 COPY packages/core ./packages/core
@@ -14,7 +23,8 @@ COPY packages/nats ./packages/nats
 COPY packages/contracts ./packages/contracts
 
 ENV NODE_ENV=development
+ENV NX_DAEMON=false
 
-EXPOSE 80
+RUN npx nx build orders
 
-CMD ["npx", "nx", "run", "orders:dev"]
+CMD ["node", "apps/orders/dist/index.cjs"]

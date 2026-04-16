@@ -1,17 +1,21 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { ROUTES } from '@/constants';
 import { logout, selectIsAuthenticated, useAppDispatch, useAppSelector } from '@/store';
 
 import { onUnauthorized } from './sessionEvents';
 
-function buildNext(pathname: string | null, searchParams: URLSearchParams | null): string {
-  const p = pathname ?? ROUTES.home;
-  const q = searchParams?.toString();
-  return q ? `${p}?${q}` : p;
+function buildNext(pathname: string | null): string {
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname || pathname || ROUTES.home;
+    const query = window.location.search;
+    return query ? `${path}${query}` : path;
+  }
+
+  return pathname ?? ROUTES.home;
 }
 
 function isSignInPath(pathname: string | null): boolean {
@@ -33,7 +37,6 @@ export function useAuth401Handler() {
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   // prevent multiple rapid redirects if several requests 401 at once
   const redirectingRef = useRef(false);
@@ -57,8 +60,8 @@ export function useAuth401Handler() {
 
       dispatch(logout());
 
-      const next = buildNext(pathname, searchParams);
+      const next = buildNext(pathname);
       router.replace(`${ROUTES.signIn}?next=${encodeURIComponent(next)}`);
     });
-  }, [dispatch, isAuthed, pathname, router, searchParams]);
+  }, [dispatch, isAuthed, pathname, router]);
 }

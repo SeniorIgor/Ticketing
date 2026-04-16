@@ -9,6 +9,7 @@ const nextConfig = {
   typescript: {
     tsconfigPath: 'tsconfig.app.json',
   },
+  output: 'standalone',
 };
 
 const plugins = [withNx];

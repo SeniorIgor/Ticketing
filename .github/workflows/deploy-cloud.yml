@@ -1,0 +1,68 @@
+name: Deploy Cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      hostname:
+        description: Public hostname for ingress and TLS
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release-production:
+    runs-on: ubuntu-latest
+    env:
+      SKAFFOLD_VERSION: v2.17.0
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold "https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64"
+          install skaffold /usr/local/bin/skaffold
+          skaffold version
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Inject cloud hostname
+        run: |
+          sed -i "s/ticketing.example.com/${{ inputs.hostname }}/g" infra/k8s/apps/ticketing/overlays/prod-gitops-cloud-app/ingress-cloud.yaml
+
+      - name: Build and push immutable images
+        run: |
+          mkdir -p .skaffold
+          skaffold build -f infra/skaffold.yaml -p prod-images --push=true --file-output=.skaffold/prod-artifacts.json
+
+      - name: Render GitOps manifests
+        run: |
+          mkdir -p infra/gitops/production/prod-infra infra/gitops/production/prod-cloud-app
+          skaffold render -f infra/skaffold.yaml -p prod-images,prod-gitops-infra -a .skaffold/prod-artifacts.json --output=infra/gitops/production/prod-infra/release.yaml
+          skaffold render -f infra/skaffold.yaml -p prod-images,prod-gitops-cloud-app -a .skaffold/prod-artifacts.json --output=infra/gitops/production/prod-cloud-app/release.yaml
+
+      - name: Commit GitOps snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add infra/gitops/production/prod-infra/release.yaml infra/gitops/production/prod-cloud-app/release.yaml
+          if git diff --staged --quiet; then
+            echo "No GitOps changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(release): update production manifests for ${GITHUB_SHA} [skip ci]"
+          git push

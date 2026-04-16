@@ -1,214 +1,182 @@
-# Ticketing App
+# Ticketing
 
-This repository contains the **Ticketing App**, a microservices-based application running on Kubernetes with an NGINX Ingress.
-It supports local development using **Skaffold**, **Docker Desktop Kubernetes**, and **HTTPS via mkcert**.
+Three workflows are supported:
 
----
+1. `dev`: staged local development with Skaffold (infra first, then app deploy loop).
+2. `prod-local`: local prod-like verification with production Dockerfiles and phased Kubernetes rollout.
+3. `prod-cloud`: cloud deployment through GitHub Actions image publishing plus Argo CD reconciliation inside the cluster.
 
-## 🚀 Prerequisites
+## Prerequisites
 
-Make sure you have the following installed:
+- Docker Desktop with Kubernetes enabled
+- `kubectl`
+- `skaffold`
+- `stern` for log tailing
 
-- Docker Desktop (with Kubernetes enabled)
-- kubectl
-- Skaffold
-- Node.js (for local development if needed)
-- Homebrew (macOS)
-
----
-
-## 🔐 Running the Ticketing App locally with HTTPS
-
-To run the application in your **local Kubernetes cluster** with HTTPS, you need to configure local DNS and a trusted TLS certificate.
-
----
-
-### 1️⃣ Map the domain to localhost
-
-Add a local DNS entry so `ticketing.dev` points to your machine.
-
-**macOS:**
-
-```bash
-sudo nano /etc/hosts
-```
-
-Add the following line:
+Add this to `/etc/hosts` for local access:
 
 ```text
 127.0.0.1 ticketing.dev
 ```
 
-This allows your browser to resolve `https://ticketing.dev` to the local cluster.
+## Local Development
 
----
-
-### 2️⃣ Install mkcert (recommended for local HTTPS)
-
-We use **mkcert**, the industry-standard tool for generating locally trusted certificates.
+Run:
 
 ```bash
-brew install mkcert
-mkcert -install
-```
-
----
-
-### 3️⃣ Generate a TLS certificate for `ticketing.dev`
-
-```bash
-mkcert ticketing.dev
-```
-
-This will generate two files:
-
-```text
-ticketing.dev.pem
-ticketing.dev-key.pem
-```
-
-These certificates are trusted by your local OS and browser.
-
----
-
-### 4️⃣ Create a Kubernetes TLS secret
-
-Create a TLS secret in Kubernetes using the generated certificate:
-
-```bash
-kubectl create secret tls ticketing-tls \
-  --cert=ticketing.dev.pem \
-  --key=ticketing.dev-key.pem
-```
-
-Verify the secret was created:
-
-```bash
-kubectl get secret ticketing-tls
-```
-
----
-
-### 5️⃣ Reference the TLS secret in Ingress
-
-Make sure your Ingress configuration includes the TLS section:
-
-```yaml
-spec:
-  tls:
-    - hosts:
-        - ticketing.dev
-      secretName: ticketing-tls
-```
-
-Once applied, your app will be available at:
-
-```
-https://ticketing.dev
-```
-
-without browser security warnings.
-
----
-
-## ▶️ Running the app with Skaffold
-
-From the project root, run:
-
-```bash
-skaffold dev
-```
-
-Skaffold will:
-
-- Build Docker images
-- Deploy manifests to Kubernetes
-- Watch for file changes and redeploy automatically
-
----
-
-## 🛠 Troubleshooting
-
-### Browser shows a security warning
-
-- Ensure `mkcert -install` was executed
-- Ensure the `ticketing-tls` secret exists
-- Verify Ingress references the correct TLS secret
-
-### App not reachable
-
-- Check Ingress controller:
-  ```bash
-  kubectl get pods -n ingress-nginx
-  ```
-- Describe ingress:
-  ```bash
-  kubectl describe ingress ingress-srv
-  ```
-
----
-
-## 📝 Notes
-
-- For simple local development, HTTP can be used instead of HTTPS.
-- HTTPS is recommended to better match production behavior.
-
----
-
-Happy hacking! 🚀
-
-////////////////////////////////////////////////
-
-🚀 How you use it
-Development
-skaffold dev
-
-uses Dockerfile.dev
-
-file sync enabled
-
-hot reload
-
-no rebuilds
-
-CI / Prod build
-skaffold build -p prod
-skaffold render -p prod
-
-
-! 1. Some new information that is not formatted yet
-//////////////////////////
-To run application in kubernetes cluster run command:
 make dev
-or
-make prod
-
-If during development changes not reflected, try to kill pod manually through the terminal or restart scaffold
-~ $ kubectl get pods
-Kill the pod by its name
-~ $ kubectl delete pod client-depl-75fc89b998-rmj2b
-
-
-// 
-//  run kustomize build overlays/dev
-//  run kustomize build overlays/prod
-
-# How to clear NATS Store (PVC)
-
-```bash
-  kubectl get pvc -n ticketing-dev | grep nats
 ```
 
+What it does:
+
+- reads local secrets from `.env.local`
+- creates a local TLS secret in `ticketing-dev`
+- applies infra (`mongo`, `redis`, `nats`, bootstrap job) and waits for readiness
+- starts `skaffold dev` for the app phase
+
+Notes:
+
+- local certs are stored under ignored `.tls/` directories
+- the default local cert is self-signed, so browsers may warn
+- if you want a trusted local cert, generate one with `mkcert` and replace the files in `infra/k8s/apps/ticketing/overlays/dev/.tls/`
+- before first run, copy `.env.local.example` to `.env.local` and fill in values
+
+Clean restart options:
+
 ```bash
-  kubectl delete pvc data-nats-0 -n ticketing-dev
+make dev-down     # delete ticketing-dev namespace
+make dev-clean    # run dev and auto-delete ticketing-dev on exit
 ```
 
-# How to clear Redis (PVC)
+## Local Prod-Like Verification
+
+Run a full local prod-like rollout:
 
 ```bash
-  kubectl get pvc -n ticketing-dev | grep redis
+make prod-local-apply
+make prod-local-status
+make prod-local-tail
 ```
 
+Useful commands:
+
 ```bash
-  kubectl delete pvc redis-data-redis-0 -n ticketing-dev
+make prod-local-down
+make prod-local-build
+make prod-local-render
+make prod-cloud-render
+```
+
+What `prod-local-apply` does:
+
+- builds production images locally
+- reads local prod-like secrets from `.env.prod`
+- renders infra and app manifests from the same Skaffold artifact file
+- applies infra first
+- waits for Mongo, Redis, NATS, and the event-bus bootstrap job
+- applies the app phase
+- restarts app deployments so ConfigMap and Secret changes take effect
+
+Before first run, copy `.env.prod.example` to `.env.prod` and fill in values.
+
+Smoke test:
+
+```bash
+curl -k https://ticketing.dev/api/v1/tickets
+```
+
+## Cloud Deployment Model
+
+Cloud deployment does not use local TLS files and does not store production secrets in Git.
+
+Production path:
+
+- images are built and pushed to GHCR with immutable Git commit tags
+- a GitHub-hosted release workflow renders secret-free production snapshots into `infra/gitops/production`
+- the release workflow commits those snapshots back to the repository
+- Argo CD watches the GitOps path and reconciles the cluster automatically
+- cert-manager manages the public TLS certificate
+
+### GitHub Actions
+
+Checks:
+
+- `.github/workflows/ci.yml`
+
+Image release:
+
+- `.github/workflows/image-release.yml`
+
+Manual cloud deploy:
+
+- `.github/workflows/deploy-cloud.yml`
+
+### Required GitHub Secrets
+
+The GitOps release workflow does not require custom deployment secrets.
+
+GitHub-hosted Actions publish to GHCR using the built-in `GITHUB_TOKEN`.
+
+### Manual deploy input
+
+The `Deploy Cloud` workflow asks for:
+
+- `hostname`
+
+That means you do not need to commit a real production domain into the repo. The workflow injects the hostname at deploy time.
+
+Detailed setup checklists:
+
+- [GitHub secrets checklist](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/github-secrets.md)
+- [Argo CD setup](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/argocd.md)
+- [ingress-nginx install](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/ingress-nginx.md)
+- [cert-manager install](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/cert-manager.md)
+- [Hetzner target layout](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/hetzner-target-layout.md)
+- [Make targets](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/workflows/make-targets.md)
+
+## Secret Management
+
+Local:
+
+- you maintain `.env.local` and `.env.prod` as ignored files
+- Make copies them into ignored `secrets.generated.env` files for Kustomize
+
+Cloud:
+
+- Argo CD reads manifests from Git
+- cluster-only secrets such as `app-secret` and `ghcr-creds` stay in Kubernetes and are not committed
+- no production secret file should be committed
+
+This is good enough for an initial small production setup. A stronger next step later would be External Secrets, SOPS, or Sealed Secrets.
+
+## TLS
+
+Local:
+
+- local self-signed cert generated by `make dev` and `make prod-local-apply`
+
+Cloud:
+
+- cert-manager with Let’s Encrypt
+- see [cert-manager install](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/cert-manager.md)
+
+## Troubleshooting
+
+Check overall health:
+
+```bash
+make prod-local-status
+kubectl get endpoints -n ticketing-prod
+```
+
+Clear NATS data:
+
+```bash
+kubectl delete pvc data-nats-0 -n ticketing-dev
+```
+
+Clear Redis data:
+
+```bash
+kubectl delete pvc redis-data-redis-0 -n ticketing-dev
 ```

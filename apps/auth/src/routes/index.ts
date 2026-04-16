@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { currentUserRouter } from './current-user';
+import { refreshRouter } from './refresh';
 import { signinRouter } from './signin';
 import { signoutRouter } from './signout';
 import { signupRouter } from './signup';
@@ -8,6 +9,7 @@ import { signupRouter } from './signup';
 const router = Router();
 
 router.use(currentUserRouter);
+router.use(refreshRouter);
 router.use(signinRouter);
 router.use(signupRouter);
 router.use(signoutRouter);

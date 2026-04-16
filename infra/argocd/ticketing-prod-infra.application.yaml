@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ticketing-prod-infra
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/SeniorIgor/Ticketing.git
+    targetRevision: master
+    path: infra/gitops/production/prod-infra
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ticketing-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ticketing-dev
+
+resources:
+  - ingress.yaml
+  - ../../base/auth
+  - ../../base/orders
+  - ../../base/payments
+  - ../../base/tickets
+  - ../../base/expiration
+  - ../../base/client
+  - ../../base/gateway
+
+patchesStrategicMerge:
+  - node-runtime-patch.yaml
+  - edge-runtime-patch.yaml
+  - client-wait-gateway-patch.yaml
+  - gateway-probes-patch.yaml
+  - gateway-dev-tuning-patch.yaml

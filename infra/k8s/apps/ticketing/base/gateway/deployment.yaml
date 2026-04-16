@@ -24,11 +24,39 @@ spec:
               value: "0.0.0.0:8000"
             - name: KONG_ADMIN_LISTEN
               value: "0.0.0.0:8001"
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_LOG_LEVEL
+              value: info
           ports:
             - name: proxy
               containerPort: 8000
             - name: admin
               containerPort: 8001
+          startupProbe:
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 10
+            failureThreshold: 3
           volumeMounts:
             - name: kong-config
               mountPath: /kong/kong.yml

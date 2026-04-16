@@ -1,14 +1,20 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from '@org/core';
+import { asyncHandler, REFRESH_COOKIE_NAME } from '@org/core';
+
+import { clearAuthCookies, revokeRefreshSession } from '../utils';
 
 const router = express.Router();
 
-router.post('/signout', (_req: Request, res: Response) => {
-  res.clearCookie(AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
+router.post(
+  '/signout',
+  asyncHandler(async (req: Request, res: Response) => {
+    await revokeRefreshSession(req.cookies?.[REFRESH_COOKIE_NAME]);
+    clearAuthCookies(res);
 
-  res.status(204).send();
-});
+    res.status(204).send();
+  }),
+);
 
 export { router as signoutRouter };

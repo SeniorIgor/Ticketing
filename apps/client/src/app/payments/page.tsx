@@ -44,9 +44,9 @@ export default async function PaymentsPage() {
         </div>
       ) : (
         <div className="row g-4">
-          {page.items.map((p) => (
-            <div key={p.id} className="col-12 col-md-6 col-lg-4">
-              <PaymentCard payment={p} />
+          {page.items.map((payment) => (
+            <div key={payment.id} className="col-12 col-md-6 col-lg-4">
+              <PaymentCard payment={payment} />
             </div>
           ))}
         </div>

@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  template:
+    spec:
+      containers:
+        - name: auth
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 120
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-depl
+spec:
+  template:
+    spec:
+      containers:
+        - name: orders
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 120
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl
+spec:
+  template:
+    spec:
+      containers:
+        - name: payments
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 120
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-depl
+spec:
+  template:
+    spec:
+      containers:
+        - name: tickets
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 120
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  template:
+    spec:
+      containers:
+        - name: expiration
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 120

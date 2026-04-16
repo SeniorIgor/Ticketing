@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { AUTH_COOKIE_NAME } from '@org/core';
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME } from '@org/core';
 
 import { createApp } from '../../app';
 
@@ -24,7 +24,7 @@ describe('POST /api/v1/users/signin', () => {
     expect(res.body.password).toBeUndefined();
   });
 
-  it('sets auth cookie', async () => {
+  it('sets access and refresh cookies', async () => {
     const res = await request(app).post('/api/v1/users/signin').send(validUser).expect(200);
 
     const cookiesHeader = res.headers['set-cookie'];
@@ -32,10 +32,14 @@ describe('POST /api/v1/users/signin', () => {
 
     const cookies = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
     const authCookie = cookies.find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
+    const refreshCookie = cookies.find((c) => c.startsWith(`${REFRESH_COOKIE_NAME}=`));
 
     expect(authCookie).toBeDefined();
+    expect(refreshCookie).toBeDefined();
     expect(authCookie).toContain('HttpOnly');
-    expect(authCookie).toContain('Max-Age=1800');
+    expect(authCookie).toContain('Max-Age=900');
+    expect(refreshCookie).toContain('HttpOnly');
+    expect(refreshCookie).toContain('Max-Age=2592000');
   });
 
   it('rejects invalid input (validation error)', async () => {

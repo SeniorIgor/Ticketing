@@ -15,6 +15,7 @@
       "options": {
         "platform": "node",
         "outputPath": "{projectRoot}/dist",
+        "generatePackageJson": true,
         "main": "{projectRoot}/src/index.ts",
         "tsConfig": "{projectRoot}/tsconfig.app.json",
         "bundle": true,

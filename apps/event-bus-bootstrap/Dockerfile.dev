@@ -1,0 +1,29 @@
+FROM node:24.11.1-slim
+
+WORKDIR /app
+
+RUN npm i -g npm@11.6.2
+
+# Install deps once
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json ./
+
+COPY apps/event-bus-bootstrap/package.json apps/event-bus-bootstrap/
+COPY packages/nats/package.json packages/nats/
+COPY packages/core/package.json packages/core/
+COPY packages/contracts/package.json packages/contracts/
+
+ENV HUSKY=0
+RUN --mount=type=cache,target=/root/.npm npm ci
+
+COPY apps/event-bus-bootstrap ./apps/event-bus-bootstrap
+COPY packages/nats ./packages/nats
+COPY packages/core ./packages/core
+COPY packages/contracts ./packages/contracts
+
+ENV NODE_ENV=development
+ENV NX_DAEMON=false
+
+RUN npx nx build event-bus-bootstrap
+
+CMD ["node", "apps/event-bus-bootstrap/dist/index.cjs"]

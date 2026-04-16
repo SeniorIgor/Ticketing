@@ -13,5 +13,6 @@ resources:
   - client
   - gateway
   - event-bus
+  - event-bus-bootstrap
   - expiration
   - redis

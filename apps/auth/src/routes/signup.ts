@@ -1,19 +1,11 @@
 import type { Request, Response } from 'express';
 import express from 'express';
 
-import {
-  asyncHandler,
-  AUTH_COOKIE_MAX_AGE,
-  AUTH_COOKIE_NAME,
-  AUTH_COOKIE_OPTIONS,
-  BusinessRuleError,
-  signJwt,
-  ValidationError,
-} from '@org/core';
+import { asyncHandler, BusinessRuleError, ValidationError } from '@org/core';
 
 import { User } from '../models';
 import type { SignupReqBody } from '../types';
-import { validateSignup } from '../utils';
+import { issueSessionForUser, setAuthCookies, validateSignup } from '../utils';
 
 const router = express.Router();
 
@@ -37,12 +29,8 @@ router.post(
     const user = User.build({ email, password });
     await user.save();
 
-    const token = signJwt({ userId: user.id, email: user.email });
-
-    res.cookie(AUTH_COOKIE_NAME, token, {
-      ...AUTH_COOKIE_OPTIONS,
-      maxAge: AUTH_COOKIE_MAX_AGE,
-    });
+    const session = await issueSessionForUser(user);
+    setAuthCookies(res, session);
 
     res.status(201).send(user);
   }),
