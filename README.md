@@ -4,7 +4,7 @@ Three workflows are supported:
 
 1. `dev`: staged local development with Skaffold (infra first, then app deploy loop).
 2. `prod-local`: local prod-like verification with production Dockerfiles and phased Kubernetes rollout.
-3. `prod-cloud`: cloud deployment through GitHub Actions with registry-pushed images, immutable tags, and runtime-injected secrets.
+3. `prod-cloud`: cloud deployment through GitHub Actions image publishing plus Argo CD reconciliation inside the cluster.
 
 ## Prerequisites
 
@@ -87,14 +87,14 @@ curl -k https://ticketing.dev/api/v1/tickets
 
 ## Cloud Deployment Model
 
-Cloud deployment does not use local TLS files and does not read production secrets from Git.
+Cloud deployment does not use local TLS files and does not store production secrets in Git.
 
 Production path:
 
 - images are built and pushed to GHCR with immutable Git commit tags
-- GitHub Actions creates `prod-common/secrets.generated.env` from repository secrets at runtime
-- GitHub Actions renders `prod-infra` and `prod-cloud-app`
-- GitHub Actions applies the phased rollout to the cluster
+- a GitHub-hosted release workflow renders secret-free production snapshots into `infra/gitops/production`
+- the release workflow commits those snapshots back to the repository
+- Argo CD watches the GitOps path and reconciles the cluster automatically
 - cert-manager manages the public TLS certificate
 
 ### GitHub Actions
@@ -113,17 +113,9 @@ Manual cloud deploy:
 
 ### Required GitHub Secrets
 
-For cloud deploy:
+The GitOps release workflow does not require custom deployment secrets.
 
-- `KUBE_CONFIG_B64`
-- `JWT_SECRET_PROD`
-- `REDIS_PASSWORD_PROD`
-- `STRIPE_SECRET_KEY_PROD`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD`
-
-### Required GitHub Variables
-
-- `LETSENCRYPT_EMAIL`
+GitHub-hosted Actions publish to GHCR using the built-in `GITHUB_TOKEN`.
 
 ### Manual deploy input
 
@@ -136,6 +128,7 @@ That means you do not need to commit a real production domain into the repo. The
 Detailed setup checklists:
 
 - [GitHub secrets checklist](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/github-secrets.md)
+- [Argo CD setup](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/argocd.md)
 - [ingress-nginx install](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/ingress-nginx.md)
 - [cert-manager install](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/cert-manager.md)
 - [Hetzner target layout](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/docs/deployment/hetzner-target-layout.md)
@@ -150,7 +143,8 @@ Local:
 
 Cloud:
 
-- secrets come from GitHub Actions secrets at deploy time
+- Argo CD reads manifests from Git
+- cluster-only secrets such as `app-secret` and `ghcr-creds` stay in Kubernetes and are not committed
 - no production secret file should be committed
 
 This is good enough for an initial small production setup. A stronger next step later would be External Secrets, SOPS, or Sealed Secrets.

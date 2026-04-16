@@ -3,6 +3,8 @@ name: Release Images
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - infra/gitops/production/**
   workflow_dispatch:
 
 permissions:

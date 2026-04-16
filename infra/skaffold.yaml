@@ -101,13 +101,28 @@ profiles:
       kustomize:
         paths:
           - infra/k8s/apps/ticketing/overlays/prod-infra
+  - name: prod-gitops-infra
+    manifests:
+      kustomize:
+        paths:
+          - infra/k8s/apps/ticketing/overlays/prod-gitops-infra
   - name: prod-app
     manifests:
       kustomize:
         paths:
           - infra/k8s/apps/ticketing/overlays/prod-app
+  - name: prod-gitops-app
+    manifests:
+      kustomize:
+        paths:
+          - infra/k8s/apps/ticketing/overlays/prod-gitops-app
   - name: prod-cloud-app
     manifests:
       kustomize:
         paths:
           - infra/k8s/apps/ticketing/overlays/prod-cloud-app
+  - name: prod-gitops-cloud-app
+    manifests:
+      kustomize:
+        paths:
+          - infra/k8s/apps/ticketing/overlays/prod-gitops-cloud-app

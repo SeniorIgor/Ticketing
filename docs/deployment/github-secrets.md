@@ -1,30 +1,28 @@
 # GitHub secrets checklist
 
-## Repository Secrets
+## Repository secrets
 
-Cloud deploy:
+For the current GitOps production release workflow:
 
-- `KUBE_CONFIG_B64`
-- `JWT_SECRET_PROD`
-- `REDIS_PASSWORD_PROD`
-- `STRIPE_SECRET_KEY_PROD`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD`
-
-## Repository Variables
-
-- `LETSENCRYPT_EMAIL`
+- no custom repository secrets are required
+- no custom repository variables are required
 
 ## How values are used
 
 - no registry secrets are required when publishing to GHCR from GitHub Actions with `GITHUB_TOKEN`
-- `KUBE_CONFIG_B64`: authenticate GitHub Actions to the cluster
-- `*_PROD`: generate `infra/k8s/apps/ticketing/overlays/prod-common/secrets.generated.env` at deploy time
-- `LETSENCRYPT_EMAIL`: injected into the cert-manager `ClusterIssuer`
+- `GITHUB_TOKEN`: authenticates the release workflow to GHCR and lets it commit the generated GitOps snapshot back to the repository
 
-## How to create `KUBE_CONFIG_B64`
+## One-time cluster secrets still required
 
-```bash
-kubectl config view --raw | base64
-```
+Before Argo CD can reconcile production successfully, the cluster still needs:
 
-Use the single-line output as the GitHub Secret value.
+- `ingress-nginx`
+- `cert-manager`
+- the `ghcr-creds` image pull secret in `ticketing-prod`
+- the `app-secret` Kubernetes secret in `ticketing-prod`
+
+These stay in the cluster and are not stored in Git.
+
+Recommended next step later:
+
+- replace manual cluster secrets with SOPS, Sealed Secrets, or External Secrets

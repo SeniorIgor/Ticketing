@@ -4,8 +4,7 @@ kind: Kustomization
 namespace: ticketing-prod
 
 resources:
-  - namespace.yaml
-  - app-config.yaml
+  - ../prod-shared
 
 secretGenerator:
   - name: app-secret

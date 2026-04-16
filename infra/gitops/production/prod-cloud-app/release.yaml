@@ -1,0 +1,469 @@
+apiVersion: v1
+data:
+  kong.yml: |
+    _format_version: "3.0"
+
+    services:
+      - name: auth
+        url: http://auth-srv:80
+        routes:
+          - name: auth-users
+            paths:
+              - /api/v1/users
+            strip_path: false
+      - name: tickets
+        url: http://tickets-srv:80
+        routes:
+          - name: tickets
+            paths:
+              - /api/v1/tickets
+            strip_path: false
+      - name: orders
+        url: http://orders-srv:80
+        routes:
+          - name: orders
+            paths:
+              - /api/v1/orders
+            strip_path: false
+      - name: payments
+        url: http://payments-srv:80
+        routes:
+          - name: payments
+            paths:
+              - /api/v1/payments
+            strip_path: false
+kind: ConfigMap
+metadata:
+  name: kong-declarative
+  namespace: ticketing-prod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: auth
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-gateway-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  selector:
+    app: client-gateway
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: client
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: orders
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: payments
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-srv
+  namespace: ticketing-prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: tickets
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-auth:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:86f9f632bd11f796221e6ea49a09fe6426593cf8180893ea83315233751c541e
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+          name: auth
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-client:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:e323648219af019253f1bc373372dff83e59bbfc27a7ada9c11c9b15f712fbd7
+          name: client
+          ports:
+            - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-gateway
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-gateway
+  template:
+    metadata:
+      labels:
+        app: client-gateway
+    spec:
+      containers:
+        - env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /kong/kong.yml
+            - name: KONG_PROXY_LISTEN
+              value: 0.0.0.0:8000
+            - name: KONG_ADMIN_LISTEN
+              value: 0.0.0.0:8001
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_LOG_LEVEL
+              value: info
+          image: kong:3.6
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 10
+          name: kong
+          ports:
+            - containerPort: 8000
+              name: proxy
+            - containerPort: 8001
+              name: admin
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 24
+            httpGet:
+              path: /status
+              port: admin
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /kong/kong.yml
+              name: kong-config
+              subPath: kong.yml
+      volumes:
+        - configMap:
+            name: kong-declarative
+          name: kong-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration
+  template:
+    metadata:
+      labels:
+        app: expiration
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-expiration:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:e6c1cc3271187d0a4a41b69cd264c87e0d6fdb27ea5e263a9532cf3c43d2e9cf
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+          name: expiration
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-orders:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:b8eb024aceac1222a202ad62a39910d5aca17d88e97d95111bc37d21401301a1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+          name: orders
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-payments:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:40d975efb02c9369c7c1364ff9f877b5baf2e0927ace3d33f5064e158db0f68a
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+          name: payments
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-depl
+  namespace: ticketing-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tickets
+  template:
+    metadata:
+      labels:
+        app: tickets
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          image: ghcr.io/seniorigor/ticketing-tickets:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:3d337fa3593315a776f503183bfed3055135228afe0e1e2d1339432f28026c62
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+          name: tickets
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 80
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  name: ingress-srv
+  namespace: ticketing-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ticketing-online.cloud
+      http:
+        paths:
+          - backend:
+              service:
+                name: client-gateway-srv
+                port:
+                  number: 80
+            path: /api
+            pathType: Prefix
+          - backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - ticketing-online.cloud
+      secretName: ticketing-cloud-tls

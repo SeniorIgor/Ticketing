@@ -28,7 +28,9 @@ PROD_TLS_KEY=$(PROD_TLS_DIR)/ticketing.dev.key
 	dev-secrets-local dev-tls-local dev-tls-reset dev-wait-infra dev-stage-infra dev dev-debug dev-tail-gateway dev-tail-gateway-raw dev-tail-services dev-down dev-clean \
 	prod-local-secrets prod-tls-local prod-tls-reset \
 	prod-local-build prod-local-render prod-local-wait-infra prod-local-wait-app prod-local-restart-app prod-local-apply prod-local-status prod-local-down prod-local-stop prod-local-start prod-local-tail \
-	prod-cloud-render
+	prod-cloud-render \
+	prod-cluster-app-secret prod-cluster-ghcr-creds \
+	prod-argocd-install prod-argocd-apps prod-argocd-status
 
 # Namespace setup
 ensure-dev-ns:
@@ -144,6 +146,43 @@ prod-local-render: prod-local-build
 prod-cloud-render: prod-local-build
 	skaffold render -f $(SKAFFOLD_CONFIG) -p $(PROD_LOCAL_BUILD_PROFILE),prod-infra -a $(PROD_ARTIFACTS) --output=$(PROD_RENDERED_INFRA)
 	skaffold render -f $(SKAFFOLD_CONFIG) -p $(PROD_LOCAL_BUILD_PROFILE),prod-cloud-app -a $(PROD_ARTIFACTS) --output=$(PROD_RENDERED_CLOUD_APP)
+
+# Create or update the in-cluster production app secret from the ignored .env.prod file.
+prod-cluster-app-secret: ensure-prod-ns
+	test -f $(PROD_ENV) || { echo "Missing $(PROD_ENV). Copy .env.prod.example to $(PROD_ENV) and fill in values."; exit 1; }
+	for key in $(SECRET_KEYS); do \
+		grep -q "^$$key=" $(PROD_ENV) || { echo "Missing $$key in $(PROD_ENV)"; exit 1; }; \
+	done
+	kubectl create secret generic app-secret -n ticketing-prod --from-env-file=$(PROD_ENV) --dry-run=client -o yaml | kubectl apply -f -
+
+# Create or update the in-cluster GHCR pull secret.
+# Usage:
+#   GHCR_USERNAME=SeniorIgor GHCR_PAT=... GHCR_EMAIL=you@example.com make prod-cluster-ghcr-creds
+prod-cluster-ghcr-creds: ensure-prod-ns
+	test -n "$$GHCR_USERNAME" || { echo "Missing GHCR_USERNAME"; exit 1; }
+	test -n "$$GHCR_PAT" || { echo "Missing GHCR_PAT"; exit 1; }
+	test -n "$$GHCR_EMAIL" || { echo "Missing GHCR_EMAIL"; exit 1; }
+	kubectl create secret docker-registry ghcr-creds \
+		-n ticketing-prod \
+		--docker-server=ghcr.io \
+		--docker-username="$$GHCR_USERNAME" \
+		--docker-password="$$GHCR_PAT" \
+		--docker-email="$$GHCR_EMAIL" \
+		--dry-run=client -o yaml | kubectl apply -f -
+
+# Install Argo CD into the cluster.
+prod-argocd-install:
+	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# Apply the Argo CD Applications defined in this repo.
+prod-argocd-apps:
+	kubectl apply -k infra/argocd
+
+# Quick Argo CD health check.
+prod-argocd-status:
+	kubectl get pods -n argocd
+	kubectl get applications -n argocd
 
 # Wait until the infra phase is actually usable before the app phase starts.
 prod-local-wait-infra:
