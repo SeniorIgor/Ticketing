@@ -91,7 +91,7 @@ Cloud deployment does not use local TLS files and does not read production secre
 
 Production path:
 
-- images are built and pushed to Docker Hub with immutable Git commit tags
+- images are built and pushed to GHCR with immutable Git commit tags
 - GitHub Actions creates `prod-common/secrets.generated.env` from repository secrets at runtime
 - GitHub Actions renders `prod-infra` and `prod-cloud-app`
 - GitHub Actions applies the phased rollout to the cluster
@@ -113,15 +113,8 @@ Manual cloud deploy:
 
 ### Required GitHub Secrets
 
-For image release:
-
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
 For cloud deploy:
 
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
 - `KUBE_CONFIG_B64`
 - `JWT_SECRET_PROD`
 - `REDIS_PASSWORD_PROD`

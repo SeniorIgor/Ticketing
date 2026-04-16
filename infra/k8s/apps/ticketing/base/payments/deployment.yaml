@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: payments
-          image: seniorigortyapkin/payments
+          image: ghcr.io/seniorigor/ticketing-payments
           envFrom:
             - configMapRef:
                 name: app-config

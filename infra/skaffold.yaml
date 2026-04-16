@@ -11,37 +11,37 @@ build:
     push: false
     useBuildkit: true
   artifacts:
-    - image: seniorigortyapkin/client
+    - image: ghcr.io/seniorigor/ticketing-client
       context: .
       docker:
         dockerfile: apps/client/Dockerfile.dev
 
-    - image: seniorigortyapkin/auth
+    - image: ghcr.io/seniorigor/ticketing-auth
       context: .
       docker:
         dockerfile: apps/auth/Dockerfile.dev
 
-    - image: seniorigortyapkin/tickets
+    - image: ghcr.io/seniorigor/ticketing-tickets
       context: .
       docker:
         dockerfile: apps/tickets/Dockerfile.dev
 
-    - image: seniorigortyapkin/orders
+    - image: ghcr.io/seniorigor/ticketing-orders
       context: .
       docker:
         dockerfile: apps/orders/Dockerfile.dev
 
-    - image: seniorigortyapkin/expiration
+    - image: ghcr.io/seniorigor/ticketing-expiration
       context: .
       docker:
         dockerfile: apps/expiration/Dockerfile.dev
 
-    - image: seniorigortyapkin/payments
+    - image: ghcr.io/seniorigor/ticketing-payments
       context: .
       docker:
         dockerfile: apps/payments/Dockerfile.dev
 
-    - image: seniorigortyapkin/event-bus-bootstrap
+    - image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap
       context: .
       docker:
         dockerfile: apps/event-bus-bootstrap/Dockerfile.dev
@@ -62,35 +62,37 @@ profiles:
           - infra/k8s/apps/ticketing/overlays/dev-infra
   - name: prod-images
     build:
+      platforms:
+        - linux/amd64
       local:
         push: false
         useBuildkit: true
       artifacts:
-        - image: seniorigortyapkin/client
+        - image: ghcr.io/seniorigor/ticketing-client
           context: .
           docker:
             dockerfile: apps/client/Dockerfile
-        - image: seniorigortyapkin/auth
+        - image: ghcr.io/seniorigor/ticketing-auth
           context: .
           docker:
             dockerfile: apps/auth/Dockerfile
-        - image: seniorigortyapkin/tickets
+        - image: ghcr.io/seniorigor/ticketing-tickets
           context: .
           docker:
             dockerfile: apps/tickets/Dockerfile
-        - image: seniorigortyapkin/orders
+        - image: ghcr.io/seniorigor/ticketing-orders
           context: .
           docker:
             dockerfile: apps/orders/Dockerfile
-        - image: seniorigortyapkin/expiration
+        - image: ghcr.io/seniorigor/ticketing-expiration
           context: .
           docker:
             dockerfile: apps/expiration/Dockerfile
-        - image: seniorigortyapkin/payments
+        - image: ghcr.io/seniorigor/ticketing-payments
           context: .
           docker:
             dockerfile: apps/payments/Dockerfile
-        - image: seniorigortyapkin/event-bus-bootstrap
+        - image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap
           context: .
           docker:
             dockerfile: apps/event-bus-bootstrap/Dockerfile

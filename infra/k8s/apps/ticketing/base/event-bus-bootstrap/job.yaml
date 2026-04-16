@@ -34,7 +34,7 @@ spec:
               done
       containers:
         - name: event-bus-bootstrap
-          image: seniorigortyapkin/event-bus-bootstrap
+          image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap
           envFrom:
             - configMapRef:
                 name: app-config

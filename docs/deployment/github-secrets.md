@@ -2,15 +2,8 @@
 
 ## Repository Secrets
 
-Image release:
-
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
 Cloud deploy:
 
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
 - `KUBE_CONFIG_B64`
 - `JWT_SECRET_PROD`
 - `REDIS_PASSWORD_PROD`
@@ -23,7 +16,7 @@ Cloud deploy:
 
 ## How values are used
 
-- `DOCKERHUB_*`: push immutable images from GitHub Actions
+- no registry secrets are required when publishing to GHCR from GitHub Actions with `GITHUB_TOKEN`
 - `KUBE_CONFIG_B64`: authenticate GitHub Actions to the cluster
 - `*_PROD`: generate `infra/k8s/apps/ticketing/overlays/prod-common/secrets.generated.env` at deploy time
 - `LETSENCRYPT_EMAIL`: injected into the cert-manager `ClusterIssuer`

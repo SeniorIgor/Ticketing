@@ -20,6 +20,9 @@ spec:
                 name: app-config
           ports:
             - containerPort: 27017
+          volumeMounts:
+            - name: orders-mongo-data
+              mountPath: /data/db
           startupProbe:
             tcpSocket:
               port: 27017
@@ -35,3 +38,7 @@ spec:
               port: 27017
             periodSeconds: 10
             failureThreshold: 3
+      volumes:
+        - name: orders-mongo-data
+          persistentVolumeClaim:
+            claimName: orders-mongo-data
