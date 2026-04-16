@@ -142,7 +142,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-auth:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:86f9f632bd11f796221e6ea49a09fe6426593cf8180893ea83315233751c541e
+          image: ghcr.io/seniorigor/ticketing-auth:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:9a782ffb2bc7de099f37ae7689e1fb9f03b10a4cf01ef1d958dcbb1538e9c231
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -186,7 +186,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-client:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:e323648219af019253f1bc373372dff83e59bbfc27a7ada9c11c9b15f712fbd7
+          image: ghcr.io/seniorigor/ticketing-client:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:46bfc0bd1ade96b6229123cf3c8be31168710a4d177ca0b88412d3db388c44f5
           name: client
           ports:
             - containerPort: 3000
@@ -281,7 +281,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-expiration:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:e6c1cc3271187d0a4a41b69cd264c87e0d6fdb27ea5e263a9532cf3c43d2e9cf
+          image: ghcr.io/seniorigor/ticketing-expiration:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:26606324d80093aa2e75c3adaf6a6fccd3c73cc5416d2da3deb37e2043f7382a
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -325,7 +325,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-orders:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:b8eb024aceac1222a202ad62a39910d5aca17d88e97d95111bc37d21401301a1
+          image: ghcr.io/seniorigor/ticketing-orders:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:ce1224ab0b92c5f33643832a8d7d122f9c33275c9e3ca530a3b16119d04b4b79
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -369,7 +369,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-payments:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:40d975efb02c9369c7c1364ff9f877b5baf2e0927ace3d33f5064e158db0f68a
+          image: ghcr.io/seniorigor/ticketing-payments:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:4ff6a609fa908282d4f9d48555ac92c84129b31459a611d3132afcfe3ba45f30
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -413,7 +413,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-tickets:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:3d337fa3593315a776f503183bfed3055135228afe0e1e2d1339432f28026c62
+          image: ghcr.io/seniorigor/ticketing-tickets:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:f953ea6eabf3c6ac048a942a0ad945b7ba538cd291bc93b3d1b9d2061e046fc6
           livenessProbe:
             failureThreshold: 3
             httpGet:

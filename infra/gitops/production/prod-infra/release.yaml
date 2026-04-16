@@ -554,7 +554,7 @@ spec:
         - envFrom:
             - configMapRef:
                 name: app-config
-          image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap:45fbc1ba828c70a6a4fa0506214fda76a97ccb31-dirty@sha256:0ecee9f964f909c27ecffde03a0c5cb3a032cc2da8bfa9fba6fad44e928dd844
+          image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap:783013f669b0d0841570351c9667a71d8ef158fc-dirty@sha256:89c77e921864fa35d4a5799065d12a30537e8d394d23ac59b9f116a752e791eb
           name: event-bus-bootstrap
       initContainers:
         - command:
