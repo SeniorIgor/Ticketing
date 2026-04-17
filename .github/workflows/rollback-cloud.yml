@@ -12,6 +12,9 @@ env:
 jobs:
   rollback-production:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.PRODUCTION_HOSTNAME }}
 
     steps:
       - uses: actions/checkout@v5

@@ -19,6 +19,9 @@ env:
 jobs:
   release-production:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.PRODUCTION_HOSTNAME }}
     env:
       SKAFFOLD_VERSION: v2.17.0
       TICKETING_HOSTNAME: ${{ vars.PRODUCTION_HOSTNAME }}
