@@ -541,6 +541,9 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
   name: event-bus-bootstrap
   namespace: ticketing-prod
 spec:
@@ -554,7 +557,7 @@ spec:
         - envFrom:
             - configMapRef:
                 name: app-config
-          image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap:342ca58c0f94fb2ddd05bb65d22ac7817bf26e58-dirty@sha256:b5109ea7582450b94dff5fd4acedfadde7d3a09091d4f4a4345f1a8a06d3f3ac
+          image: ghcr.io/seniorigor/ticketing-event-bus-bootstrap:8767e87b19706308120c5b0d72779c7df3aeb4cb-dirty@sha256:7ad8ef38b70691494973079c7e4161e440472e311a14f3e52e1c90cc2bf69619
           name: event-bus-bootstrap
       initContainers:
         - command:
@@ -578,4 +581,3 @@ spec:
           image: busybox:1.36
           name: wait-for-redis
       restartPolicy: OnFailure
-  ttlSecondsAfterFinished: 3600
