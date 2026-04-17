@@ -103,13 +103,13 @@ Checks:
 
 - `.github/workflows/ci.yml`
 
-Image release:
-
-- `.github/workflows/image-release.yml`
-
-Manual cloud deploy:
+Production release:
 
 - `.github/workflows/deploy-cloud.yml`
+
+Production rollback:
+
+- `.github/workflows/rollback-cloud.yml`
 
 ### Required GitHub Secrets
 
@@ -123,13 +123,37 @@ GitHub-hosted Actions publish to GHCR using the built-in `GITHUB_TOKEN`.
 
 ### Release trigger
 
-The `Deploy Cloud` workflow is started manually from the Actions tab.
+Normal production releases are triggered by pushing a tag that starts with `prod-v`.
+
+Example:
+
+```bash
+make deploy-prod
+```
 
 For this repository, the hostname comes from the repository variable:
 
 - `PRODUCTION_HOSTNAME=ticketing-online.cloud`
 
 That keeps the release workflow simple and avoids typing the same hostname every time.
+
+### Release behavior
+
+- tag-triggered releases build only the affected service images when possible
+- Argo CD watches the committed `release.yaml` snapshots and rolls only workloads whose manifests changed
+
+### Fast rollback
+
+Use the `Rollback Cloud` workflow when you need to move production back quickly without rebuilding images or reverting source code.
+
+It restores the previous GitOps snapshot in:
+
+- `infra/gitops/production/prod-infra/release.yaml`
+- `infra/gitops/production/prod-cloud-app/release.yaml`
+
+Then Argo CD syncs the cluster back to that previously published image set.
+
+The rollback workflow is intentionally limited to the immediately previous published production snapshot. That keeps emergency rollback fast and predictable.
 
 Detailed setup checklists:
 

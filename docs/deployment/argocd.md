@@ -66,24 +66,39 @@ The `default` service account is now declared in Git and references `ghcr-creds`
 
 ## 4) Release flow
 
-Run the GitHub Actions workflow:
-
-- [deploy-cloud.yml](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/.github/workflows/deploy-cloud.yml)
-
-Before the first release, set this repository variable:
+Set this repository variable once:
 
 - `PRODUCTION_HOSTNAME=ticketing-online.cloud`
+
+Normal production release:
+
+```bash
+make deploy-prod
+```
+
+- [deploy-cloud.yml](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/.github/workflows/deploy-cloud.yml)
 
 It will:
 
 1. build and push immutable production images to GHCR
-2. render `prod-gitops-infra` and `prod-gitops-cloud-app`
-3. commit the generated YAML into `infra/gitops/production`
-4. push that commit back to the repository
+2. build only affected services for tag releases when possible
+3. render `prod-gitops-infra` and `prod-gitops-cloud-app`
+4. commit the generated YAML into `infra/gitops/production`
+5. push that commit back to the repository
 
 Argo CD then detects the Git change and syncs the cluster.
 
-## 5) Initial bootstrap order
+## 5) Fast rollback
+
+Use:
+
+- [rollback-cloud.yml](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/.github/workflows/rollback-cloud.yml)
+
+This workflow does not rebuild images and does not revert source code.
+
+Instead it restores the immediately previous committed production `release.yaml` snapshot, commits that rollback snapshot to `master`, and lets Argo CD move the cluster back to the older published images.
+
+## 6) Initial bootstrap order
 
 For the first setup:
 
@@ -94,4 +109,4 @@ For the first setup:
 5. create `app-secret`
 6. install Argo CD
 7. apply `infra/argocd`
-8. run the `Deploy Cloud` workflow once
+8. push a `prod-v*` tag once with `make deploy-prod`

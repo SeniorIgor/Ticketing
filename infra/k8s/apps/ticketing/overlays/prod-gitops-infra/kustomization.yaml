@@ -12,3 +12,16 @@ resources:
   - ../../base/event-bus
   - ../../base/redis
   - ../../base/event-bus-bootstrap
+
+patches:
+  - target:
+      kind: Job
+      name: event-bus-bootstrap
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/hook: PostSync
+          argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+      - op: remove
+        path: /spec/ttlSecondsAfterFinished
