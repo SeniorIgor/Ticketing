@@ -173,7 +173,7 @@ prod-cluster-ghcr-creds: ensure-prod-ns
 # Install Argo CD into the cluster.
 prod-argocd-install:
 	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Apply the Argo CD Applications defined in this repo.
 prod-argocd-apps:

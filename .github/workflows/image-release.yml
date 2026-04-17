@@ -1,15 +1,14 @@
 name: Release Images
 
 on:
-  push:
-    branches: [master]
-    paths-ignore:
-      - infra/gitops/production/**
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-push:
@@ -24,7 +23,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Skaffold

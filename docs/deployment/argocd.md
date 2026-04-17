@@ -70,6 +70,10 @@ Run the GitHub Actions workflow:
 
 - [deploy-cloud.yml](/Users/user/Drafts/personal/Microservices%20Udemy%20Course/ticketing/.github/workflows/deploy-cloud.yml)
 
+Before the first release, set this repository variable:
+
+- `PRODUCTION_HOSTNAME=ticketing-online.cloud`
+
 It will:
 
 1. build and push immutable production images to GHCR

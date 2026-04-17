@@ -117,13 +117,19 @@ The GitOps release workflow does not require custom deployment secrets.
 
 GitHub-hosted Actions publish to GHCR using the built-in `GITHUB_TOKEN`.
 
-### Manual deploy input
+### Required GitHub Variables
 
-The `Deploy Cloud` workflow asks for:
+- `PRODUCTION_HOSTNAME`
 
-- `hostname`
+### Release trigger
 
-That means you do not need to commit a real production domain into the repo. The workflow injects the hostname at deploy time.
+The `Deploy Cloud` workflow is started manually from the Actions tab.
+
+For this repository, the hostname comes from the repository variable:
+
+- `PRODUCTION_HOSTNAME=ticketing-online.cloud`
+
+That keeps the release workflow simple and avoids typing the same hostname every time.
 
 Detailed setup checklists:
 
