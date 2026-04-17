@@ -1,0 +1,43 @@
+name: Rollback Cloud
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  rollback-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Select rollback target
+        id: rollback
+        run: |
+          TARGET_REVISION="$(git log --format=%H -- infra/gitops/production/prod-infra/release.yaml infra/gitops/production/prod-cloud-app/release.yaml | sed -n '2p')"
+          test -n "${TARGET_REVISION}"
+          echo "target=${TARGET_REVISION}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore previous GitOps snapshot
+        run: |
+          git show "${{ steps.rollback.outputs.target }}:infra/gitops/production/prod-infra/release.yaml" > infra/gitops/production/prod-infra/release.yaml
+          git show "${{ steps.rollback.outputs.target }}:infra/gitops/production/prod-cloud-app/release.yaml" > infra/gitops/production/prod-cloud-app/release.yaml
+
+      - name: Commit rollback snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add infra/gitops/production/prod-infra/release.yaml infra/gitops/production/prod-cloud-app/release.yaml
+          if git diff --staged --quiet; then
+            echo "No rollback changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(rollback): restore production manifests from ${{ steps.rollback.outputs.target }} [skip ci]"
+          git push origin HEAD:master

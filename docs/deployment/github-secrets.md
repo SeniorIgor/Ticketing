@@ -13,6 +13,18 @@ For the current GitOps production release workflow:
 - `GITHUB_TOKEN`: authenticates the release workflow to GHCR and lets it commit the generated GitOps snapshot back to the repository
 - `PRODUCTION_HOSTNAME`: injected into the production cloud ingress before the GitOps snapshot is rendered
 
+## Release entrypoints
+
+Production release:
+
+- push a tag matching `prod-v*`
+- easiest path: `make deploy-prod`
+
+Emergency rollback:
+
+- run the `Rollback Cloud` workflow from GitHub Actions
+- it will restore the immediately previous production snapshot
+
 ## One-time cluster secrets still required
 
 Before Argo CD can reconcile production successfully, the cluster still needs:

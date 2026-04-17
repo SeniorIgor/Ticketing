@@ -30,7 +30,8 @@ PROD_TLS_KEY=$(PROD_TLS_DIR)/ticketing.dev.key
 	prod-local-build prod-local-render prod-local-wait-infra prod-local-wait-app prod-local-restart-app prod-local-apply prod-local-status prod-local-down prod-local-stop prod-local-start prod-local-tail \
 	prod-cloud-render \
 	prod-cluster-app-secret prod-cluster-ghcr-creds \
-	prod-argocd-install prod-argocd-apps prod-argocd-status
+	prod-argocd-install prod-argocd-apps prod-argocd-status \
+	deploy-prod deploy-prod-minor deploy-prod-major
 
 # Namespace setup
 ensure-dev-ns:
@@ -183,6 +184,16 @@ prod-argocd-apps:
 prod-argocd-status:
 	kubectl get pods -n argocd
 	kubectl get applications -n argocd
+
+# Create and push the next production release tag.
+deploy-prod:
+	bash bin/create_release_tag.sh -e prod
+
+deploy-prod-minor:
+	bash bin/create_release_tag.sh -e prod -b minor
+
+deploy-prod-major:
+	bash bin/create_release_tag.sh -e prod -b major
 
 # Wait until the infra phase is actually usable before the app phase starts.
 prod-local-wait-infra:
