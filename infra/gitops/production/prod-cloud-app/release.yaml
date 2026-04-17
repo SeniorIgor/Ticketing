@@ -186,7 +186,7 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secret
-          image: ghcr.io/seniorigor/ticketing-client:342ca58c0f94fb2ddd05bb65d22ac7817bf26e58-dirty@sha256:7e8aaf2fa65e2f86c89c4ff53981a9cc8f30eec39554694d01354d4add518f0b
+          image: ghcr.io/seniorigor/ticketing-client:80f6c54fa12f624e9ca0cbaac3bec32ae0a3f9bc-dirty@sha256:7dcae6236d37f6d69149936c1c84180dca13311b6ea803f09156e436ba65de89
           name: client
           ports:
             - containerPort: 3000

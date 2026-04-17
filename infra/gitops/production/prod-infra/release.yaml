@@ -541,6 +541,9 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
   name: event-bus-bootstrap
   namespace: ticketing-prod
 spec:
@@ -578,4 +581,3 @@ spec:
           image: busybox:1.36
           name: wait-for-redis
       restartPolicy: OnFailure
-  ttlSecondsAfterFinished: 3600
