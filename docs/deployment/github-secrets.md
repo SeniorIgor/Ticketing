@@ -5,12 +5,13 @@
 For the current GitOps production release workflow:
 
 - no custom repository secrets are required
-- no custom repository variables are required
+- one repository variable is required: `PRODUCTION_HOSTNAME`
 
 ## How values are used
 
 - no registry secrets are required when publishing to GHCR from GitHub Actions with `GITHUB_TOKEN`
 - `GITHUB_TOKEN`: authenticates the release workflow to GHCR and lets it commit the generated GitOps snapshot back to the repository
+- `PRODUCTION_HOSTNAME`: injected into the production cloud ingress before the GitOps snapshot is rendered
 
 ## One-time cluster secrets still required
 
